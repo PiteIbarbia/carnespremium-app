@@ -25,10 +25,7 @@ jobs:
           python -c "
           import os, urllib.request, json, datetime
           
-          api_url = os.environ.get('SHEETS_API_URL', '')
-          if not api_url:
-              print('No se configuró SHEETS_API_URL. Saltando descarga en vivo.')
-              exit(0)
+          api_url = os.environ.get('SHEETS_API_URL', '') or 'https://script.google.com/macros/s/AKfycbzE0NUBtDRgMQDmtDeUcy4QpO82lutlR-66wvWYpMLUsA2e0-01vcu3LrTFMlIdk7nFXg/exec'
               
           today = datetime.datetime.now().strftime('%Y-%m-%d')
           os.makedirs('backups', exist_ok=True)
