@@ -3,30 +3,34 @@
  * GESTIÓN DE CARNICERÍA - JUANITO & LUCAS
  * Backend API & Automatizaciones para Google Sheets
  * ====================================================================
- * 
- * INSTRUCCIONES DE INSTALACIÓN:
- * 1. En tu Google Sheet, ve a: Extensiones > Apps Script.
- * 2. Borra todo el código que haya y pega este archivo completo.
- * 3. Haz clic en "Guardar" (ícono de disco).
- * 4. Haz clic en "Implementar" (botón azul arriba a la derecha) > "Nueva implementación".
- * 5. Selecciona Tipo: "Aplicación web".
- * 6. Configura:
- *    - Descripción: "API Carnicería v1"
- *    - Ejecutar como: "Yo" (tu cuenta)
- *    - Quién tiene acceso: "Cualquier persona" (Anyone)
- * 7. Haz clic en "Implementar" y autoriza los permisos.
- * 8. Copia la URL de la aplicación web generada (la usarás en la App).
  */
 
-// Menú personalizado al abrir el Google Sheet
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
-  ui.createMenu('🥩 Gestión Carnes')
+  ui.createMenu('🥩 Carnes Premium')
     .addItem('📊 Recalcular Totales', 'recalcularTodo')
     .addItem('💾 Generar Respaldo Manual', 'generarRespaldoInterno')
     .addSeparator()
     .addItem('📱 Información de la API', 'mostrarInfoAPI')
     .addToUi();
+}
+
+/**
+ * Función inteligente para encontrar una hoja por varios nombres posibles
+ */
+function obtenerHoja(ss, nombres) {
+  for (let i = 0; i < nombres.length; i++) {
+    const s = ss.getSheetByName(nombres[i]);
+    if (s) return s;
+  }
+  const allSheets = ss.getSheets();
+  for (let i = 0; i < allSheets.length; i++) {
+    const name = allSheets[i].getName().trim().toLowerCase();
+    for (let j = 0; j < nombres.length; j++) {
+      if (name === nombres[j].trim().toLowerCase()) return allSheets[i];
+    }
+  }
+  return null;
 }
 
 /**
@@ -40,16 +44,16 @@ function doGet(e) {
     let data = {};
 
     if (action === 'all' || action === 'productos') {
-      data.productos = leerHojaComoJSON(ss.getSheetByName('PRODUCTOS'));
+      data.productos = leerHojaComoJSON(obtenerHoja(ss, ['PRODUCTOS', 'Cortes de Carne', 'Cortes', 'Productos']));
     }
     if (action === 'all' || action === 'clientes') {
-      data.clientes = leerHojaComoJSON(ss.getSheetByName('CLIENTES'));
+      data.clientes = leerHojaComoJSON(obtenerHoja(ss, ['CLIENTES', 'Clientes', 'cta cte clientes']));
     }
     if (action === 'all' || action === 'ventas') {
-      data.ventas = leerHojaComoJSON(ss.getSheetByName('VENTAS'));
+      data.ventas = leerHojaComoJSON(obtenerHoja(ss, ['VENTAS', 'Ventas', 'Registro de Ventas']));
     }
     if (action === 'all' || action === 'lucas') {
-      data.lucas = leerHojaComoJSON(ss.getSheetByName('LUCAS'));
+      data.lucas = leerHojaComoJSON(obtenerHoja(ss, ['LUCAS', 'Lucas', 'cta cte Lucas', 'Cta cte Lucas']));
     }
 
     return ContentService.createTextOutput(JSON.stringify({ status: 'success', data: data }))
@@ -70,7 +74,15 @@ function doPost(e) {
     const action = payload.action;
 
     if (action === 'nueva_venta') {
-      const sheetVentas = ss.getSheetByName('VENTAS');
+      let sheetVentas = obtenerHoja(ss, ['VENTAS', 'Ventas', 'Registro de Ventas']);
+      if (!sheetVentas) {
+        sheetVentas = ss.insertSheet('VENTAS');
+        sheetVentas.appendRow([
+          'ID', 'FECHA', 'MES', 'CLIENTE', 'CORTE', 'KG_VENDIDOS', 'COSTO_X_KG',
+          'COSTO_TOTAL', 'PRECIO_X_KG', 'TOTAL_VENTA', 'GANANCIA_TOTAL', 'NETO_JUANITO',
+          'NETO_LUCAS', 'MEDIO_PAGO', 'MONTO_RECIBIDO', 'SALDO_CLIENTE', 'ESTADO_PAGO', 'OBSERVACIONES'
+        ]);
+      }
       const v = payload.venta;
       
       const newRow = [
@@ -104,7 +116,11 @@ function doPost(e) {
     }
 
     if (action === 'nuevo_pago_lucas') {
-      const sheetLucas = ss.getSheetByName('LUCAS');
+      let sheetLucas = obtenerHoja(ss, ['LUCAS', 'Lucas', 'cta cte Lucas']);
+      if (!sheetLucas) {
+        sheetLucas = ss.insertSheet('LUCAS');
+        sheetLucas.appendRow(['ID', 'FECHA', 'CONCEPTO', 'MEDIO_PAGO', 'PAGO_A_LUCAS', 'COSTO_CARNE', 'SALDO', 'NOTAS']);
+      }
       const l = payload.lucas;
       
       const newRow = [
@@ -149,7 +165,7 @@ function leerHojaComoJSON(sheet) {
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    if (row.every(cell => cell === '')) continue; // Saltar filas vacías
+    if (row.every(cell => cell === '')) continue;
     
     let obj = {};
     for (let j = 0; j < headers.length; j++) {
@@ -167,8 +183,8 @@ function recalcularTodo() {
 function mostrarInfoAPI() {
   const ui = SpreadsheetApp.getUi();
   ui.alert(
-    'Conexión API',
-    'Para conectar tu App Móvil:\n\n1. Ve a "Implementar" > "Gestionar implementaciones".\n2. Copia la URL de la aplicación web.\n3. Pégala en la pestaña Configuración de tu App de GitHub.',
+    'Conexión API Activa',
+    'Tu API de Google Sheets está conectada correctamente con tu App de Carnes Premium en GitHub Pages.',
     ui.ButtonSet.OK
   );
 }

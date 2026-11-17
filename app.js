@@ -151,12 +151,27 @@ function populateProductSelect() {
   });
 }
 
+function normalizeClient(c) {
+  const nombre = c.cliente || c.nombre || '';
+  const tel = c.teléfono_contacto || c.telefono_contacto || c.teléfono || c.telefono || '';
+  const cleanTel = String(tel).replace(/[^0-9]/g, '');
+  return {
+    id: c.id || nombre,
+    nombre: nombre,
+    telefono: tel,
+    telefono_whatsapp: cleanTel,
+    domicilio: c.domicilio || c.dirección || c.direccion || '',
+    notas: c.notas || c.observaciones || ''
+  };
+}
+
 function populateClientDatalist() {
   const datalist = document.getElementById('clientesDatalist');
   if (!datalist) return;
 
   datalist.innerHTML = '';
   AppState.clientes.forEach(c => {
+    if (!c.nombre) return;
     const opt = document.createElement('option');
     opt.value = c.nombre;
     datalist.appendChild(opt);
@@ -679,7 +694,9 @@ async function syncFromSheetsSilently() {
 
     if (json.status === 'success' && json.data) {
       if (json.data.productos && json.data.productos.length > 0) AppState.productos = json.data.productos;
-      if (json.data.clientes && json.data.clientes.length > 0) AppState.clientes = json.data.clientes;
+      if (json.data.clientes && json.data.clientes.length > 0) {
+        AppState.clientes = json.data.clientes.map(normalizeClient);
+      }
       if (json.data.ventas && json.data.ventas.length > 0) AppState.ventas = json.data.ventas;
       if (json.data.lucas && json.data.lucas.length > 0) AppState.lucas = json.data.lucas;
 
