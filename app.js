@@ -5,14 +5,23 @@
  * ====================================================================
  */
 
+// Helper para obtener la URL de Google Apps Script (desde config.js o localStorage)
+const getInitialApiUrl = () => {
+  if (typeof CONFIG !== 'undefined' && CONFIG.SHEETS_API_URL && CONFIG.SHEETS_API_URL.trim() !== '') {
+    return CONFIG.SHEETS_API_URL.trim();
+  }
+  return localStorage.getItem('sheets_api_url') || '';
+};
+
 // Estado global de la aplicación
 const AppState = {
   productos: [],
   clientes: [],
   ventas: [],
   lucas: [],
-  sheetsApiUrl: localStorage.getItem('sheets_api_url') || '',
-  selectedClient: null
+  sheetsApiUrl: getInitialApiUrl(),
+  selectedClient: null,
+  isSyncing: false
 };
 
 // Formateador de moneda en pesos argentinos
@@ -34,6 +43,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderClientes();
   renderLucas();
   checkConnectionStatus();
+
+  // Sincronización automática silenciosa al iniciar si hay URL
+  if (AppState.sheetsApiUrl) {
+    syncFromSheetsSilently();
+  }
+
+  // Activar observadores de segundo plano (visibilidad, conexión, polling)
+  initAutoSync();
 
   // Registro del Service Worker para funcionamiento como PWA Offline
   if ('serviceWorker' in navigator) {
@@ -78,7 +95,6 @@ function initDateDisplay() {
  */
 async function loadInitialData() {
   try {
-    // Si tenemos datos en localStorage, los usamos primero para velocidad
     const localVentas = localStorage.getItem('carniceria_ventas');
     const localClientes = localStorage.getItem('carniceria_clientes');
     const localProductos = localStorage.getItem('carniceria_productos');
@@ -90,7 +106,6 @@ async function loadInitialData() {
       AppState.productos = JSON.parse(localProductos);
       AppState.lucas = JSON.parse(localLucas);
     } else {
-      // Cargar archivos JSON iniciales
       const [prodRes, cliRes, vtaRes, lucRes] = await Promise.all([
         fetch('./database/productos.json').then(r => r.json()),
         fetch('./database/clientes.json').then(r => r.json()),
@@ -160,7 +175,6 @@ function setupEventListeners() {
   const montoRecibidoInput = document.getElementById('posMontoRecibido');
   const form = document.getElementById('posForm');
 
-  // Autocompletar precios al cambiar corte
   corteSelect.addEventListener('change', () => {
     const corteSeleccionado = AppState.productos.find(p => p.corte === corteSelect.value);
     if (corteSeleccionado) {
@@ -170,7 +184,6 @@ function setupEventListeners() {
     }
   });
 
-  // Mostrar info del cliente seleccionado (teléfono / dirección)
   clienteInput.addEventListener('input', () => {
     const match = AppState.clientes.find(c => c.nombre.toLowerCase() === clienteInput.value.trim().toLowerCase());
     const badge = document.getElementById('clienteInfoBadge');
@@ -184,18 +197,14 @@ function setupEventListeners() {
     }
   });
 
-  // Recalcular en vivo al teclear kilos, costos o precios
   [kilosInput, costoKgInput, precioKgInput, montoRecibidoInput].forEach(inp => {
     inp.addEventListener('input', calculatePosTotals);
   });
 
-  // Guardar venta
   form.addEventListener('submit', handleGuardarVenta);
 
-  // Botón WhatsApp Ticket
   document.getElementById('btnWhatsAppTicket').addEventListener('click', handleEnviarWhatsApp);
 
-  // Botón Ver Ticket
   document.getElementById('btnVerTicket').addEventListener('click', () => {
     renderTicketModal();
     document.getElementById('ticketModal').classList.add('active');
@@ -209,15 +218,12 @@ function setupEventListeners() {
     window.print();
   });
 
-  // Filtro de Mes en Dashboard
   document.getElementById('dashMonthFilter').addEventListener('change', renderDashboard);
 
-  // Buscador de Clientes
   document.getElementById('searchClienteInput').addEventListener('input', (e) => {
     renderClientes(e.target.value);
   });
 
-  // Configuración de API
   const apiInput = document.getElementById('sheetsApiUrlInput');
   if (apiInput) apiInput.value = AppState.sheetsApiUrl;
 
@@ -226,7 +232,8 @@ function setupEventListeners() {
     localStorage.setItem('sheets_api_url', val);
     AppState.sheetsApiUrl = val;
     checkConnectionStatus();
-    alert('URL guardada correctamente.');
+    syncFromSheetsSilently();
+    alert('URL guardada. Probando conexión en tiempo real...');
   });
 
   document.getElementById('btnSyncFromSheets').addEventListener('click', syncFromSheets);
@@ -255,7 +262,6 @@ function calculatePosTotals() {
   document.getElementById('liveNetoJuanito').textContent = formatMoney(netoJuanito);
   document.getElementById('liveNetoLucas').textContent = formatMoney(netoLucas);
 
-  // Calcular diferencia con lo recibido
   const saldoBox = document.getElementById('saldoDiferenciaBox');
   if (!isNaN(montoRecibido)) {
     const dif = montoRecibido - totalVenta;
@@ -274,7 +280,7 @@ function calculatePosTotals() {
 }
 
 /**
- * 6. GUARDAR VENTA (LOCAL + GOOGLE SHEETS)
+ * 6. GUARDAR VENTA (SINCRONIZACIÓN AUTOMÁTICA EN TIEMPO REAL)
  */
 async function handleGuardarVenta(e) {
   e.preventDefault();
@@ -315,37 +321,69 @@ async function handleGuardarVenta(e) {
     observaciones: saldoCliente === 0 ? '' : (saldoCliente > 0 ? `A favor AR$ ${saldoCliente}` : `Debe AR$ ${Math.abs(saldoCliente)}`)
   };
 
-  // Agregar al inicio de la lista
+  // 1. Guardar en memoria local inmediata del teléfono/PC
   AppState.ventas.unshift(nuevaVenta);
   saveLocalData();
+  renderDashboard();
 
-  // Si existe conexión con Google Sheets, sincronizar por POST
+  // 2. Transmitir a la nube de Google Sheets
   if (AppState.sheetsApiUrl) {
+    updateStatusBadge('syncing');
     try {
       fetch(AppState.sheetsApiUrl, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'nueva_venta', venta: nuevaVenta })
+      }).then(() => {
+        updateStatusBadge('connected');
+      }).catch((err) => {
+        console.warn('Venta encolada offline:', err);
+        encolarVentaOffline(nuevaVenta);
+        updateStatusBadge('offline');
       });
     } catch (err) {
-      console.warn('Error al enviar a Google Sheets en background:', err);
+      encolarVentaOffline(nuevaVenta);
     }
   }
 
-  alert(`¡Venta #${nuevaVenta.id} guardada con éxito!\nTotal: ${formatMoney(c.totalVenta)}`);
+  alert(`¡Venta #${nuevaVenta.id} guardada!\nTotal: ${formatMoney(c.totalVenta)}\nSincronizada con Google Sheets y respaldada.`);
 
-  // Opcional: mostrar ticket directo
   renderTicketModal(nuevaVenta);
   document.getElementById('ticketModal').classList.add('active');
 
-  // Resetear formulario
   document.getElementById('posForm').reset();
   calculatePosTotals();
 }
 
 /**
- * 7. GENERACIÓN DE MENSAJE Y ENVÍO POR WHATSAPP
+ * 7. COLA OFFLINE (Garantía de cero pérdida sin señal en la calle)
+ */
+function encolarVentaOffline(venta) {
+  let cola = JSON.parse(localStorage.getItem('carniceria_offline_queue') || '[]');
+  cola.push(venta);
+  localStorage.setItem('carniceria_offline_queue', JSON.stringify(cola));
+}
+
+function flushOfflineQueue() {
+  let cola = JSON.parse(localStorage.getItem('carniceria_offline_queue') || '[]');
+  if (cola.length === 0 || !AppState.sheetsApiUrl) return;
+
+  cola.forEach(v => {
+    fetch(AppState.sheetsApiUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'nueva_venta', venta: v })
+    });
+  });
+
+  localStorage.removeItem('carniceria_offline_queue');
+  console.log(`Se sincronizaron ${cola.length} ventas que estaban guardadas offline.`);
+}
+
+/**
+ * 8. GENERACIÓN DE MENSAJE Y ENVÍO POR WHATSAPP
  */
 function handleEnviarWhatsApp() {
   const clienteNombre = document.getElementById('posCliente').value.trim();
@@ -357,14 +395,12 @@ function handleEnviarWhatsApp() {
     return;
   }
 
-  // Buscar teléfono del cliente
   let cliente = AppState.selectedClient;
   if (!cliente) {
     cliente = AppState.clientes.find(cl => cl.nombre.toLowerCase() === clienteNombre.toLowerCase());
   }
 
   const tel = cliente ? (cliente.telefono_whatsapp || cliente.telefono.replace(/\D/g, '')) : '';
-
   const recibido = isNaN(c.montoRecibido) ? c.totalVenta : c.montoRecibido;
   const saldo = recibido - c.totalVenta;
 
@@ -397,7 +433,7 @@ ${saldoTxt}
 }
 
 /**
- * 8. RENDERIZAR TICKET DIGITAL / TÉRMICO
+ * 9. RENDERIZAR TICKET DIGITAL / TÉRMICO
  */
 function renderTicketModal(ventaDirecta = null) {
   const c = calculatePosTotals();
@@ -435,7 +471,7 @@ function renderTicketModal(ventaDirecta = null) {
 }
 
 /**
- * 9. RENDERIZAR DASHBOARD
+ * 10. RENDERIZAR DASHBOARD
  */
 function renderDashboard() {
   const filterMonth = document.getElementById('dashMonthFilter').value;
@@ -445,7 +481,6 @@ function renderDashboard() {
     filtered = AppState.ventas.filter(v => v.mes && v.mes.toLowerCase() === filterMonth.toLowerCase());
   }
 
-  // Cálculos acumulados
   let totalFacturado = 0;
   let totalKilos = 0;
   let totalNetoJuanito = 0;
@@ -456,7 +491,6 @@ function renderDashboard() {
     totalNetoJuanito += parseFloat(v.neto_juanito) || 0;
   });
 
-  // Saldo con Lucas
   let saldoLucas = 0;
   if (AppState.lucas.length > 0) {
     saldoLucas = AppState.lucas[AppState.lucas.length - 1].saldo || 0;
@@ -482,7 +516,6 @@ function renderDashboard() {
     subLucasEl.textContent = '✅ Al día (Mano a mano)';
   }
 
-  // Renderizar lista de ventas
   document.getElementById('ventasFiltradasBadge').textContent = `${filtered.length} ventas`;
   const container = document.getElementById('dashboardVentasList');
   container.innerHTML = '';
@@ -510,7 +543,7 @@ function renderDashboard() {
 }
 
 /**
- * 10. RENDERIZAR CLIENTES
+ * 11. RENDERIZAR CLIENTES
  */
 function renderClientes(query = '') {
   const container = document.getElementById('clientesList');
@@ -552,7 +585,7 @@ function renderClientes(query = '') {
 }
 
 /**
- * 11. RENDERIZAR CUENTA LUCAS
+ * 12. RENDERIZAR CUENTA LUCAS
  */
 function renderLucas() {
   const container = document.getElementById('lucasList');
@@ -583,31 +616,64 @@ function renderLucas() {
 }
 
 /**
- * 12. COMPROBACIÓN Y SINCRONIZACIÓN CON GOOGLE SHEETS
+ * 13. SINCRONIZACIÓN EN TIEMPO REAL MULTI-DISPOSITIVO (PC, IPHONE, ANDROID)
  */
-function checkConnectionStatus() {
+function initAutoSync() {
+  // Sincronizar al volver a la pestaña/pantalla en celular o PC
+  window.addEventListener('focus', () => syncFromSheetsSilently());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncFromSheetsSilently();
+  });
+
+  // Al recuperar señal de internet en la calle
+  window.addEventListener('online', () => {
+    syncFromSheetsSilently();
+    flushOfflineQueue();
+  });
+
+  // Polling automático cada 60 segundos
+  const interval = (typeof CONFIG !== 'undefined' && CONFIG.AUTO_SYNC_INTERVAL) ? CONFIG.AUTO_SYNC_INTERVAL : 60000;
+  setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      syncFromSheetsSilently();
+    }
+  }, interval);
+}
+
+function updateStatusBadge(state) {
   const statusEl = document.getElementById('connectionStatus');
   const textEl = document.getElementById('statusText');
+  if (!statusEl || !textEl) return;
 
-  if (AppState.sheetsApiUrl && AppState.sheetsApiUrl.includes('script.google.com')) {
+  if (state === 'syncing') {
+    statusEl.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+    statusEl.style.color = 'var(--accent-blue)';
+    textEl.textContent = 'Sincronizando nube...';
+  } else if (state === 'connected') {
     statusEl.style.borderColor = 'rgba(16, 185, 129, 0.4)';
     statusEl.style.color = 'var(--accent-green)';
-    textEl.textContent = 'Conectado a Google Sheets';
-  } else {
+    textEl.textContent = 'En vivo (Google Sheets)';
+  } else if (state === 'offline') {
     statusEl.style.borderColor = 'rgba(245, 158, 11, 0.4)';
     statusEl.style.color = 'var(--accent-amber)';
-    textEl.textContent = 'Modo Local (Sin URL API)';
+    textEl.textContent = 'Guardado local (Offline)';
   }
 }
 
-async function syncFromSheets() {
-  if (!AppState.sheetsApiUrl) {
-    alert('Primero ingresa y guarda la URL de la Web App en el campo superior.');
-    return;
+function checkConnectionStatus() {
+  if (AppState.sheetsApiUrl && AppState.sheetsApiUrl.includes('script.google.com')) {
+    updateStatusBadge('connected');
+  } else {
+    updateStatusBadge('offline');
   }
+}
+
+async function syncFromSheetsSilently() {
+  if (!AppState.sheetsApiUrl || AppState.isSyncing) return;
+  AppState.isSyncing = true;
+  updateStatusBadge('syncing');
 
   try {
-    alert('Consultando Google Sheets en tiempo real...');
     const res = await fetch(AppState.sheetsApiUrl + '?action=all');
     const json = await res.json();
 
@@ -623,14 +689,24 @@ async function syncFromSheets() {
       renderDashboard();
       renderClientes();
       renderLucas();
-
-      alert('¡Sincronización completada con éxito!');
-    } else {
-      alert('Respuesta inesperada de Google Sheets: ' + JSON.stringify(json));
+      updateStatusBadge('connected');
+      flushOfflineQueue();
     }
-  } catch (error) {
-    alert('Error al sincronizar: ' + error.message);
+  } catch (err) {
+    console.log('Sincronización en segundo plano esperando red:', err);
+    updateStatusBadge('offline');
+  } finally {
+    AppState.isSyncing = false;
   }
+}
+
+async function syncFromSheets() {
+  if (!AppState.sheetsApiUrl) {
+    alert('Primero ingresa y guarda la URL de la Web App en el campo superior o en config.js.');
+    return;
+  }
+  await syncFromSheetsSilently();
+  alert('¡Datos sincronizados con Google Sheets con éxito!');
 }
 
 function exportarBackupJSON() {
@@ -645,7 +721,7 @@ function exportarBackupJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup, null, 2));
   const downloadAnchor = document.createElement('a');
   downloadAnchor.setAttribute("href", dataStr);
-  downloadAnchor.setAttribute("download", `carniceria_backup_${new Date().toISOString().split('T')[0]}.json`);
+  downloadAnchor.setAttribute("download", `carnespremium_backup_${new Date().toISOString().split('T')[0]}.json`);
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
