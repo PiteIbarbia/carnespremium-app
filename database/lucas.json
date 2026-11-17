@@ -1,0 +1,282 @@
+[
+  {
+    "id": 1,
+    "fecha": "2026-06-27",
+    "concepto": "Mercaderia semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 550000.0,
+    "costo_carne": 654600.0,
+    "saldo": 104600.0,
+    "notas": "ok"
+  },
+  {
+    "id": 2,
+    "fecha": "2026-06-27",
+    "concepto": "JuanMa costo carne",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 25300.0,
+    "costo_carne": 0.0,
+    "saldo": 79300.0,
+    "notas": "dif"
+  },
+  {
+    "id": 3,
+    "fecha": "2026-06-30",
+    "concepto": "Mercaderia semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 294600.0,
+    "costo_carne": 376200.0,
+    "saldo": 160900.0,
+    "notas": "2219500 90305 cancelado"
+  },
+  {
+    "id": 4,
+    "fecha": "2026-07-01",
+    "concepto": "Pagó Carola directo",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 23000.0,
+    "costo_carne": 0.0,
+    "saldo": 137900.0,
+    "notas": ""
+  },
+  {
+    "id": 5,
+    "fecha": "2026-07-01",
+    "concepto": "Deuda semana pasada",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 79300.0,
+    "costo_carne": 0.0,
+    "saldo": 58600.0,
+    "notas": ""
+  },
+  {
+    "id": 6,
+    "fecha": "2026-07-02",
+    "concepto": "Priemeros días de julio",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 122300.0,
+    "costo_carne": 108400.0,
+    "saldo": 44700.0,
+    "notas": ""
+  },
+  {
+    "id": 7,
+    "fecha": "2026-07-02",
+    "concepto": "Mercaderia semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 44700.0,
+    "costo_carne": 0.0,
+    "saldo": 0.0,
+    "notas": ""
+  },
+  {
+    "id": 8,
+    "fecha": "2026-07-11",
+    "concepto": "Mercaderia semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 1023800.0,
+    "costo_carne": 1016200.0,
+    "saldo": -7600.0,
+    "notas": ""
+  },
+  {
+    "id": 9,
+    "fecha": "2026-07-18",
+    "concepto": "Mercaderia semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 397300.0,
+    "costo_carne": 628395.0,
+    "saldo": 223495.0,
+    "notas": ""
+  },
+  {
+    "id": 10,
+    "fecha": "2026-07-19",
+    "concepto": "Pagó directo Santi",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 126110.0,
+    "costo_carne": 0.0,
+    "saldo": 97385.0,
+    "notas": "dif"
+  },
+  {
+    "id": 11,
+    "fecha": "2026-07-23",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 277165.0,
+    "costo_carne": 362515.0,
+    "saldo": 182735.0,
+    "notas": "372545 10030"
+  },
+  {
+    "id": 12,
+    "fecha": "2026-07-29",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 44735.0,
+    "costo_carne": 153955.0,
+    "saldo": 291955.0,
+    "notas": "ok"
+  },
+  {
+    "id": 13,
+    "fecha": "2026-07-30",
+    "concepto": "Mercaderia semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 24050.0,
+    "costo_carne": 235065.0,
+    "saldo": 502970.0,
+    "notas": "ok"
+  },
+  {
+    "id": 14,
+    "fecha": "2026-07-30",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercacoPago",
+    "pago_a_lucas": 205785.0,
+    "costo_carne": 0.0,
+    "saldo": 297185.0,
+    "notas": ""
+  },
+  {
+    "id": 15,
+    "fecha": "2026-07-31",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 111587.5,
+    "costo_carne": 0.0,
+    "saldo": 185597.5,
+    "notas": ""
+  },
+  {
+    "id": 16,
+    "fecha": "2026-08-07",
+    "concepto": "Deuda semana pasada",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 83250.0,
+    "costo_carne": 71060.0,
+    "saldo": 173407.5,
+    "notas": ""
+  },
+  {
+    "id": 17,
+    "fecha": "2026-08-14",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 1181400.0,
+    "costo_carne": 1089925.0,
+    "saldo": 81932.5,
+    "notas": ""
+  },
+  {
+    "id": 18,
+    "fecha": "2026-08-14",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 52675.0,
+    "costo_carne": 0.0,
+    "saldo": 29257.5,
+    "notas": ""
+  },
+  {
+    "id": 19,
+    "fecha": "2026-08-19",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 100675.0,
+    "costo_carne": 87625.0,
+    "saldo": 16207.5,
+    "notas": ""
+  },
+  {
+    "id": 20,
+    "fecha": "2026-08-27",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 610700.0,
+    "costo_carne": 612790.0,
+    "saldo": 18297.5,
+    "notas": "acá son como 708.000 aprox"
+  },
+  {
+    "id": 21,
+    "fecha": "2026-09-04",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 706790.0,
+    "costo_carne": 679130.0,
+    "saldo": -9362.5,
+    "notas": ""
+  },
+  {
+    "id": 22,
+    "fecha": "2026-09-11",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 193095.0,
+    "costo_carne": 173895.0,
+    "saldo": -28562.5,
+    "notas": "Me transferiste AR$15.000"
+  },
+  {
+    "id": 23,
+    "fecha": "2026-09-18",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 660145.0,
+    "costo_carne": 654190.0,
+    "saldo": -34517.5,
+    "notas": ""
+  },
+  {
+    "id": 24,
+    "fecha": "2026-09-25",
+    "concepto": "Deuda semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 195705.0,
+    "costo_carne": 117680.0,
+    "saldo": -112542.5,
+    "notas": ""
+  },
+  {
+    "id": 25,
+    "fecha": "2026-09-29",
+    "concepto": "Deuda semana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 121455.0,
+    "costo_carne": 105185.0,
+    "saldo": -128812.5,
+    "notas": "Me transferiste AR$16.000"
+  },
+  {
+    "id": 26,
+    "fecha": "2026-09-01",
+    "concepto": "Deuda seamana",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 140480.0,
+    "costo_carne": 131545.0,
+    "saldo": -137747.5,
+    "notas": "Mi ganancia que no cobré aú es AR$23.810"
+  },
+  {
+    "id": 27,
+    "fecha": "2026-10-10",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 342270.0,
+    "costo_carne": 323740.0,
+    "saldo": -156277.5,
+    "notas": ""
+  },
+  {
+    "id": 28,
+    "fecha": "2026-10-17",
+    "concepto": "Pago directo clientes",
+    "medio_pago": "MercadoPago",
+    "pago_a_lucas": 383955.0,
+    "costo_carne": 387830.0,
+    "saldo": -152402.5,
+    "notas": ""
+  }
+]

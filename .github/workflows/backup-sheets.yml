@@ -1,0 +1,58 @@
+name: Respaldo Automático Google Sheets
+
+on:
+  schedule:
+    # Se ejecuta todos los días a las 03:00 UTC (00:00 hora de Argentina)
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Permite disparar el respaldo manualmente con 1 clic en GitHub
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ejecutar Script de Respaldo
+        env:
+          SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
+        run: |
+          python -c "
+          import os, urllib.request, json, datetime
+          
+          api_url = os.environ.get('SHEETS_API_URL', '')
+          if not api_url:
+              print('No se configuró SHEETS_API_URL. Saltando descarga en vivo.')
+              exit(0)
+              
+          today = datetime.datetime.now().strftime('%Y-%m-%d')
+          os.makedirs('backups', exist_ok=True)
+          
+          req = urllib.request.Request(api_url + '?action=all', headers={'User-Agent': 'Mozilla/5.0'})
+          try:
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  data = json.loads(response.read().decode('utf-8'))
+                  backup_path = f'backups/{today}_backup.json'
+                  with open(backup_path, 'w', encoding='utf-8') as f:
+                      json.dump(data, f, indent=2, ensure_ascii=False)
+                  print(f'Respaldo guardado exitosamente en {backup_path}')
+          except Exception as e:
+              print(f'Error al respaldar: {e}')
+          "
+
+      - name: Commit y Push del Respaldo
+        run: |
+          git config --global user.name "Carniceria Backup Bot"
+          git config --global user.email "bot@carniceria.app"
+          git add backups/
+          if git diff --staged --quiet; then
+            print "No hay cambios para respaldar hoy."
+          else
+            git commit -m "chore(backup): respaldo automático $(date +'%Y-%m-%d')"
+            git push
+          fi

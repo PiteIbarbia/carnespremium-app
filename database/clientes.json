@@ -1,0 +1,442 @@
+[
+  {
+    "id": "1",
+    "nombre": "Adela Igarzabal",
+    "telefono": "54 911-3261-4129",
+    "telefono_whatsapp": "5491132614129",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "2",
+    "nombre": "Ale Silveyra",
+    "telefono": "54 911-5720-1983",
+    "telefono_whatsapp": "5491157201983",
+    "domicilio": "Victoria Ocampo 738, Beccar",
+    "notas": "Coordinar con Silvina"
+  },
+  {
+    "id": "3",
+    "nombre": "Ana del Pino",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "4",
+    "nombre": "Annette",
+    "telefono": "54 911-6227-8629",
+    "telefono_whatsapp": "5491162278629",
+    "domicilio": "Suipacha 2365, Beccar",
+    "notas": ""
+  },
+  {
+    "id": "5",
+    "nombre": "Bettina Helvadjian",
+    "telefono": "54 911-4889-5676",
+    "telefono_whatsapp": "5491148895676",
+    "domicilio": "Diagonal Tucumán 671, Martinez",
+    "notas": ""
+  },
+  {
+    "id": "6",
+    "nombre": "Carlos Rivero",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "7",
+    "nombre": "Carola Alfonzo",
+    "telefono": "54 911-6369-0104",
+    "telefono_whatsapp": "5491163690104",
+    "domicilio": "",
+    "notas": "Mamá Fran Rodillo"
+  },
+  {
+    "id": "8",
+    "nombre": "Cristina Igarzabal",
+    "telefono": "54 911-3245-6070",
+    "telefono_whatsapp": "5491132456070",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "9",
+    "nombre": "Delia",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "10",
+    "nombre": "Diego",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "11",
+    "nombre": "Diego Gonzalez Bonorino",
+    "telefono": "54 911-4041-3480",
+    "telefono_whatsapp": "5491140413480",
+    "domicilio": "Nicolás Avellaneda 2262, San Isidro",
+    "notas": ""
+  },
+  {
+    "id": "12",
+    "nombre": "Ezequiel",
+    "telefono": "54 911-6589-4002",
+    "telefono_whatsapp": "5491165894002",
+    "domicilio": "Barrio Sunny, Tigre",
+    "notas": "Lote 24"
+  },
+  {
+    "id": "13",
+    "nombre": "Fran Rodillo",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "14",
+    "nombre": "Gaston",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "15",
+    "nombre": "Gaston Uzin",
+    "telefono": "54 911-3245-7669",
+    "telefono_whatsapp": "5491132457669",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "16",
+    "nombre": "Inés Igarzabal",
+    "telefono": "54 911-6494-8444",
+    "telefono_whatsapp": "5491164948444",
+    "domicilio": "Jacinto Diaz 2080, San Isidro",
+    "notas": ""
+  },
+  {
+    "id": "17",
+    "nombre": "Isabel Lopez Lacarrere (Isa)",
+    "telefono": "54 911-4444-7034",
+    "telefono_whatsapp": "5491144447034",
+    "domicilio": "Barrio Sunny, Tigre",
+    "notas": "Lote 49"
+  },
+  {
+    "id": "18",
+    "nombre": "Jaime Lorenzo",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "19",
+    "nombre": "Jime Gonzalez Mathys",
+    "telefono": "54 911-3090-2166",
+    "telefono_whatsapp": "5491130902166",
+    "domicilio": "Rosario de Santa Fe 649, Beccar",
+    "notas": ""
+  },
+  {
+    "id": "20",
+    "nombre": "Joaquin Reichart",
+    "telefono": "56 9 9851-6389",
+    "telefono_whatsapp": "56998516389",
+    "domicilio": "Bolivar 290, Beccar",
+    "notas": "Casa de los padres"
+  },
+  {
+    "id": "21",
+    "nombre": "Juan Sw",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "22",
+    "nombre": "Juanito",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "23",
+    "nombre": "JuanMa",
+    "telefono": "54 911-3209-0844",
+    "telefono_whatsapp": "5491132090844",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "24",
+    "nombre": "Laura Guidi",
+    "telefono": "54 911-3930-7437",
+    "telefono_whatsapp": "5491139307437",
+    "domicilio": "J. F. Kennedy, Victoria",
+    "notas": "Costurera/Limpieza"
+  },
+  {
+    "id": "25",
+    "nombre": "Laura Igarzabal",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "26",
+    "nombre": "Lourdes",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "27",
+    "nombre": "Maria Eizayaga",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "28",
+    "nombre": "Mariano",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "29",
+    "nombre": "Matias de Blasi",
+    "telefono": "54 911-6299-2667",
+    "telefono_whatsapp": "5491162992667",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "30",
+    "nombre": "Matias Sonzini",
+    "telefono": "54 911-3593-2039",
+    "telefono_whatsapp": "5491135932039",
+    "domicilio": "Ohiggins 450, San Isidro",
+    "notas": "1A"
+  },
+  {
+    "id": "31",
+    "nombre": "Matias Ureta",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "32",
+    "nombre": "Muncha",
+    "telefono": "54 911-4416-8375",
+    "telefono_whatsapp": "5491144168375",
+    "domicilio": "Murature 732, San Isidro",
+    "notas": "Mamá de Naco y Juan Ortega"
+  },
+  {
+    "id": "33",
+    "nombre": "Pato O'Reilly",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "34",
+    "nombre": "Patricio Cabrini",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "35",
+    "nombre": "Peter",
+    "telefono": "54 911-5452-4573",
+    "telefono_whatsapp": "5491154524573",
+    "domicilio": "Vicente Fidel López 388, Martinez",
+    "notas": "2A"
+  },
+  {
+    "id": "36",
+    "nombre": "Rochi Melazza",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "37",
+    "nombre": "Rodolfo Melazza",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "38",
+    "nombre": "Santi Breide",
+    "telefono": "54 911-3904-5214",
+    "telefono_whatsapp": "5491139045214",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "39",
+    "nombre": "Sonia Haddad",
+    "telefono": "507 6354-0567",
+    "telefono_whatsapp": "50763540567",
+    "domicilio": "Monseñor Alberti 474, San Isidro",
+    "notas": "3A"
+  },
+  {
+    "id": "40",
+    "nombre": "Tomas Koch",
+    "telefono": "54 911-3004-1596",
+    "telefono_whatsapp": "5491130041596",
+    "domicilio": "Comandante Luis Piedrabuena 3311, Victoria",
+    "notas": ""
+  },
+  {
+    "id": "41",
+    "nombre": "Tomi Rivero",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "42",
+    "nombre": "Tomi Suarez",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "43",
+    "nombre": "Ezequiel Cardoni",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "44",
+    "nombre": "Nacho Gabancho",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "45",
+    "nombre": "Amparo Nogueira",
+    "telefono": "54 911-6959-1241",
+    "telefono_whatsapp": "5491169591241",
+    "domicilio": "Juan Jose Diaz 1068, San Isidro",
+    "notas": "Casa 1"
+  },
+  {
+    "id": "46",
+    "nombre": "Fernando Zambra",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "47",
+    "nombre": "Sole Ezcurra",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "48",
+    "nombre": "Santi Perrota",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "49",
+    "nombre": "Agustin Reichart",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "50",
+    "nombre": "María Aramburu Igarzabal",
+    "telefono": "54 911-6208-0177",
+    "telefono_whatsapp": "5491162080177",
+    "domicilio": "Pacheco Golf",
+    "notas": "Lote 77"
+  },
+  {
+    "id": "51",
+    "nombre": "Marcos Bruno",
+    "telefono": "54 911-3676-9054",
+    "telefono_whatsapp": "5491136769054",
+    "domicilio": "Santa Catalina 6105, en victoria",
+    "notas": "Barrio Cerrado Greenlands Lote 5"
+  },
+  {
+    "id": "52",
+    "nombre": "Jorge Galache",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "53",
+    "nombre": "Santiago Reichart",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "54",
+    "nombre": "Francisco Vazquez (Pela)",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "",
+    "notas": ""
+  },
+  {
+    "id": "55",
+    "nombre": "Lucia Fernandez",
+    "telefono": "",
+    "telefono_whatsapp": "",
+    "domicilio": "Santa Catalina 6105, en victoria",
+    "notas": "Lote 71"
+  }
+]

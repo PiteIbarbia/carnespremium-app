@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Carnicería - Gestión & Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0f19">
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="navbar">
+    <div class="brand">
+      <span class="brand-icon">🥩</span>
+      <span>Carnes Juanito & Lucas</span>
+    </div>
+    <div id="connectionStatus" class="status-badge">
+      <span class="status-dot"></span>
+      <span id="statusText">Modo Local</span>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+
+    <!-- ==========================================
+         TAB 1: NUEVA VENTA (POS RÁPIDO)
+         ========================================== -->
+    <section id="tab-pos" class="tab-content active">
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">📝 Registrar Venta</h2>
+          <span style="font-size: 0.8rem; color: var(--text-muted);" id="currentDateDisplay"></span>
+        </div>
+
+        <form id="posForm">
+          <!-- CLIENTE -->
+          <div class="form-group">
+            <label class="form-label" for="posCliente">Cliente</label>
+            <input type="text" id="posCliente" class="form-control" list="clientesDatalist" placeholder="Buscar o escribir cliente..." required autocomplete="off">
+            <datalist id="clientesDatalist"></datalist>
+            <div id="clienteInfoBadge" style="margin-top: 6px; font-size: 0.75rem; color: var(--text-muted); display: none;"></div>
+          </div>
+
+          <!-- CORTE & KILOS -->
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="posCorte">Corte de Carne</label>
+              <select id="posCorte" class="form-control" required>
+                <option value="">Seleccionar corte...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="posKilos">Kilos Vendidos (Kg)</label>
+              <input type="number" id="posKilos" class="form-control" step="0.001" min="0.1" placeholder="Ej: 1.850" required>
+            </div>
+          </div>
+
+          <!-- COSTO & PRECIO SUGERIDOS (EDITABLES) -->
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="posCostoKg">Costo Lucas ($/Kg)</label>
+              <input type="number" id="posCostoKg" class="form-control" placeholder="$ 0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="posPrecioKg">Precio Venta ($/Kg)</label>
+              <input type="number" id="posPrecioKg" class="form-control" placeholder="$ 0" required>
+            </div>
+          </div>
+
+          <!-- RESUMEN AUTOMÁTICO EN VIVO -->
+          <div class="calc-preview">
+            <div class="calc-row">
+              <span>Costo Mercadería (Lucas):</span>
+              <strong id="liveCostoTotal">$ 0</strong>
+            </div>
+            <div class="calc-row total">
+              <span>TOTAL A COBRAR:</span>
+              <strong id="liveTotalVenta">$ 0</strong>
+            </div>
+            <div class="calc-row split">
+              <span>Margen Neto Total: <span id="liveMargenTotal">$ 0</span></span>
+              <span>(50% Juanito: <strong id="liveNetoJuanito" style="color: #fff;">$ 0</strong> | 50% Lucas: <strong id="liveNetoLucas" style="color: #fff;">$ 0</strong>)</span>
+            </div>
+          </div>
+
+          <!-- PAGO Y SALDOS -->
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="posMedioPago">Medio de Pago</label>
+              <select id="posMedioPago" class="form-control">
+                <option value="MercadoPago">MercadoPago</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia">Transferencia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="posMontoRecibido">Monto Recibido ($)</label>
+              <input type="number" id="posMontoRecibido" class="form-control" placeholder="Igual al total si pagó justo">
+            </div>
+          </div>
+
+          <div id="saldoDiferenciaBox" style="font-size: 0.85rem; font-weight: 700; margin-bottom: 16px;"></div>
+
+          <!-- BOTONES DE ACCIÓN -->
+          <button type="submit" class="btn btn-primary">
+            💾 Guardar Venta
+          </button>
+
+          <div class="btn-group-row">
+            <button type="button" id="btnWhatsAppTicket" class="btn btn-whatsapp">
+              📲 Ticket x WhatsApp
+            </button>
+            <button type="button" id="btnVerTicket" class="btn btn-secondary">
+              📄 Ver / Imprimir Ticket
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 2: DASHBOARD
+         ========================================== -->
+    <section id="tab-dashboard" class="tab-content">
+      <!-- FILTRO DE MES -->
+      <div class="panel" style="padding: 12px 16px; margin-bottom: 14px;">
+        <div style="display: flex; gap: 8px; align-items: center; overflow-x: auto;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Filtrar Mes:</span>
+          <select id="dashMonthFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
+            <option value="all">Todo el Año (2026)</option>
+            <option value="Abril">Abril</option>
+            <option value="Mayo">Mayo</option>
+            <option value="Junio">Junio</option>
+            <option value="Julio">Julio</option>
+            <option value="Agosto">Agosto</option>
+            <option value="Septiembre">Septiembre</option>
+            <option value="Octubre">Octubre</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- KPI GRID -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total Facturado</div>
+          <div class="kpi-value" id="kpiTotalVentas">$ 0</div>
+          <div class="kpi-sub" id="kpiVentasCount">0 ventas registradas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Kilos Totales</div>
+          <div class="kpi-value" id="kpiTotalKilos">0 Kg</div>
+          <div class="kpi-sub">Promedio en carnes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Ganancia Juanito (50%)</div>
+          <div class="kpi-value" id="kpiNetoJuanito" style="color: var(--accent-green);">$ 0</div>
+          <div class="kpi-sub">Libre de costo mercadería</div>
+        </div>
+        <div class="kpi-card lucas">
+          <div class="kpi-title">Saldo Cuenta Lucas</div>
+          <div class="kpi-value" id="kpiSaldoLucas">$ 0</div>
+          <div class="kpi-sub" id="kpiEstadoLucas">Calculando conciliación...</div>
+        </div>
+      </div>
+
+      <!-- ÚLTIMAS VENTAS -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">📋 Registro Histórico de Ventas</h3>
+          <span id="ventasFiltradasBadge" class="badge badge-green">0</span>
+        </div>
+        <div id="dashboardVentasList" class="item-list"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 3: CLIENTES & CUENTAS CORRIENTES
+         ========================================== -->
+    <section id="tab-clientes" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">👥 Directorio de Clientes</h2>
+          <span class="badge badge-green" id="clientesCountBadge">0 Clientes</span>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="searchClienteInput" class="form-control" placeholder="🔍 Buscar por nombre, teléfono o dirección...">
+        </div>
+        <div id="clientesList" class="item-list"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 4: CUENTA LUCAS
+         ========================================== -->
+    <section id="tab-lucas" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">🤝 Cuenta Corriente de Lucas</h2>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+          Conciliación entre costo de carne retirada de frigorífico vs. transferencias y pagos directos.
+        </p>
+
+        <div id="lucasList" class="item-list"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 5: CONFIGURACIÓN & SINCRONIZACIÓN
+         ========================================== -->
+    <section id="tab-config" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">⚙️ Conexión con Google Sheets</h2>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+          Pega la URL de la aplicación web que obtienes al implementar el script <code>Code.gs</code> en tu hoja de Google Drive.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="sheetsApiUrlInput">URL de la Web App (Google Apps Script)</label>
+          <input type="url" id="sheetsApiUrlInput" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+
+        <button id="btnGuardarApiUrl" class="btn btn-primary" style="margin-bottom: 10px;">
+          🔗 Guardar y Probar Conexión
+        </button>
+
+        <button id="btnSyncFromSheets" class="btn btn-secondary">
+          🔄 Sincronizar Datos desde Google Sheets Ahora
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">💾 Descargar Copias de Respaldo</h3>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+          Descarga un archivo JSON completo con todas las ventas, clientes y saldos para guardarlo en tu computadora.
+        </p>
+        <button id="btnExportJson" class="btn btn-secondary">
+          📥 Descargar Respaldo Completo (JSON)
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE TICKET TÉRMICO / DIGITAL -->
+  <div id="ticketModal" class="modal-overlay">
+    <div class="ticket-container">
+      <div class="ticket-header">
+        <div class="ticket-title">🥩 CARNES PREMIUM</div>
+        <div class="ticket-sub">JUANITO & LUCAS</div>
+        <div class="ticket-sub" id="ticketFecha">16/11/2026</div>
+      </div>
+
+      <div id="ticketBody">
+        <!-- Render dinámico del pedido -->
+      </div>
+
+      <div class="ticket-footer">
+        <div>¡Gracias por tu compra!</div>
+        <div style="font-size: 0.65rem; margin-top: 4px;">Atención personalizada por WhatsApp</div>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <button id="btnPrintTicket" class="btn btn-primary" style="padding: 10px;">
+          🖨️ Imprimir
+        </button>
+        <button id="btnCloseTicket" class="btn btn-secondary" style="padding: 10px;">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION BAR -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="tab-pos">
+      <span class="nav-icon">📝</span>
+      <span>Vender</span>
+    </button>
+    <button class="nav-item" data-tab="tab-dashboard">
+      <span class="nav-icon">📊</span>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-item" data-tab="tab-clientes">
+      <span class="nav-icon">👥</span>
+      <span>Clientes</span>
+    </button>
+    <button class="nav-item" data-tab="tab-lucas">
+      <span class="nav-icon">🤝</span>
+      <span>Lucas</span>
+    </button>
+    <button class="nav-item" data-tab="tab-config">
+      <span class="nav-icon">⚙️</span>
+      <span>Ajustes</span>
+    </button>
+  </nav>
+
+  <!-- APP LOGIC SCRIPT -->
+  <script src="app.js"></script>
+</body>
+</html>

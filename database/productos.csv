@@ -1,0 +1,16 @@
+id,corte,costo_kg,precio_kg,ganancia_kg,notas
+1,Bife Ch,20000,22000,2000,
+2,Bife Ch Fraccionado,20000,24000,4000,
+3,Colita de Cuadril,21000,23000,2000,
+4,Lomo,27000,29000,2000,
+5,Nalga Feteada,19000,22000,3000,
+6,Nalga sin Tapa,17500,19500,2000,Actualizado 30-07-2026
+7,Peceto,19000,21000,2000,
+8,Peceto Feteado,19000,22000,3000,
+9,Picada especial,14000,16000,2000,
+10,Picaña,19000,23000,4000,
+11,Vacio,17000,20000,3000,
+12,Vacio Fraccionado,17000,22000,5000,
+13,Ojo de Bife,26000,29000,3000,Revisado
+14,Chorizo,7500,9000,1500,
+15,Cuadrada feteada,16000,19000,3000,

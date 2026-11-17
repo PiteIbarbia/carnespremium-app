@@ -1,0 +1,122 @@
+[
+  {
+    "id": "1",
+    "corte": "Bife Ch",
+    "costo_kg": "20000",
+    "precio_kg": "22000",
+    "ganancia_kg": "2000",
+    "notas": ""
+  },
+  {
+    "id": "2",
+    "corte": "Bife Ch Fraccionado",
+    "costo_kg": "20000",
+    "precio_kg": "24000",
+    "ganancia_kg": "4000",
+    "notas": ""
+  },
+  {
+    "id": "3",
+    "corte": "Colita de Cuadril",
+    "costo_kg": "21000",
+    "precio_kg": "23000",
+    "ganancia_kg": "2000",
+    "notas": ""
+  },
+  {
+    "id": "4",
+    "corte": "Lomo",
+    "costo_kg": "27000",
+    "precio_kg": "29000",
+    "ganancia_kg": "2000",
+    "notas": ""
+  },
+  {
+    "id": "5",
+    "corte": "Nalga Feteada",
+    "costo_kg": "19000",
+    "precio_kg": "22000",
+    "ganancia_kg": "3000",
+    "notas": ""
+  },
+  {
+    "id": "6",
+    "corte": "Nalga sin Tapa",
+    "costo_kg": "17500",
+    "precio_kg": "19500",
+    "ganancia_kg": "2000",
+    "notas": "Actualizado 30-07-2026"
+  },
+  {
+    "id": "7",
+    "corte": "Peceto",
+    "costo_kg": "19000",
+    "precio_kg": "21000",
+    "ganancia_kg": "2000",
+    "notas": ""
+  },
+  {
+    "id": "8",
+    "corte": "Peceto Feteado",
+    "costo_kg": "19000",
+    "precio_kg": "22000",
+    "ganancia_kg": "3000",
+    "notas": ""
+  },
+  {
+    "id": "9",
+    "corte": "Picada especial",
+    "costo_kg": "14000",
+    "precio_kg": "16000",
+    "ganancia_kg": "2000",
+    "notas": ""
+  },
+  {
+    "id": "10",
+    "corte": "Picaña",
+    "costo_kg": "19000",
+    "precio_kg": "23000",
+    "ganancia_kg": "4000",
+    "notas": ""
+  },
+  {
+    "id": "11",
+    "corte": "Vacio",
+    "costo_kg": "17000",
+    "precio_kg": "20000",
+    "ganancia_kg": "3000",
+    "notas": ""
+  },
+  {
+    "id": "12",
+    "corte": "Vacio Fraccionado",
+    "costo_kg": "17000",
+    "precio_kg": "22000",
+    "ganancia_kg": "5000",
+    "notas": ""
+  },
+  {
+    "id": "13",
+    "corte": "Ojo de Bife",
+    "costo_kg": "26000",
+    "precio_kg": "29000",
+    "ganancia_kg": "3000",
+    "notas": "Revisado"
+  },
+  {
+    "id": "14",
+    "corte": "Chorizo",
+    "costo_kg": "7500",
+    "precio_kg": "9000",
+    "ganancia_kg": "1500",
+    "notas": ""
+  },
+  {
+    "id": "15",
+    "corte": "Cuadrada feteada",
+    "costo_kg": "16000",
+    "precio_kg": "19000",
+    "ganancia_kg": "3000",
+    "notas": ""
+  }
+]
