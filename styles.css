@@ -141,10 +141,6 @@ body {
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-amber));
 }
 
-.kpi-card.amber::before {
-  background: linear-gradient(90deg, var(--accent-amber), var(--accent-rose));
-}
-
 .kpi-title {
   font-size: 0.75rem;
   font-weight: 700;
@@ -233,6 +229,61 @@ body {
   gap: 10px;
 }
 
+/* CART MULTI-CORTE */
+.cart-box {
+  background: rgba(31, 43, 69, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.cart-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cart-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.btn-remove-item {
+  background: transparent;
+  border: none;
+  color: var(--accent-rose);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 1.1rem;
+  transition: transform 0.15s;
+}
+
+.btn-remove-item:hover {
+  transform: scale(1.15);
+}
+
+.mixed-payment-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-top: 10px;
+  margin-bottom: 14px;
+}
+
 /* CALCULATION LIVE PREVIEW BOX */
 .calc-preview {
   background: rgba(31, 43, 69, 0.7);
@@ -255,7 +306,7 @@ body {
 }
 
 .calc-row.total {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 800;
   padding-top: 8px;
   border-top: 1px solid var(--border-color);
@@ -431,7 +482,6 @@ body {
   justify-content: space-between;
   align-items: center;
   transition: all 0.15s;
-  cursor: pointer;
 }
 
 .list-item:hover {
@@ -474,6 +524,30 @@ body {
 .badge-yellow { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
 .badge-blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
 .badge-purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
+.badge-amber { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.btn-icon:hover {
+  background: var(--bg-card-hover);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+.btn-icon.danger:hover {
+  color: var(--accent-rose);
+  border-color: var(--accent-rose);
+}
 
 /* BOTTOM NAVIGATION (6 TABS) */
 .bottom-nav {
@@ -487,20 +561,20 @@ body {
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: space-around;
-  padding: 6px 4px;
+  padding: 6px 2px;
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 6px 6px;
+  padding: 6px 4px;
   border-radius: var(--radius-md);
   transition: all 0.15s;
   background: transparent;

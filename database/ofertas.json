@@ -1,0 +1,20 @@
+[
+  {
+    "id": "OF-1",
+    "nombre": "Promo Fin de Semana Vacío",
+    "corte": "Vacio",
+    "tipo": "precio_fijo",
+    "valor": 19000,
+    "descripcion": "Precio especial $19.000/Kg",
+    "activa": true
+  },
+  {
+    "id": "OF-2",
+    "nombre": "Descuento Lomo x +5Kg",
+    "corte": "Lomo",
+    "tipo": "precio_fijo",
+    "valor": 27500,
+    "descripcion": "Lomo especial $27.500/Kg",
+    "activa": true
+  }
+]

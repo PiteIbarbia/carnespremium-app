@@ -1,7 +1,16 @@
 /**
  * ====================================================================
  * CARNES PREMIUM — GESTIÓN, PEDIDOS & VENTAS
- * Frontend Controller, Métricas con Chart.js, Preventa y Sincronización
+ * Controller Integral PWA / Web App
+ * Soporta:
+ *  - Carrito Multi-Corte por Ticket (Opción A en Google Sheets)
+ *  - Medios de Pago Mixtos (Efectivo + Digital)
+ *  - CRUD Completo de Cortes de Carne (Costos & Precios)
+ *  - CRUD Completo de Ofertas & Promociones (Detección en Balanza)
+ *  - CRUD Completo de Clientes & Ficha 360°
+ *  - Preventa / Pedidos Programados & Consolidado Frigorífico
+ *  - Métricas Chart.js & Proyecciones con Regla Histórica de Ganancia
+ *  - Sincronización Automática Bidireccional con Google Sheets
  * ====================================================================
  */
 
@@ -20,6 +29,9 @@ const AppState = {
   ventas: [],
   pedidos: [],
   proveedor: [],
+  ofertas: [],
+  posCart: [],           // Cortes cargados en el ticket actual
+  lastSavedTicket: null, // Último ticket guardado para imprimir o WhatsApp
   sheetsApiUrl: getInitialApiUrl(),
   selectedClient: null,
   isSyncing: false,
@@ -38,35 +50,41 @@ const formatMoney = (val) => {
   }).format(val || 0);
 };
 
-// Inicialización de la App al cargar el DOM
+// ====================================================================
+// INICIALIZACIÓN DE LA APLICACIÓN AL CARGAR EL DOM
+// ====================================================================
 document.addEventListener('DOMContentLoaded', async () => {
   initTabs();
   initDateDisplays();
   await loadInitialData();
   setupEventListeners();
+  renderPosCart();
+  calculatePosTotals();
   renderDashboard();
   renderPedidos();
+  renderCortesCatalog();
+  renderOffersList();
   renderClientes();
   renderProveedor();
   checkConnectionStatus();
 
-  // Sincronización automática silenciosa si hay URL
+  // Sincronización automática silenciosa si hay URL configurada
   if (AppState.sheetsApiUrl) {
     syncFromSheetsSilently();
   }
 
-  // Activar observadores de segundo plano
+  // Activar observadores de segundo plano para sincronizar al volver a la app
   initAutoSync();
 
-  // Service Worker PWA Offline
+  // Registrar Service Worker para soporte PWA y modo Offline
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
   }
 });
 
-/**
- * 1. NAVEGACIÓN POR PESTAÑAS
- */
+// ====================================================================
+// 1. NAVEGACIÓN POR PESTAÑAS
+// ====================================================================
 function initTabs() {
   const navButtons = document.querySelectorAll('.nav-item');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -84,11 +102,18 @@ function initTabs() {
 
       if (targetTabId === 'tab-dashboard') {
         renderDashboard();
-        setTimeout(renderCharts, 100);
+        setTimeout(renderCharts, 120);
       }
       if (targetTabId === 'tab-pedidos') renderPedidos();
+      if (targetTabId === 'tab-cortes') {
+        renderOffersList();
+        renderCortesCatalog();
+      }
       if (targetTabId === 'tab-clientes') renderClientes();
-      if (targetTabId === 'tab-proveedor') renderProveedor();
+      if (targetTabId === 'tab-config') renderProveedor();
+      if (targetTabId === 'tab-pos') {
+        calculatePosTotals();
+      }
     });
   });
 }
@@ -99,7 +124,6 @@ function initDateDisplays() {
   const display = document.getElementById('currentDateDisplay');
   if (display) display.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 
-  // Set today in date inputs
   const todayIso = d.toISOString().split('T')[0];
   const posFecha = document.getElementById('posFecha');
   if (posFecha && !posFecha.value) posFecha.value = todayIso;
@@ -115,9 +139,9 @@ function initDateDisplays() {
   if (provFecha && !provFecha.value) provFecha.value = todayIso;
 }
 
-/**
- * 2. CARGA DE DATOS LOCALES O REMOTOS
- */
+// ====================================================================
+// 2. CARGA DE DATOS LOCALES O REMOTOS
+// ====================================================================
 async function loadInitialData() {
   try {
     const localVentas = localStorage.getItem('carniceria_ventas');
@@ -125,6 +149,7 @@ async function loadInitialData() {
     const localProductos = localStorage.getItem('carniceria_productos');
     const localPedidos = localStorage.getItem('carniceria_pedidos');
     const localProveedor = localStorage.getItem('carniceria_proveedor') || localStorage.getItem('carniceria_lucas');
+    const localOfertas = localStorage.getItem('carniceria_ofertas');
 
     if (localVentas && localClientes && localProductos) {
       AppState.ventas = JSON.parse(localVentas);
@@ -132,13 +157,15 @@ async function loadInitialData() {
       AppState.productos = JSON.parse(localProductos);
       AppState.pedidos = localPedidos ? JSON.parse(localPedidos) : [];
       AppState.proveedor = localProveedor ? JSON.parse(localProveedor) : [];
+      AppState.ofertas = localOfertas ? JSON.parse(localOfertas) : [];
     } else {
-      const [prodRes, cliRes, vtaRes, pedRes, provRes] = await Promise.all([
+      const [prodRes, cliRes, vtaRes, pedRes, provRes, ofRes] = await Promise.all([
         fetch('./database/productos.json').then(r => r.json()).catch(() => []),
         fetch('./database/clientes.json').then(r => r.json()).catch(() => []),
         fetch('./database/ventas.json').then(r => r.json()).catch(() => []),
         fetch('./database/pedidos.json').then(r => r.json()).catch(() => []),
-        fetch('./database/proveedor.json').then(r => r.json()).catch(() => [])
+        fetch('./database/proveedor.json').then(r => r.json()).catch(() => []),
+        fetch('./database/ofertas.json').then(r => r.json()).catch(() => [])
       ]);
 
       AppState.productos = prodRes;
@@ -146,17 +173,16 @@ async function loadInitialData() {
       AppState.ventas = vtaRes;
       AppState.pedidos = pedRes;
       AppState.proveedor = provRes;
+      AppState.ofertas = ofRes;
 
       saveLocalData();
     }
 
-    // Calcular saldos de billetera de clientes según ventas históricas
     calculateClientBalances();
-
     populateProductSelects();
     populateClientDatalists();
   } catch (error) {
-    console.error('Error cargando datos:', error);
+    console.error('Error cargando base de datos inicial:', error);
   }
 }
 
@@ -165,7 +191,7 @@ function normalizeClient(c) {
   const tel = c.teléfono_contacto || c.telefono_contacto || c.teléfono || c.telefono || '';
   const cleanTel = String(tel).replace(/[^0-9]/g, '');
   return {
-    id: c.id || nombre,
+    id: c.id || String(Date.now() + Math.random()),
     nombre: nombre,
     telefono: tel,
     telefono_whatsapp: cleanTel,
@@ -199,20 +225,23 @@ function saveLocalData() {
   localStorage.setItem('carniceria_productos', JSON.stringify(AppState.productos));
   localStorage.setItem('carniceria_pedidos', JSON.stringify(AppState.pedidos));
   localStorage.setItem('carniceria_proveedor', JSON.stringify(AppState.proveedor));
+  localStorage.setItem('carniceria_ofertas', JSON.stringify(AppState.ofertas));
 }
 
-/**
- * 3. SELECTORES & AUTOCOMPLETADO
- */
+// ====================================================================
+// 3. SELECTORES & AUTOCOMPLETADO
+// ====================================================================
 function populateProductSelects() {
   const posSelect = document.getElementById('posCorte');
   const orderSelect = document.getElementById('orderCorte');
+  const offerSelect = document.getElementById('offerCut');
 
   const optionsHtml = '<option value="">Seleccionar corte...</option>' + 
     AppState.productos.map(p => `<option value="${p.corte}">${p.corte} ($ ${Number(p.precio_kg).toLocaleString('es-AR')}/Kg)</option>`).join('');
 
   if (posSelect) posSelect.innerHTML = optionsHtml;
   if (orderSelect) orderSelect.innerHTML = optionsHtml;
+  if (offerSelect) offerSelect.innerHTML = optionsHtml;
 }
 
 function populateClientDatalists() {
@@ -225,25 +254,45 @@ function populateClientDatalists() {
     .join('');
 }
 
-/**
- * 4. EVENTOS Y FORMULARIOS
- */
+// ====================================================================
+// 4. CONFIGURACIÓN DE EVENTOS PRINCIPALES
+// ====================================================================
 function setupEventListeners() {
   const clienteInput = document.getElementById('posCliente');
   const corteSelect = document.getElementById('posCorte');
   const kilosInput = document.getElementById('posKilos');
   const costoKgInput = document.getElementById('posCostoKg');
   const precioKgInput = document.getElementById('posPrecioKg');
+  const posDescuentoInput = document.getElementById('posDescuento');
+  const posMedioPagoSelect = document.getElementById('posMedioPago');
   const montoRecibidoInput = document.getElementById('posMontoRecibido');
+  const pagoEfectivoInput = document.getElementById('posPagoEfectivo');
+  const pagoDigitalInput = document.getElementById('posPagoDigital');
   const posFechaInput = document.getElementById('posFecha');
   const posForm = document.getElementById('posForm');
 
+  // Selección de corte: auto-completar costo, precio y chequear ofertas activas
   corteSelect.addEventListener('change', () => {
     const corteSeleccionado = AppState.productos.find(p => p.corte === corteSelect.value);
+    const offerBadge = document.getElementById('activeOfferBadge');
+
     if (corteSeleccionado) {
       costoKgInput.value = corteSeleccionado.costo_kg;
       precioKgInput.value = corteSeleccionado.precio_kg;
+
+      // Buscar si este corte tiene una oferta activa
+      const promo = AppState.ofertas.find(o => o.activa && o.corte.toLowerCase() === corteSeleccionado.corte.toLowerCase());
+      if (promo) {
+        offerBadge.style.display = 'block';
+        offerBadge.innerHTML = `🔥 <strong>${promo.nombre}:</strong> $${Number(promo.valor).toLocaleString('es-AR')}/Kg (${promo.descripcion || 'Especial'}) 
+          <button type="button" class="btn btn-sm btn-primary" style="margin-left:8px; padding:2px 8px; font-size:0.75rem;" onclick="aplicarOfertaAlCorte(${promo.valor})">Aplicar Precio Oferta</button>`;
+      } else {
+        offerBadge.style.display = 'none';
+      }
+
       calculatePosTotals();
+    } else {
+      offerBadge.style.display = 'none';
     }
   });
 
@@ -254,6 +303,7 @@ function setupEventListeners() {
     const badge = document.getElementById('clienteInfoBadge');
     const walletBox = document.getElementById('walletAlertBox');
     const walletText = document.getElementById('walletAlertText');
+    const btnApply = document.getElementById('btnApplyWalletCredit');
 
     if (match) {
       AppState.selectedClient = match;
@@ -262,13 +312,16 @@ function setupEventListeners() {
 
       if (match.saldo > 0) {
         walletBox.style.display = 'flex';
+        walletBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        walletBox.style.background = 'rgba(16, 185, 129, 0.15)';
+        btnApply.style.display = 'inline-block';
         walletText.innerHTML = `🟢 <strong>${match.nombre}</strong> tiene <strong>${formatMoney(match.saldo)}</strong> a favor en su billetera.`;
       } else if (match.saldo < 0) {
         walletBox.style.display = 'flex';
         walletBox.style.borderColor = 'rgba(244, 63, 94, 0.4)';
         walletBox.style.background = 'rgba(244, 63, 94, 0.15)';
+        btnApply.style.display = 'none';
         walletText.innerHTML = `🔴 <strong>${match.nombre}</strong> adeuda <strong>${formatMoney(Math.abs(match.saldo))}</strong> de compras anteriores.`;
-        document.getElementById('btnApplyWalletCredit').style.display = 'none';
       } else {
         walletBox.style.display = 'none';
       }
@@ -286,14 +339,35 @@ function setupEventListeners() {
       const montoNeto = Math.max(0, c.totalVenta - AppState.selectedClient.saldo);
       montoRecibidoInput.value = montoNeto;
       calculatePosTotals();
-      alert(`Se aplicó el crédito de ${formatMoney(AppState.selectedClient.saldo)}. Monto restante a abonar: ${formatMoney(montoNeto)}`);
+      alert(`Se aplicó el crédito de ${formatMoney(AppState.selectedClient.saldo)}. Saldo a abonar: ${formatMoney(montoNeto)}`);
     }
   });
 
-  [kilosInput, costoKgInput, precioKgInput, montoRecibidoInput, posFechaInput].forEach(inp => {
-    inp.addEventListener('input', calculatePosTotals);
+  // Manejo de pago mixto vs pago individual
+  posMedioPagoSelect.addEventListener('change', () => {
+    const isMixto = posMedioPagoSelect.value === 'Mixto';
+    const mixedBox = document.getElementById('mixedPaymentBox');
+    const singleGroup = document.getElementById('singlePaymentGroup');
+
+    if (isMixto) {
+      mixedBox.style.display = 'block';
+      singleGroup.style.display = 'none';
+    } else {
+      mixedBox.style.display = 'none';
+      singleGroup.style.display = 'block';
+    }
+    calculatePosTotals();
   });
 
+  // Evento botón "➕ Agregar Corte al Ticket"
+  document.getElementById('btnAddItemToCart').addEventListener('click', handleAddItemToCart);
+
+  // Recálculos en vivo
+  [kilosInput, costoKgInput, precioKgInput, posDescuentoInput, montoRecibidoInput, pagoEfectivoInput, pagoDigitalInput, posFechaInput].forEach(inp => {
+    if (inp) inp.addEventListener('input', calculatePosTotals);
+  });
+
+  // Envío del Ticket completo de Venta
   posForm.addEventListener('submit', handleGuardarVenta);
 
   // Botones WhatsApp y Ticket
@@ -307,14 +381,14 @@ function setupEventListeners() {
   });
   document.getElementById('btnPrintTicket').addEventListener('click', () => window.print());
 
-  // Formulario Pedido Futuro
+  // Formulario Pedido Futuro (Preventa)
   const orderForm = document.getElementById('orderForm');
   if (orderForm) orderForm.addEventListener('submit', handleGuardarPedido);
 
   // Copiar Pedido Frigorífico
   document.getElementById('btnCopiarPedidoFrigo').addEventListener('click', handleCopiarPedidoFrigorifico);
 
-  // Formulario Proveedor
+  // Formulario Movimiento Proveedor
   const provForm = document.getElementById('proveedorForm');
   if (provForm) provForm.addEventListener('submit', handleGuardarMovimientoProveedor);
 
@@ -333,12 +407,33 @@ function setupEventListeners() {
     renderClientes(e.target.value);
   });
 
-  // Cerrar Modal Cliente
+  // Cerrar Modal Ficha Cliente 360°
   document.getElementById('btnCloseClientModal').addEventListener('click', () => {
     document.getElementById('clientModal').classList.remove('active');
   });
 
-  // Configuración de API
+  // MODAL CORTES: Abrir / Cerrar / Guardar
+  document.getElementById('btnOpenNewCutModal').addEventListener('click', openNewCutModal);
+  document.getElementById('btnCloseCutModal').addEventListener('click', () => {
+    document.getElementById('cutModal').classList.remove('active');
+  });
+  document.getElementById('cutForm').addEventListener('submit', handleSaveCut);
+
+  // MODAL OFERTAS: Abrir / Cerrar / Guardar
+  document.getElementById('btnOpenNewOfferModal').addEventListener('click', openNewOfferModal);
+  document.getElementById('btnCloseOfferModal').addEventListener('click', () => {
+    document.getElementById('offerModal').classList.remove('active');
+  });
+  document.getElementById('offerForm').addEventListener('submit', handleSaveOffer);
+
+  // MODAL CLIENTES: Abrir / Cerrar / Guardar
+  document.getElementById('btnOpenNewClientModal').addEventListener('click', openNewClientModal);
+  document.getElementById('btnCloseClientEditModal').addEventListener('click', () => {
+    document.getElementById('clientEditModal').classList.remove('active');
+  });
+  document.getElementById('clientEditForm').addEventListener('submit', handleSaveClient);
+
+  // Configuración de API Google Sheets
   const apiInput = document.getElementById('sheetsApiUrlInput');
   if (apiInput) apiInput.value = AppState.sheetsApiUrl;
 
@@ -355,23 +450,144 @@ function setupEventListeners() {
   document.getElementById('btnExportJson').addEventListener('click', exportarBackupJSON);
 }
 
-/**
- * 5. CÁLCULO DE TOTALES EN VIVO (CON REGLA DE NEGOCIO HISTÓRICA)
- */
-function calculatePosTotals() {
-  const kilos = parseFloat(document.getElementById('posKilos').value) || 0;
-  const costoKg = parseFloat(document.getElementById('posCostoKg').value) || 0;
-  const precioKg = parseFloat(document.getElementById('posPrecioKg').value) || 0;
-  const montoRecibido = parseFloat(document.getElementById('posMontoRecibido').value);
-  const fecha = document.getElementById('posFecha').value || new Date().toISOString().split('T')[0];
+// Función global para aplicar oferta al input de precio
+window.aplicarOfertaAlCorte = function(valorPromo) {
+  document.getElementById('posPrecioKg').value = valorPromo;
+  calculatePosTotals();
+};
 
+// ====================================================================
+// 5. GESTIÓN DEL CARRITO MULTI-CORTE (TICKET MULTI-ITEM)
+// ====================================================================
+function handleAddItemToCart() {
+  const corteSelect = document.getElementById('posCorte');
+  const kilosInput = document.getElementById('posKilos');
+  const costoKgInput = document.getElementById('posCostoKg');
+  const precioKgInput = document.getElementById('posPrecioKg');
+
+  const corte = corteSelect.value;
+  const kilos = parseFloat(kilosInput.value) || 0;
+  const costoKg = parseFloat(costoKgInput.value) || 0;
+  let precioKg = parseFloat(precioKgInput.value) || 0;
+
+  if (!corte) {
+    alert('Por favor selecciona un corte de carne.');
+    return;
+  }
+  if (kilos <= 0) {
+    alert('Ingresa los kilos válidos para este corte (ej: 2.350).');
+    return;
+  }
+  if (precioKg <= 0) {
+    const prod = AppState.productos.find(p => p.corte === corte);
+    if (prod) precioKg = parseFloat(prod.precio_kg) || 0;
+  }
+
+  const subtotal = kilos * precioKg;
   const costoTotal = kilos * costoKg;
-  const totalVenta = kilos * precioKg;
+  const margenBruto = subtotal - costoTotal;
+
+  AppState.posCart.push({
+    id: 'ITM-' + Date.now().toString().slice(-4) + Math.floor(Math.random() * 100),
+    corte: corte,
+    kg_vendidos: kilos,
+    costo_x_kg: costoKg,
+    costo_total: costoTotal,
+    precio_x_kg: precioKg,
+    subtotal: subtotal,
+    margen_bruto: margenBruto
+  });
+
+  // Limpiar campos de agregado
+  corteSelect.value = '';
+  kilosInput.value = '';
+  costoKgInput.value = '';
+  precioKgInput.value = '';
+  document.getElementById('activeOfferBadge').style.display = 'none';
+
+  renderPosCart();
+  calculatePosTotals();
+}
+
+window.removeItemFromCart = function(index) {
+  AppState.posCart.splice(index, 1);
+  renderPosCart();
+  calculatePosTotals();
+};
+
+function renderPosCart() {
+  const container = document.getElementById('posCartContainer');
+  const countBadge = document.getElementById('cartCountBadge');
+  if (!container) return;
+
+  countBadge.textContent = AppState.posCart.length;
+
+  if (AppState.posCart.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+        Todavía no agregaste ningún corte. Elige corte y kilos arriba y toca "➕ Agregar Este Corte al Ticket".
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = AppState.posCart.map((item, idx) => `
+    <div class="cart-item">
+      <div class="cart-item-main">
+        <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">
+          🥩 ${item.corte}
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          ${item.kg_vendidos} Kg × ${formatMoney(item.precio_x_kg)}/Kg
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <strong style="color: var(--accent-green); font-size: 1rem;">
+          ${formatMoney(item.subtotal)}
+        </strong>
+        <button type="button" class="btn-remove-item" onclick="removeItemFromCart(${idx})" title="Eliminar corte">
+          🗑️
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ====================================================================
+// 6. CÁLCULO DE TOTALES EN VIVO (CON REGLA DE NEGOCIO HISTÓRICA)
+// ====================================================================
+function calculatePosTotals() {
+  const fecha = document.getElementById('posFecha').value || new Date().toISOString().split('T')[0];
+  const descuento = parseFloat(document.getElementById('posDescuento').value) || 0;
+  const medioPago = document.getElementById('posMedioPago').value;
+
+  let totalKilos = 0;
+  let costoTotal = 0;
+  let subtotalVenta = 0;
+
+  // Si hay cortes en el carrito, calcular sobre el carrito
+  if (AppState.posCart.length > 0) {
+    AppState.posCart.forEach(it => {
+      totalKilos += it.kg_vendidos;
+      costoTotal += it.costo_total;
+      subtotalVenta += it.subtotal;
+    });
+  } else {
+    // Si todavía no agregó al carrito, calcular preview del corte en los inputs
+    const kilos = parseFloat(document.getElementById('posKilos').value) || 0;
+    const costoKg = parseFloat(document.getElementById('posCostoKg').value) || 0;
+    const precioKg = parseFloat(document.getElementById('posPrecioKg').value) || 0;
+    totalKilos = kilos;
+    costoTotal = kilos * costoKg;
+    subtotalVenta = kilos * precioKg;
+  }
+
+  const totalVenta = Math.max(0, subtotalVenta - descuento);
   const margenTotal = totalVenta - costoTotal;
 
-  // Regla de ganancia:
-  // Hasta 2026-06-22: 50%
-  // Desde 2026-06-23: 100% directa (Lucas sumó ganancia al costo)
+  // REGLA HISTÓRICA DE GANANCIA:
+  // Hasta 2026-06-22: 50% Compartida
+  // Desde 2026-06-23: 100% Directa (Lucas sumó su ganancia al costo)
   let gananciaNeta = margenTotal;
   let splitLabel = 'Ganancia 100% Directa';
 
@@ -380,13 +596,31 @@ function calculatePosTotals() {
     splitLabel = 'Ganancia 50% Compartida';
   }
 
+  document.getElementById('liveTotalKilos').textContent = `${totalKilos.toFixed(2)} Kg`;
   document.getElementById('liveCostoTotal').textContent = formatMoney(costoTotal);
+  document.getElementById('liveSubtotalVenta').textContent = formatMoney(subtotalVenta);
   document.getElementById('liveTotalVenta').textContent = formatMoney(totalVenta);
   document.getElementById('liveMargenTotal').textContent = formatMoney(gananciaNeta);
   document.getElementById('liveSplitText').textContent = splitLabel;
 
+  // Manejo del cobro recibido
+  let montoRecibido = 0;
+  let cobroEfectivo = 0;
+  let cobroDigital = 0;
+
+  if (medioPago === 'Mixto') {
+    cobroEfectivo = parseFloat(document.getElementById('posPagoEfectivo').value) || 0;
+    cobroDigital = parseFloat(document.getElementById('posPagoDigital').value) || 0;
+    montoRecibido = cobroEfectivo + cobroDigital;
+  } else {
+    const rawRecibido = parseFloat(document.getElementById('posMontoRecibido').value);
+    montoRecibido = isNaN(rawRecibido) ? totalVenta : rawRecibido;
+    if (medioPago === 'Efectivo') cobroEfectivo = montoRecibido;
+    else cobroDigital = montoRecibido;
+  }
+
   const saldoBox = document.getElementById('saldoDiferenciaBox');
-  if (!isNaN(montoRecibido)) {
+  if (totalVenta > 0 && !isNaN(montoRecibido)) {
     const dif = montoRecibido - totalVenta;
     if (dif === 0) {
       saldoBox.innerHTML = '<span style="color: var(--accent-green);">✅ Pagó monto exacto.</span>';
@@ -399,81 +633,286 @@ function calculatePosTotals() {
     saldoBox.innerHTML = '';
   }
 
-  return { kilos, costoKg, costoTotal, precioKg, totalVenta, margenTotal, gananciaNeta, montoRecibido, fecha };
+  return {
+    totalKilos,
+    costoTotal,
+    subtotalVenta,
+    descuento,
+    totalVenta,
+    margenTotal,
+    gananciaNeta,
+    montoRecibido,
+    cobroEfectivo,
+    cobroDigital,
+    fecha,
+    medioPago
+  };
 }
 
-/**
- * 6. GUARDAR VENTA
- */
+// ====================================================================
+// 7. GUARDAR TICKET DE VENTA (OPCIÓN A: RELACIONAL EN GOOGLE SHEETS)
+// ====================================================================
 async function handleGuardarVenta(e) {
   e.preventDefault();
 
+  // Si no hay cortes en el carrito pero los inputs tienen datos, auto-agregar
+  if (AppState.posCart.length === 0) {
+    const corteSelect = document.getElementById('posCorte');
+    const kilosInput = document.getElementById('posKilos');
+    if (corteSelect.value && parseFloat(kilosInput.value) > 0) {
+      handleAddItemToCart();
+    } else {
+      alert('Por favor agrega al menos un corte al ticket antes de guardar.');
+      return;
+    }
+  }
+
   const c = calculatePosTotals();
-  if (c.kilos <= 0 || c.totalVenta <= 0) {
-    alert('Por favor completa los kilos y precio válidos.');
+  if (c.totalKilos <= 0 || c.totalVenta <= 0) {
+    alert('El ticket debe tener kilos y monto válidos.');
     return;
   }
 
   const clienteNombre = document.getElementById('posCliente').value.trim();
-  const corte = document.getElementById('posCorte').value;
-  const medioPago = document.getElementById('posMedioPago').value;
-  const recibido = isNaN(c.montoRecibido) ? c.totalVenta : c.montoRecibido;
-  const saldoCliente = recibido - c.totalVenta;
+  if (!clienteNombre) {
+    alert('Ingresa el nombre del cliente.');
+    return;
+  }
 
+  const motivoDescuento = document.getElementById('posMotivoDescuento').value.trim();
+  const saldoCliente = c.montoRecibido - c.totalVenta;
   const meses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
   const mIdx = parseInt(c.fecha.split('-')[1], 10);
   const mes = meses[mIdx] || 'Noviembre';
 
-  const nuevaVenta = {
-    id: Date.now().toString().slice(-6),
+  const idTicket = 'TCK-' + Date.now().toString().slice(-6);
+
+  // Armar objeto del Ticket Consolidado
+  const ticketData = {
+    id_ticket: idTicket,
     fecha: c.fecha,
     mes: mes,
     cliente: clienteNombre,
-    corte: corte,
-    kg_vendidos: c.kilos,
-    costo_x_kg: c.costoKg,
-    costo_total: c.costoTotal,
-    precio_x_kg: c.precioKg,
+    items: [...AppState.posCart],
+    subtotal: c.subtotalVenta,
+    descuento: c.descuento,
+    motivo_descuento: motivoDescuento,
     total_venta: c.totalVenta,
-    margen_bruto: c.margenTotal,
+    costo_total: c.costoTotal,
     ganancia_neta: c.gananciaNeta,
-    etapa_margen: c.fecha <= '2026-06-22' ? '50% Compartida' : '100% Directa',
-    medio_pago: medioPago,
-    monto_recibido: recibido,
+    medio_pago: c.medioPago,
+    cobro_efectivo: c.cobroEfectivo,
+    cobro_digital: c.cobroDigital,
+    monto_recibido: c.montoRecibido,
     saldo_cliente: saldoCliente,
     estado_pago: saldoCliente >= 0 ? 'Pagó' : 'Saldo Pendiente',
-    observaciones: saldoCliente === 0 ? '' : (saldoCliente > 0 ? `A favor AR$ ${saldoCliente}` : `Debe AR$ ${Math.abs(saldoCliente)}`)
+    observaciones: motivoDescuento
   };
 
-  AppState.ventas.unshift(nuevaVenta);
+  // Guardar en AppState.ventas según la OPCIÓN A:
+  // Una fila por cada corte compartiendo el ID_TICKET para análisis en tablas dinámicas
+  AppState.posCart.forEach((item, idx) => {
+    const itemDiscount = c.subtotalVenta > 0 ? (item.subtotal / c.subtotalVenta) * c.descuento : 0;
+    const itemNeto = item.subtotal - itemDiscount - item.costo_total;
+    const itemGanancia = c.fecha <= '2026-06-22' ? itemNeto * 0.5 : itemNeto;
+
+    AppState.ventas.unshift({
+      id: idTicket + '-' + (idx + 1),
+      id_ticket: idTicket,
+      fecha: c.fecha,
+      mes: mes,
+      cliente: clienteNombre,
+      corte: item.corte,
+      kg_vendidos: item.kg_vendidos,
+      costo_x_kg: item.costo_x_kg,
+      costo_total: item.costo_total,
+      precio_x_kg: item.precio_x_kg,
+      subtotal_venta: item.subtotal,
+      descuento_ticket: c.descuento,
+      total_ticket: c.totalVenta,
+      total_venta: item.subtotal - itemDiscount,
+      margen_bruto: item.subtotal - item.costo_total,
+      ganancia_neta: itemGanancia,
+      etapa_margen: c.fecha <= '2026-06-22' ? '50% Compartida' : '100% Directa',
+      medio_pago: c.medioPago,
+      cobro_efectivo: c.cobroEfectivo,
+      cobro_digital: c.cobroDigital,
+      monto_recibido: c.montoRecibido,
+      saldo_cliente: saldoCliente,
+      estado_pago: saldoCliente >= 0 ? 'Pagó' : 'Saldo Pendiente',
+      observaciones: motivoDescuento
+    });
+  });
+
+  AppState.lastSavedTicket = ticketData;
+
+  // Actualizar saldos y guardar localmente
   calculateClientBalances();
   saveLocalData();
   renderDashboard();
   renderClientes();
 
+  // Enviar a Google Sheets vía POST (Opción A)
   if (AppState.sheetsApiUrl) {
     updateStatusBadge('syncing');
     fetch(AppState.sheetsApiUrl, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'nueva_venta', venta: nuevaVenta })
+      body: JSON.stringify({ action: 'nuevo_ticket_multicorte', ticket: ticketData })
     }).then(() => updateStatusBadge('connected')).catch(() => updateStatusBadge('offline'));
   }
 
-  alert(`¡Venta #${nuevaVenta.id} registrada!\nTotal: ${formatMoney(c.totalVenta)}\nGanancia Neta: ${formatMoney(c.gananciaNeta)}`);
+  // Notificar al usuario y abrir Ticket
+  alert(`¡Ticket #${idTicket} registrado con éxito!\nTotal: ${formatMoney(c.totalVenta)}\nCortes: ${AppState.posCart.length}\nGanancia Neta: ${formatMoney(c.gananciaNeta)}`);
 
-  renderTicketModal(nuevaVenta);
+  renderTicketModal(ticketData);
   document.getElementById('ticketModal').classList.add('active');
 
+  // Resetear Carrito y Formulario
+  AppState.posCart = [];
+  renderPosCart();
   document.getElementById('posForm').reset();
   initDateDisplays();
   calculatePosTotals();
 }
 
-/**
- * 7. GESTIÓN DE PEDIDOS PROGRAMADOS / TICKETS FUTUROS
- */
+// ====================================================================
+// 8. TICKET TÉRMICO / DIGITAL & COMPROBANTES DE WHATSAPP
+// ====================================================================
+function handleEnviarWhatsApp() {
+  const clienteNombre = document.getElementById('posCliente').value.trim();
+  const c = calculatePosTotals();
+
+  // Si hay un ticket guardado recientemente, usarlo; si no, armar del actual
+  let t = AppState.lastSavedTicket;
+  if (!t || t.cliente.toLowerCase() !== clienteNombre.toLowerCase()) {
+    if (AppState.posCart.length === 0 && (!clienteNombre || c.totalVenta <= 0)) {
+      alert('Ingresa el cliente y agrega cortes al ticket antes de generar el comprobante.');
+      return;
+    }
+    t = {
+      id_ticket: 'TCK-' + Date.now().toString().slice(-4),
+      cliente: clienteNombre,
+      fecha: c.fecha,
+      items: AppState.posCart.length > 0 ? AppState.posCart : [{
+        corte: document.getElementById('posCorte').value || 'Carne',
+        kg_vendidos: parseFloat(document.getElementById('posKilos').value) || 0,
+        precio_x_kg: parseFloat(document.getElementById('posPrecioKg').value) || 0,
+        subtotal: c.subtotalVenta
+      }],
+      subtotal: c.subtotalVenta,
+      descuento: c.descuento,
+      motivo_descuento: document.getElementById('posMotivoDescuento').value,
+      total_venta: c.totalVenta,
+      medio_pago: c.medioPago,
+      cobro_efectivo: c.cobroEfectivo,
+      cobro_digital: c.cobroDigital,
+      monto_recibido: c.montoRecibido,
+      saldo_cliente: c.montoRecibido - c.totalVenta
+    };
+  }
+
+  let cliente = AppState.selectedClient;
+  if (!cliente) {
+    cliente = AppState.clientes.find(cl => cl.nombre && cl.nombre.toLowerCase() === t.cliente.toLowerCase());
+  }
+
+  const tel = cliente ? (cliente.telefono_whatsapp || cliente.telefono.replace(/\D/g, '')) : '';
+
+  let saldoTxt = '✅ *Saldo:* Al día ($0)';
+  if (t.saldo_cliente > 0) saldoTxt = `🟢 *Saldo a tu favor:* +${formatMoney(t.saldo_cliente)}`;
+  if (t.saldo_cliente < 0) saldoTxt = `⚠️ *Saldo pendiente:* ${formatMoney(Math.abs(t.saldo_cliente))}`;
+
+  let detalleItems = t.items.map(it => `  • ${it.kg_vendidos} Kg de ${it.corte} (${formatMoney(it.precio_x_kg)}/Kg) → *${formatMoney(it.subtotal)}*`).join('\n');
+
+  let pagoDetalle = `${t.medio_pago}`;
+  if (t.medio_pago === 'Mixto') {
+    pagoDetalle = `Mixto (Efectivo: ${formatMoney(t.cobro_efectivo)} | Digital/MP: ${formatMoney(t.cobro_digital)})`;
+  }
+
+  let descTxt = '';
+  if (t.descuento > 0) {
+    descTxt = `\n🏷️ *Descuento Especial:* -${formatMoney(t.descuento)}${t.motivo_descuento ? ` (${t.motivo_descuento})` : ''}`;
+  }
+
+  const mensaje = 
+`🥩 *CARNES PREMIUM*
+----------------------------------------
+👤 *Cliente:* ${t.cliente}
+📅 *Fecha:* ${t.fecha}
+🧾 *Ticket:* #${t.id_ticket}
+🛒 *Detalle del Pedido:*
+${detalleItems}
+----------------------------------------
+📦 *Kilos Totales:* ${t.items.reduce((acc, it) => acc + (it.kg_vendidos || 0), 0).toFixed(2)} Kg
+💵 *Subtotal:* ${formatMoney(t.subtotal)}${descTxt}
+💰 *TOTAL A ABONAR:* ${formatMoney(t.total_venta)}
+💳 *Medio de Pago:* ${pagoDetalle}
+💵 *Monto Abonado:* ${formatMoney(t.monto_recibido)}
+${saldoTxt}
+----------------------------------------
+¡Muchas gracias por elegirnos! 🙏`;
+
+  const encodedMsg = encodeURIComponent(mensaje);
+  const waUrl = tel ? `https://wa.me/${tel}?text=${encodedMsg}` : `https://wa.me/?text=${encodedMsg}`;
+
+  window.open(waUrl, '_blank');
+}
+
+function renderTicketModal(ticketData = null) {
+  const t = ticketData || AppState.lastSavedTicket || {
+    id_ticket: 'TCK-' + Date.now().toString().slice(-4),
+    fecha: new Date().toLocaleDateString('es-AR'),
+    cliente: document.getElementById('posCliente').value || 'Cliente',
+    items: AppState.posCart,
+    subtotal: calculatePosTotals().subtotalVenta,
+    descuento: calculatePosTotals().descuento,
+    total_venta: calculatePosTotals().totalVenta,
+    medio_pago: document.getElementById('posMedioPago').value,
+    monto_recibido: calculatePosTotals().montoRecibido,
+    saldo_cliente: calculatePosTotals().montoRecibido - calculatePosTotals().totalVenta
+  };
+
+  document.getElementById('ticketFecha').textContent = `${t.fecha} — #${t.id_ticket}`;
+
+  let itemsHtml = '';
+  if (t.items && t.items.length > 0) {
+    itemsHtml = t.items.map(it => `
+      <div class="ticket-row" style="margin-top: 4px;">
+        <span>${it.kg_vendidos} Kg x ${formatMoney(it.precio_x_kg)}</span>
+        <strong>${formatMoney(it.subtotal)}</strong>
+      </div>
+      <div style="font-size: 0.78rem; color: #555; margin-bottom: 4px;">${it.corte}</div>
+    `).join('');
+  } else {
+    itemsHtml = `<div class="ticket-row"><span>Corte de Carne</span><strong>${formatMoney(t.total_venta)}</strong></div>`;
+  }
+
+  const body = document.getElementById('ticketBody');
+  body.innerHTML = `
+    <div class="ticket-row"><span>CLIENTE:</span> <strong>${t.cliente}</strong></div>
+    <div class="ticket-row"><span>MEDIO PAGO:</span> <span>${t.medio_pago}</span></div>
+    <div style="border-top: 1px dashed #ccc; margin: 8px 0;"></div>
+    ${itemsHtml}
+    <div style="border-top: 1px dashed #ccc; margin: 8px 0;"></div>
+    <div class="ticket-row"><span>SUBTOTAL:</span> <span>${formatMoney(t.subtotal || t.total_venta)}</span></div>
+    ${t.descuento > 0 ? `<div class="ticket-row" style="color: #b91c1c;"><span>DESCUENTO:</span> <span>-${formatMoney(t.descuento)}</span></div>` : ''}
+    <div class="ticket-total ticket-row">
+      <span>TOTAL:</span>
+      <span>${formatMoney(t.total_venta)}</span>
+    </div>
+    <div class="ticket-row"><span>ABONADO:</span> <span>${formatMoney(t.monto_recibido)}</span></div>
+    <div class="ticket-row">
+      <span>SALDO:</span>
+      <span>${t.saldo_cliente === 0 ? '$ 0 (Al día)' : (t.saldo_cliente > 0 ? `+${formatMoney(t.saldo_cliente)} a favor` : `${formatMoney(t.saldo_cliente)} pendiente`)}</span>
+    </div>
+  `;
+}
+
+// ====================================================================
+// 9. GESTIÓN DE PEDIDOS PROGRAMADOS / PREVENTA (SIN ANTICIPO)
+// ====================================================================
 function handleGuardarPedido(e) {
   e.preventDefault();
 
@@ -502,7 +941,7 @@ function handleGuardarPedido(e) {
     corte: corte,
     kg_estimados: kilos,
     precio_x_kg: precio,
-    estado: 'Pendiente',
+    estado: 'Pendiente', // No requiere adelanto ni seña
     notas: notas,
     telefono: tel
   };
@@ -511,7 +950,17 @@ function handleGuardarPedido(e) {
   saveLocalData();
   renderPedidos();
 
-  alert(`¡Pedido ${nuevoPedido.id} agendado para entrega el ${fechaEntrega}!`);
+  // Sincronizar pedido con Google Sheets
+  if (AppState.sheetsApiUrl) {
+    fetch(AppState.sheetsApiUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'nuevo_pedido', pedido: nuevoPedido })
+    }).catch(console.error);
+  }
+
+  alert(`¡Pedido agendado para ${cliente} el ${fechaEntrega}!`);
   document.getElementById('orderForm').reset();
   initDateDisplays();
 }
@@ -523,7 +972,7 @@ function renderPedidos() {
   if (!container) return;
 
   const activeOrders = AppState.pedidos.filter(p => p.estado !== 'Entregado');
-  countBadge.textContent = `${activeOrders.length} Pendientes`;
+  if (countBadge) countBadge.textContent = `${activeOrders.length} Pendientes`;
 
   // Calcular consolidado para frigorífico
   const cutsTally = {};
@@ -536,7 +985,7 @@ function renderPedidos() {
 
   if (frigoContainer) {
     if (Object.keys(cutsTally).length === 0) {
-      frigoContainer.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted);">No hay pedidos pendientes para esta semana.</span>';
+      frigoContainer.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted);">No hay pedidos pendientes para encargar esta semana.</span>';
     } else {
       frigoContainer.innerHTML = Object.entries(cutsTally)
         .map(([corte, kg]) => `<div class="frigo-cut-tag">🥩 ${corte}: <strong>${kg.toFixed(2)} Kg</strong></div>`)
@@ -546,7 +995,7 @@ function renderPedidos() {
 
   container.innerHTML = '';
   if (AppState.pedidos.length === 0) {
-    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No hay pedidos agendados.</div>';
+    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No hay pedidos agendados en preventa.</div>';
     return;
   }
 
@@ -573,7 +1022,7 @@ function renderPedidos() {
         ` : ''}
         ${p.telefono ? `
           <a href="https://wa.me/${p.telefono.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${p.cliente}! Tu pedido de ${p.corte} para el ${p.fecha_entrega} está agendado en Carnes Premium.`)}" target="_blank" class="badge badge-green" style="text-decoration: none; padding: 6px 10px;">
-            📲 WhatsApp
+            📲 WA
           </a>
         ` : ''}
       </div>
@@ -582,7 +1031,7 @@ function renderPedidos() {
   });
 }
 
-// Convertir pedido futuro en venta rápida
+// Convertir pedido futuro en venta en POS
 window.convertirPedidoAVenta = function(pedidoId) {
   const p = AppState.pedidos.find(x => x.id === pedidoId);
   if (!p) return;
@@ -600,13 +1049,13 @@ window.convertirPedidoAVenta = function(pedidoId) {
     document.getElementById('posPrecioKg').value = prod.precio_kg;
   }
 
-  // Disparar input event para actualizar alerta de billetera
   document.getElementById('posCliente').dispatchEvent(new Event('input'));
   calculatePosTotals();
 
   // Marcar pedido como Entregado
   p.estado = 'Entregado';
   saveLocalData();
+  renderPedidos();
 };
 
 function handleCopiarPedidoFrigorifico() {
@@ -636,94 +1085,557 @@ function handleCopiarPedidoFrigorifico() {
   });
 }
 
-/**
- * 8. WHATSAPP & TICKETS (NEUTRAL - CARNES PREMIUM)
- */
-function handleEnviarWhatsApp() {
-  const clienteNombre = document.getElementById('posCliente').value.trim();
-  const corte = document.getElementById('posCorte').value;
-  const c = calculatePosTotals();
+// ====================================================================
+// 10. CRUD CORTES & CATÁLOGO DE PRECIOS
+// ====================================================================
+function renderCortesCatalog() {
+  const container = document.getElementById('cutsCatalogList');
+  const countBadge = document.getElementById('cutsCountBadge');
+  if (!container) return;
 
-  if (!clienteNombre || c.totalVenta <= 0) {
-    alert('Ingresa el cliente, corte y kilos antes de generar el comprobante.');
+  if (countBadge) countBadge.textContent = `${AppState.productos.length} Cortes`;
+  container.innerHTML = '';
+
+  AppState.productos.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+
+    const costo = Number(c.costo_kg) || 0;
+    const precio = Number(c.precio_kg) || 0;
+    const ganancia = precio - costo;
+
+    item.innerHTML = `
+      <div class="item-main">
+        <div class="item-title" style="font-size: 1rem;">🥩 ${c.corte}</div>
+        <div class="item-desc">
+          Costo: <strong>${formatMoney(costo)}/Kg</strong> | Venta: <strong style="color: var(--accent-green);">${formatMoney(precio)}/Kg</strong>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--accent-blue); margin-top: 2px;">
+          Margen: +${formatMoney(ganancia)}/Kg ${c.notas ? `• 📌 ${c.notas}` : ''}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button type="button" class="btn-icon" onclick="openEditCutModal('${c.id || c.corte}')" title="Editar precio o costo">
+          ✏️
+        </button>
+        <button type="button" class="btn-icon danger" onclick="deleteCut('${c.id || c.corte}')" title="Eliminar corte">
+          🗑️
+        </button>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function openNewCutModal() {
+  document.getElementById('cutModalTitle').textContent = 'Nuevo Corte de Carne';
+  document.getElementById('editCutId').value = '';
+  document.getElementById('cutName').value = '';
+  document.getElementById('cutCost').value = '';
+  document.getElementById('cutPrice').value = '';
+  document.getElementById('cutNotes').value = '';
+  document.getElementById('cutModal').classList.add('active');
+}
+
+window.openEditCutModal = function(cutId) {
+  const cut = AppState.productos.find(p => (p.id && String(p.id) === String(cutId)) || p.corte === cutId);
+  if (!cut) return;
+
+  document.getElementById('cutModalTitle').textContent = 'Editar Corte de Carne';
+  document.getElementById('editCutId').value = cut.id || cut.corte;
+  document.getElementById('cutName').value = cut.corte;
+  document.getElementById('cutCost').value = cut.costo_kg;
+  document.getElementById('cutPrice').value = cut.precio_kg;
+  document.getElementById('cutNotes').value = cut.notas || '';
+
+  document.getElementById('cutModal').classList.add('active');
+};
+
+function handleSaveCut(e) {
+  e.preventDefault();
+  const id = document.getElementById('editCutId').value;
+  const name = document.getElementById('cutName').value.trim();
+  const cost = parseFloat(document.getElementById('cutCost').value) || 0;
+  const price = parseFloat(document.getElementById('cutPrice').value) || 0;
+  const notes = document.getElementById('cutNotes').value.trim();
+
+  if (!name || cost <= 0 || price <= 0) {
+    alert('Ingresa el nombre, costo y precio de venta válidos.');
     return;
   }
 
-  let cliente = AppState.selectedClient;
-  if (!cliente) {
-    cliente = AppState.clientes.find(cl => cl.nombre && cl.nombre.toLowerCase() === clienteNombre.toLowerCase());
+  let cutObj;
+  if (id) {
+    cutObj = AppState.productos.find(p => (p.id && String(p.id) === String(id)) || p.corte === id);
+    if (cutObj) {
+      cutObj.corte = name;
+      cutObj.costo_kg = cost;
+      cutObj.precio_kg = price;
+      cutObj.ganancia_kg = price - cost;
+      cutObj.notas = notes;
+    }
+  } else {
+    cutObj = {
+      id: String(Date.now()),
+      corte: name,
+      costo_kg: cost,
+      precio_kg: price,
+      ganancia_kg: price - cost,
+      notas: notes
+    };
+    AppState.productos.push(cutObj);
   }
 
-  const tel = cliente ? (cliente.telefono_whatsapp || cliente.telefono.replace(/\D/g, '')) : '';
-  const recibido = isNaN(c.montoRecibido) ? c.totalVenta : c.montoRecibido;
-  const saldo = recibido - c.totalVenta;
+  saveLocalData();
+  populateProductSelects();
+  renderCortesCatalog();
+  document.getElementById('cutModal').classList.remove('active');
 
-  let saldoTxt = '✅ Saldo: Al día ($0)';
-  if (saldo > 0) saldoTxt = `🟢 Saldo a tu favor: +${formatMoney(saldo)}`;
-  if (saldo < 0) saldoTxt = `⚠️ Saldo pendiente: ${formatMoney(Math.abs(saldo))}`;
+  // Sincronizar corte con Google Sheets
+  if (AppState.sheetsApiUrl) {
+    fetch(AppState.sheetsApiUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'guardar_corte', corte: cutObj })
+    }).catch(console.error);
+  }
 
-  const now = new Date();
-  const fechaStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
-
-  const mensaje = 
-`🥩 *CARNES PREMIUM*
-----------------------------------------
-👤 *Cliente:* ${clienteNombre}
-📅 *Fecha:* ${fechaStr}
-🛒 *Detalle del Pedido:*
-  • ${c.kilos} Kg de ${corte || 'Carne'}
-  • Precio: ${formatMoney(c.precioKg)}/Kg
-----------------------------------------
-💰 *TOTAL:* ${formatMoney(c.totalVenta)}
-💵 *Abonado:* ${formatMoney(recibido)} (${document.getElementById('posMedioPago').value})
-${saldoTxt}
-----------------------------------------
-¡Muchas gracias por elegirnos! 🙏`;
-
-  const encodedMsg = encodeURIComponent(mensaje);
-  const waUrl = tel ? `https://wa.me/${tel}?text=${encodedMsg}` : `https://wa.me/?text=${encodedMsg}`;
-
-  window.open(waUrl, '_blank');
+  alert(`¡Corte "${name}" guardado correctamente!`);
 }
 
-function renderTicketModal(ventaDirecta = null) {
-  const c = calculatePosTotals();
-  const cliente = document.getElementById('posCliente').value || (ventaDirecta ? ventaDirecta.cliente : 'Cliente');
-  const corte = document.getElementById('posCorte').value || (ventaDirecta ? ventaDirecta.corte : 'Corte');
-  const kilos = ventaDirecta ? ventaDirecta.kg_vendidos : c.kilos;
-  const precio = ventaDirecta ? ventaDirecta.precio_x_kg : c.precioKg;
-  const total = ventaDirecta ? ventaDirecta.total_venta : c.totalVenta;
-  const recibido = ventaDirecta ? ventaDirecta.monto_recibido : (isNaN(c.montoRecibido) ? total : c.montoRecibido);
-  const medio = ventaDirecta ? ventaDirecta.medio_pago : document.getElementById('posMedioPago').value;
+window.deleteCut = function(cutId) {
+  const cut = AppState.productos.find(p => (p.id && String(p.id) === String(cutId)) || p.corte === cutId);
+  if (!cut) return;
 
-  const now = new Date();
-  document.getElementById('ticketFecha').textContent = now.toLocaleString('es-AR');
+  if (confirm(`¿Estás seguro de eliminar el corte "${cut.corte}" del catálogo?`)) {
+    AppState.productos = AppState.productos.filter(p => p !== cut);
+    saveLocalData();
+    populateProductSelects();
+    renderCortesCatalog();
+  }
+};
 
-  const body = document.getElementById('ticketBody');
-  body.innerHTML = `
-    <div class="ticket-row"><span>CLIENTE:</span> <strong>${cliente}</strong></div>
-    <div class="ticket-row"><span>MEDIO PAGO:</span> <span>${medio}</span></div>
-    <div style="border-top: 1px dashed #ccc; margin: 8px 0;"></div>
-    <div class="ticket-row">
-      <span>${kilos} Kg x ${formatMoney(precio)}</span>
-      <strong>${formatMoney(total)}</strong>
-    </div>
-    <div style="font-size: 0.8rem; color: #555; margin-bottom: 6px;">${corte}</div>
-    <div class="ticket-total ticket-row">
-      <span>TOTAL:</span>
-      <span>${formatMoney(total)}</span>
-    </div>
-    <div class="ticket-row"><span>ABONADO:</span> <span>${formatMoney(recibido)}</span></div>
-    <div class="ticket-row">
-      <span>DIFERENCIA:</span>
-      <span>${recibido - total === 0 ? '$ 0 (Al día)' : formatMoney(recibido - total)}</span>
-    </div>
-  `;
+// ====================================================================
+// 11. CRUD OFERTAS & PROMOCIONES
+// ====================================================================
+function renderOffersList() {
+  const container = document.getElementById('offersList');
+  const countBadge = document.getElementById('offersCountBadge');
+  if (!container) return;
+
+  if (countBadge) countBadge.textContent = `${AppState.ofertas.length} Ofertas`;
+  container.innerHTML = '';
+
+  if (AppState.ofertas.length === 0) {
+    container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 12px; text-align: center;">No hay ofertas configuradas. Crea una nueva con el botón superior.</div>';
+    return;
+  }
+
+  AppState.ofertas.forEach(o => {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+
+    item.innerHTML = `
+      <div class="item-main">
+        <div class="item-title" style="color: var(--accent-amber);">
+          🔥 ${o.nombre} <span class="badge ${o.activa ? 'badge-green' : 'badge-yellow'}" style="margin-left: 6px;">${o.activa ? 'Activa' : 'Pausada'}</span>
+        </div>
+        <div class="item-desc">
+          🥩 Corte: <strong>${o.corte}</strong> | Precio Promo: <strong style="color: #fff;">${formatMoney(o.valor)}/Kg</strong>
+        </div>
+        ${o.descripcion ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">📌 ${o.descripcion}</div>` : ''}
+      </div>
+      <div class="item-actions">
+        <button type="button" class="btn btn-sm ${o.activa ? 'btn-secondary' : 'btn-primary'}" onclick="toggleOffer('${o.id}')">
+          ${o.activa ? 'Pausar' : 'Activar'}
+        </button>
+        <button type="button" class="btn-icon" onclick="openEditOfferModal('${o.id}')" title="Editar oferta">
+          ✏️
+        </button>
+        <button type="button" class="btn-icon danger" onclick="deleteOffer('${o.id}')" title="Eliminar oferta">
+          🗑️
+        </button>
+      </div>
+    `;
+    container.appendChild(item);
+  });
 }
 
-/**
- * 9. DASHBOARD, GRÁFICAS (CHART.JS) & PROYECCIONES
- */
+function openNewOfferModal() {
+  populateProductSelects();
+  document.getElementById('offerModalTitle').textContent = 'Crear Oferta Especial';
+  document.getElementById('editOfferId').value = '';
+  document.getElementById('offerName').value = '';
+  document.getElementById('offerCut').value = '';
+  document.getElementById('offerValue').value = '';
+  document.getElementById('offerDesc').value = '';
+  document.getElementById('offerModal').classList.add('active');
+}
+
+window.openEditOfferModal = function(offerId) {
+  const o = AppState.ofertas.find(x => x.id === offerId);
+  if (!o) return;
+
+  populateProductSelects();
+  document.getElementById('offerModalTitle').textContent = 'Editar Oferta Especial';
+  document.getElementById('editOfferId').value = o.id;
+  document.getElementById('offerName').value = o.nombre;
+  document.getElementById('offerCut').value = o.corte;
+  document.getElementById('offerValue').value = o.valor;
+  document.getElementById('offerDesc').value = o.descripcion || '';
+  document.getElementById('offerModal').classList.add('active');
+};
+
+function handleSaveOffer(e) {
+  e.preventDefault();
+  const id = document.getElementById('editOfferId').value;
+  const name = document.getElementById('offerName').value.trim();
+  const cut = document.getElementById('offerCut').value;
+  const value = parseFloat(document.getElementById('offerValue').value) || 0;
+  const desc = document.getElementById('offerDesc').value.trim();
+
+  if (!name || !cut || value <= 0) {
+    alert('Completa los campos requeridos de la oferta.');
+    return;
+  }
+
+  if (id) {
+    const o = AppState.ofertas.find(x => x.id === id);
+    if (o) {
+      o.nombre = name;
+      o.corte = cut;
+      o.valor = value;
+      o.descripcion = desc;
+    }
+  } else {
+    AppState.ofertas.push({
+      id: 'OF-' + Date.now().toString().slice(-4),
+      nombre: name,
+      corte: cut,
+      tipo: 'precio_fijo',
+      valor: value,
+      descripcion: desc,
+      activa: true
+    });
+  }
+
+  saveLocalData();
+  renderOffersList();
+  document.getElementById('offerModal').classList.remove('active');
+  alert(`¡Oferta "${name}" guardada!`);
+}
+
+window.toggleOffer = function(offerId) {
+  const o = AppState.ofertas.find(x => x.id === offerId);
+  if (!o) return;
+  o.activa = !o.activa;
+  saveLocalData();
+  renderOffersList();
+};
+
+window.deleteOffer = function(offerId) {
+  if (confirm('¿Deseas eliminar esta oferta?')) {
+    AppState.ofertas = AppState.ofertas.filter(x => x.id !== offerId);
+    saveLocalData();
+    renderOffersList();
+  }
+};
+
+// ====================================================================
+// 12. CRUD CLIENTES & FICHA 360°
+// ====================================================================
+function renderClientes(query = '') {
+  const container = document.getElementById('clientesList');
+  const countBadge = document.getElementById('clientesCountBadge');
+  if (!container) return;
+
+  const q = query.toLowerCase().trim();
+  const filtered = AppState.clientes.filter(c => 
+    (c.nombre && c.nombre.toLowerCase().includes(q)) || 
+    (c.telefono && String(c.telefono).includes(q)) ||
+    (c.domicilio && c.domicilio.toLowerCase().includes(q))
+  );
+
+  if (countBadge) countBadge.textContent = `${filtered.length} Clientes`;
+  container.innerHTML = '';
+
+  filtered.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+
+    let saldoBadge = '';
+    if (c.saldo > 0) saldoBadge = `<span class="badge badge-green">+${formatMoney(c.saldo)} a favor</span>`;
+    if (c.saldo < 0) saldoBadge = `<span class="badge badge-red">Debe ${formatMoney(Math.abs(c.saldo))}</span>`;
+
+    item.innerHTML = `
+      <div class="item-main" onclick="abrirFichaCliente('${c.nombre.replace(/'/g, "\\'")}')">
+        <div class="item-title">${c.nombre} ${saldoBadge}</div>
+        <div class="item-desc">📞 ${c.telefono || 'Sin teléfono'}</div>
+        <div class="item-desc">📍 ${c.domicilio || 'Sin domicilio registrado'}</div>
+        ${c.notas ? `<div style="font-size: 0.75rem; color: var(--accent-amber); margin-top: 2px;">📌 ${c.notas}</div>` : ''}
+      </div>
+      <div class="item-actions">
+        ${c.telefono_whatsapp ? `
+          <a href="https://wa.me/${c.telefono_whatsapp}" target="_blank" class="badge badge-green" style="text-decoration: none; padding: 6px 10px;">
+            💬 WA
+          </a>
+        ` : ''}
+        <button type="button" class="btn-icon" onclick="openEditClientModal('${c.id || c.nombre.replace(/'/g, "\\'")}')" title="Editar cliente">
+          ✏️
+        </button>
+        <button type="button" class="btn-icon danger" onclick="deleteClient('${c.id || c.nombre.replace(/'/g, "\\'")}')" title="Eliminar cliente">
+          🗑️
+        </button>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function openNewClientModal() {
+  document.getElementById('clientEditModalTitle').textContent = 'Nuevo Cliente';
+  document.getElementById('editClientId').value = '';
+  document.getElementById('clientEditName').value = '';
+  document.getElementById('clientEditPhone').value = '';
+  document.getElementById('clientEditAddress').value = '';
+  document.getElementById('clientEditNotes').value = '';
+  document.getElementById('clientEditModal').classList.add('active');
+}
+
+window.openEditClientModal = function(clientId) {
+  const c = AppState.clientes.find(x => (x.id && String(x.id) === String(clientId)) || x.nombre === clientId);
+  if (!c) return;
+
+  document.getElementById('clientEditModalTitle').textContent = 'Editar Cliente';
+  document.getElementById('editClientId').value = c.id || c.nombre;
+  document.getElementById('clientEditName').value = c.nombre;
+  document.getElementById('clientEditPhone').value = c.telefono;
+  document.getElementById('clientEditAddress').value = c.domicilio;
+  document.getElementById('clientEditNotes').value = c.notas;
+
+  document.getElementById('clientEditModal').classList.add('active');
+};
+
+function handleSaveClient(e) {
+  e.preventDefault();
+  const id = document.getElementById('editClientId').value;
+  const name = document.getElementById('clientEditName').value.trim();
+  const phone = document.getElementById('clientEditPhone').value.trim();
+  const address = document.getElementById('clientEditAddress').value.trim();
+  const notes = document.getElementById('clientEditNotes').value.trim();
+
+  if (!name) {
+    alert('Ingresa el nombre del cliente.');
+    return;
+  }
+
+  const cleanTel = phone.replace(/[^0-9]/g, '');
+  let clientObj;
+
+  if (id) {
+    clientObj = AppState.clientes.find(x => (x.id && String(x.id) === String(id)) || x.nombre === id);
+    if (clientObj) {
+      clientObj.nombre = name;
+      clientObj.telefono = phone;
+      clientObj.telefono_whatsapp = cleanTel;
+      clientObj.domicilio = address;
+      clientObj.notas = notes;
+    }
+  } else {
+    clientObj = {
+      id: String(Date.now()),
+      nombre: name,
+      telefono: phone,
+      telefono_whatsapp: cleanTel,
+      domicilio: address,
+      notas: notes,
+      saldo: 0
+    };
+    AppState.clientes.push(clientObj);
+  }
+
+  saveLocalData();
+  populateClientDatalists();
+  renderClientes();
+  document.getElementById('clientEditModal').classList.remove('active');
+
+  // Sincronizar cliente con Google Sheets
+  if (AppState.sheetsApiUrl) {
+    fetch(AppState.sheetsApiUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'guardar_cliente', cliente: clientObj })
+    }).catch(console.error);
+  }
+
+  alert(`¡Cliente "${name}" guardado!`);
+}
+
+window.deleteClient = function(clientId) {
+  const c = AppState.clientes.find(x => (x.id && String(x.id) === String(clientId)) || x.nombre === clientId);
+  if (!c) return;
+
+  if (confirm(`¿Estás seguro de eliminar a ${c.nombre} del directorio de clientes?`)) {
+    AppState.clientes = AppState.clientes.filter(x => x !== c);
+    saveLocalData();
+    populateClientDatalists();
+    renderClientes();
+  }
+};
+
+window.abrirFichaCliente = function(nombreCliente) {
+  const cliente = AppState.clientes.find(c => c.nombre === nombreCliente);
+  if (!cliente) return;
+
+  document.getElementById('clientModalName').textContent = cliente.nombre;
+  document.getElementById('clientModalContact').innerHTML = `📞 ${cliente.telefono || 'Sin teléfono'} | 📍 ${cliente.domicilio || 'Sin dirección'}`;
+
+  // Compras de este cliente
+  const compras = AppState.ventas.filter(v => v.cliente && v.cliente.toLowerCase() === cliente.nombre.toLowerCase());
+  const totalFacturado = compras.reduce((acc, v) => acc + (v.total_venta || 0), 0);
+  const totalKilos = compras.reduce((acc, v) => acc + (v.kg_vendidos || 0), 0);
+
+  document.getElementById('clientModalTotalVentas').textContent = formatMoney(totalFacturado);
+  document.getElementById('clientModalTotalKilos').textContent = `${totalKilos.toFixed(1)} Kg`;
+
+  const saldoEl = document.getElementById('clientModalSaldo');
+  if (cliente.saldo > 0) {
+    saldoEl.textContent = `+${formatMoney(cliente.saldo)}`;
+    saldoEl.style.color = 'var(--accent-green)';
+  } else if (cliente.saldo < 0) {
+    saldoEl.textContent = `-${formatMoney(Math.abs(cliente.saldo))}`;
+    saldoEl.style.color = 'var(--accent-rose)';
+  } else {
+    saldoEl.textContent = '$ 0 (Al día)';
+    saldoEl.style.color = '#fff';
+  }
+
+  // Enlace WhatsApp
+  const btnWa = document.getElementById('btnClientModalWhatsApp');
+  if (cliente.telefono_whatsapp) {
+    btnWa.style.display = 'inline-flex';
+    btnWa.href = `https://wa.me/${cliente.telefono_whatsapp}`;
+  } else {
+    btnWa.style.display = 'none';
+  }
+
+  // Botón Tomar Pedido
+  document.getElementById('btnClientModalNewOrder').onclick = () => {
+    document.getElementById('clientModal').classList.remove('active');
+    document.querySelector('.nav-item[data-tab="tab-pedidos"]').click();
+    document.getElementById('orderCliente').value = cliente.nombre;
+  };
+
+  // Render historial
+  const historyList = document.getElementById('clientModalHistoryList');
+  historyList.innerHTML = '';
+  if (compras.length === 0) {
+    historyList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">Sin compras registradas aún.</div>';
+  } else {
+    compras.forEach(v => {
+      const row = document.createElement('div');
+      row.className = 'list-item';
+      row.style.padding = '8px 10px';
+      row.innerHTML = `
+        <div class="item-main">
+          <div style="font-weight: 700; font-size: 0.85rem;">${v.fecha} — ${v.corte || 'Carne'}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}</div>
+        </div>
+        <div style="font-weight: 800; color: var(--accent-green); font-size: 0.9rem;">
+          ${formatMoney(v.total_venta)}
+        </div>
+      `;
+      historyList.appendChild(row);
+    });
+  }
+
+  document.getElementById('clientModal').classList.add('active');
+};
+
+// ====================================================================
+// 13. CUENTA CORRIENTE PROVEEDOR (CONCILIACIÓN)
+// ====================================================================
+function handleGuardarMovimientoProveedor(e) {
+  e.preventDefault();
+
+  const fecha = document.getElementById('provFecha').value;
+  const concepto = document.getElementById('provConcepto').value.trim();
+  const pago = parseFloat(document.getElementById('provPago').value) || 0;
+  const costo = parseFloat(document.getElementById('provCosto').value) || 0;
+  const medio = document.getElementById('provMedio').value;
+
+  const ultimoSaldo = AppState.proveedor.length > 0 ? (AppState.proveedor[0].saldo || 0) : 0;
+  const nuevoSaldo = ultimoSaldo + costo - pago;
+
+  const nuevoMov = {
+    id: Date.now().toString().slice(-5),
+    fecha: fecha,
+    concepto: concepto,
+    medio_pago: medio,
+    pago_a_proveedor: pago,
+    costo_carne: costo,
+    saldo: nuevoSaldo,
+    notas: ''
+  };
+
+  AppState.proveedor.unshift(nuevoMov);
+  saveLocalData();
+  renderProveedor();
+
+  alert('Movimiento de proveedor registrado.');
+  document.getElementById('proveedorForm').reset();
+  initDateDisplays();
+}
+
+function renderProveedor() {
+  const container = document.getElementById('proveedorList');
+  const saldoBadge = document.getElementById('proveedorSaldoBadge');
+  if (!container) return;
+
+  const ultimoSaldo = AppState.proveedor.length > 0 ? (AppState.proveedor[0].saldo || 0) : 0;
+  if (saldoBadge) {
+    saldoBadge.textContent = `Saldo: ${formatMoney(Math.abs(ultimoSaldo))}`;
+    if (ultimoSaldo > 0) {
+      saldoBadge.className = 'badge badge-red';
+      saldoBadge.textContent += ' (Deuda carne)';
+    } else if (ultimoSaldo < 0) {
+      saldoBadge.className = 'badge badge-green';
+      saldoBadge.textContent += ' (A favor)';
+    } else {
+      saldoBadge.className = 'badge badge-green';
+      saldoBadge.textContent = 'Al día ($0)';
+    }
+  }
+
+  container.innerHTML = '';
+  AppState.proveedor.forEach(l => {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+
+    item.innerHTML = `
+      <div class="item-main">
+        <div class="item-title">${l.concepto || 'Movimiento'}</div>
+        <div class="item-desc">${l.fecha} | ${l.medio_pago || 'MercadoPago'}</div>
+        ${l.notas ? `<div style="font-size: 0.75rem; color: var(--text-muted);">${l.notas}</div>` : ''}
+      </div>
+      <div class="item-actions" style="text-align: right; flex-direction: column; align-items: flex-end;">
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          Costo: ${formatMoney(l.costo_carne)} | Pago: ${formatMoney(l.pago_a_proveedor)}
+        </div>
+        <div style="font-weight: 700; color: ${l.saldo > 0 ? 'var(--accent-rose)' : 'var(--accent-green)'}">
+          Saldo: ${formatMoney(l.saldo)}
+        </div>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+// ====================================================================
+// 14. DASHBOARD, MÉTRICAS & CHART.JS
+// ====================================================================
 function renderDashboard() {
   const filterMonth = document.getElementById('dashMonthFilter').value;
 
@@ -782,7 +1694,6 @@ function renderDashboard() {
 function calculateProjectionSimulator() {
   const metaGanancia = parseFloat(document.getElementById('inputMetaGanancia').value) || 1500000;
 
-  // Promedio mensual real del histórico
   const mesesDistintos = new Set(AppState.ventas.map(v => v.mes)).size || 6;
   const totalFacturadoHist = AppState.ventas.reduce((acc, v) => acc + (v.total_venta || 0), 0);
   const totalGananciaHist = AppState.ventas.reduce((acc, v) => acc + (v.ganancia_neta || 0), 0);
@@ -905,201 +1816,9 @@ function renderCharts() {
   }
 }
 
-/**
- * 10. FICHA DE CLIENTE 360° & HISTORIAL
- */
-function renderClientes(query = '') {
-  const container = document.getElementById('clientesList');
-  if (!container) return;
-
-  const q = query.toLowerCase().trim();
-  const filtered = AppState.clientes.filter(c => 
-    (c.nombre && c.nombre.toLowerCase().includes(q)) || 
-    (c.telefono && String(c.telefono).includes(q)) ||
-    (c.domicilio && c.domicilio.toLowerCase().includes(q))
-  );
-
-  document.getElementById('clientesCountBadge').textContent = `${filtered.length} Clientes`;
-  container.innerHTML = '';
-
-  filtered.forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'list-item';
-
-    let saldoBadge = '';
-    if (c.saldo > 0) saldoBadge = `<span class="badge badge-green">+${formatMoney(c.saldo)} a favor</span>`;
-    if (c.saldo < 0) saldoBadge = `<span class="badge badge-red">Debe ${formatMoney(Math.abs(c.saldo))}</span>`;
-
-    item.innerHTML = `
-      <div class="item-main" onclick="abrirFichaCliente('${c.nombre.replace(/'/g, "\\'")}')">
-        <div class="item-title">${c.nombre} ${saldoBadge}</div>
-        <div class="item-desc">📞 ${c.telefono || 'Sin teléfono'}</div>
-        <div class="item-desc">📍 ${c.domicilio || 'Sin domicilio registrado'}</div>
-        ${c.notas ? `<div style="font-size: 0.75rem; color: var(--accent-amber); margin-top: 2px;">📌 ${c.notas}</div>` : ''}
-      </div>
-      <div class="item-actions">
-        ${c.telefono_whatsapp ? `
-          <a href="https://wa.me/${c.telefono_whatsapp}" target="_blank" class="badge badge-green" style="text-decoration: none; padding: 6px 10px;">
-            💬 WA
-          </a>
-        ` : ''}
-      </div>
-    `;
-    container.appendChild(item);
-  });
-}
-
-window.abrirFichaCliente = function(nombreCliente) {
-  const cliente = AppState.clientes.find(c => c.nombre === nombreCliente);
-  if (!cliente) return;
-
-  document.getElementById('clientModalName').textContent = cliente.nombre;
-  document.getElementById('clientModalContact').innerHTML = `📞 ${cliente.telefono || 'Sin teléfono'} | 📍 ${cliente.domicilio || 'Sin dirección'}`;
-
-  // Compras de este cliente
-  const compras = AppState.ventas.filter(v => v.cliente && v.cliente.toLowerCase() === cliente.nombre.toLowerCase());
-  const totalFacturado = compras.reduce((acc, v) => acc + (v.total_venta || 0), 0);
-  const totalKilos = compras.reduce((acc, v) => acc + (v.kg_vendidos || 0), 0);
-
-  document.getElementById('clientModalTotalVentas').textContent = formatMoney(totalFacturado);
-  document.getElementById('clientModalTotalKilos').textContent = `${totalKilos.toFixed(1)} Kg`;
-
-  const saldoEl = document.getElementById('clientModalSaldo');
-  if (cliente.saldo > 0) {
-    saldoEl.textContent = `+${formatMoney(cliente.saldo)}`;
-    saldoEl.style.color = 'var(--accent-green)';
-  } else if (cliente.saldo < 0) {
-    saldoEl.textContent = `-${formatMoney(Math.abs(cliente.saldo))}`;
-    saldoEl.style.color = 'var(--accent-rose)';
-  } else {
-    saldoEl.textContent = '$ 0 (Al día)';
-    saldoEl.style.color = '#fff';
-  }
-
-  // Enlace WhatsApp
-  const btnWa = document.getElementById('btnClientModalWhatsApp');
-  if (cliente.telefono_whatsapp) {
-    btnWa.style.display = 'inline-flex';
-    btnWa.href = `https://wa.me/${cliente.telefono_whatsapp}`;
-  } else {
-    btnWa.style.display = 'none';
-  }
-
-  // Botón Tomar Pedido
-  document.getElementById('btnClientModalNewOrder').onclick = () => {
-    document.getElementById('clientModal').classList.remove('active');
-    document.querySelector('.nav-item[data-tab="tab-pedidos"]').click();
-    document.getElementById('orderCliente').value = cliente.nombre;
-  };
-
-  // Render historial
-  const historyList = document.getElementById('clientModalHistoryList');
-  historyList.innerHTML = '';
-  if (compras.length === 0) {
-    historyList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 10px;">Sin compras registradas aún.</div>';
-  } else {
-    compras.forEach(v => {
-      const row = document.createElement('div');
-      row.className = 'list-item';
-      row.style.padding = '8px 10px';
-      row.innerHTML = `
-        <div class="item-main">
-          <div style="font-weight: 700; font-size: 0.85rem;">${v.fecha} — ${v.corte || 'Carne'}</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}</div>
-        </div>
-        <div style="font-weight: 800; color: var(--accent-green); font-size: 0.9rem;">
-          ${formatMoney(v.total_venta)}
-        </div>
-      `;
-      historyList.appendChild(row);
-    });
-  }
-
-  document.getElementById('clientModal').classList.add('active');
-};
-
-/**
- * 11. CUENTA PROVEEDOR
- */
-function handleGuardarMovimientoProveedor(e) {
-  e.preventDefault();
-
-  const fecha = document.getElementById('provFecha').value;
-  const concepto = document.getElementById('provConcepto').value.trim();
-  const pago = parseFloat(document.getElementById('provPago').value) || 0;
-  const costo = parseFloat(document.getElementById('provCosto').value) || 0;
-  const medio = document.getElementById('provMedio').value;
-
-  const ultimoSaldo = AppState.proveedor.length > 0 ? (AppState.proveedor[0].saldo || 0) : 0;
-  const nuevoSaldo = ultimoSaldo + costo - pago;
-
-  const nuevoMov = {
-    id: Date.now().toString().slice(-5),
-    fecha: fecha,
-    concepto: concepto,
-    medio_pago: medio,
-    pago_a_proveedor: pago,
-    costo_carne: costo,
-    saldo: nuevoSaldo,
-    notas: ''
-  };
-
-  AppState.proveedor.unshift(nuevoMov);
-  saveLocalData();
-  renderProveedor();
-
-  alert('Movimiento de proveedor registrado.');
-  document.getElementById('proveedorForm').reset();
-  initDateDisplays();
-}
-
-function renderProveedor() {
-  const container = document.getElementById('proveedorList');
-  const saldoBadge = document.getElementById('proveedorSaldoBadge');
-  if (!container) return;
-
-  const ultimoSaldo = AppState.proveedor.length > 0 ? (AppState.proveedor[0].saldo || 0) : 0;
-  if (saldoBadge) {
-    saldoBadge.textContent = `Saldo: ${formatMoney(Math.abs(ultimoSaldo))}`;
-    if (ultimoSaldo > 0) {
-      saldoBadge.className = 'badge badge-red';
-      saldoBadge.textContent += ' (Deuda carne)';
-    } else if (ultimoSaldo < 0) {
-      saldoBadge.className = 'badge badge-green';
-      saldoBadge.textContent += ' (A favor)';
-    } else {
-      saldoBadge.className = 'badge badge-green';
-      saldoBadge.textContent = 'Al día ($0)';
-    }
-  }
-
-  container.innerHTML = '';
-  AppState.proveedor.forEach(l => {
-    const item = document.createElement('div');
-    item.className = 'list-item';
-
-    item.innerHTML = `
-      <div class="item-main">
-        <div class="item-title">${l.concepto || 'Movimiento'}</div>
-        <div class="item-desc">${l.fecha} | ${l.medio_pago || 'MercadoPago'}</div>
-        ${l.notas ? `<div style="font-size: 0.75rem; color: var(--text-muted);">${l.notas}</div>` : ''}
-      </div>
-      <div class="item-actions" style="text-align: right; flex-direction: column; align-items: flex-end;">
-        <div style="font-size: 0.8rem; color: var(--text-muted);">
-          Costo: ${formatMoney(l.costo_carne)} | Pago: ${formatMoney(l.pago_a_proveedor)}
-        </div>
-        <div style="font-weight: 700; color: ${l.saldo > 0 ? 'var(--accent-rose)' : 'var(--accent-green)'}">
-          Saldo: ${formatMoney(l.saldo)}
-        </div>
-      </div>
-    `;
-    container.appendChild(item);
-  });
-}
-
-/**
- * 12. AUTO-SYNC & STATUS
- */
+// ====================================================================
+// 15. AUTO-SYNC & ESTADO DE CONEXIÓN
+// ====================================================================
 function initAutoSync() {
   window.addEventListener('focus', () => syncFromSheetsSilently());
   document.addEventListener('visibilitychange', () => {
@@ -1164,6 +1883,9 @@ async function syncFromSheetsSilently() {
       if (json.data.lucas && json.data.lucas.length > 0) {
         AppState.proveedor = json.data.lucas;
       }
+      if (json.data.ofertas && json.data.ofertas.length > 0) {
+        AppState.ofertas = json.data.ofertas;
+      }
 
       calculateClientBalances();
       saveLocalData();
@@ -1171,6 +1893,8 @@ async function syncFromSheetsSilently() {
       populateClientDatalists();
       renderDashboard();
       renderPedidos();
+      renderCortesCatalog();
+      renderOffersList();
       renderClientes();
       renderProveedor();
       updateStatusBadge('connected');
@@ -1199,7 +1923,8 @@ function exportarBackupJSON() {
     clientes: AppState.clientes,
     ventas: AppState.ventas,
     pedidos: AppState.pedidos,
-    proveedor: AppState.proveedor
+    proveedor: AppState.proveedor,
+    ofertas: AppState.ofertas
   };
 
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup, null, 2));

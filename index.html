@@ -28,12 +28,12 @@
   <main class="container">
 
     <!-- ==========================================
-         TAB 1: NUEVA VENTA (POS RÁPIDO)
+         TAB 1: NUEVA VENTA (POS CON CARRITO MULTI-CORTE)
          ========================================== -->
     <section id="tab-pos" class="tab-content active">
       <div class="panel">
         <div class="panel-header">
-          <h2 class="panel-title">📝 Registrar Venta</h2>
+          <h2 class="panel-title">📝 Registrar Venta (Ticket Multi-Corte)</h2>
           <span style="font-size: 0.8rem; color: var(--text-muted);" id="currentDateDisplay"></span>
         </div>
 
@@ -58,69 +58,124 @@
           </div>
           <div id="clienteInfoBadge" style="margin-top: -8px; margin-bottom: 14px; font-size: 0.75rem; color: var(--text-muted); display: none;"></div>
 
-          <!-- CORTE & KILOS -->
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label" for="posCorte">Corte de Carne</label>
-              <select id="posCorte" class="form-control" required>
-                <option value="">Seleccionar corte...</option>
-              </select>
+          <!-- SECCIÓN: AGREGAR CORTE AL TICKET -->
+          <div class="cart-box">
+            <h4 style="font-size: 0.9rem; font-weight: 800; color: #fff; margin-bottom: 10px;">➕ Agregar Cortes a este Ticket</h4>
+            
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="posCorte">Corte de Carne</label>
+                <select id="posCorte" class="form-control">
+                  <option value="">Seleccionar corte...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="posKilos">Kilos Vendidos (Kg)</label>
+                <input type="number" id="posKilos" class="form-control" step="0.001" min="0.05" placeholder="Ej: 2.350">
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="posKilos">Kilos Vendidos (Kg)</label>
-              <input type="number" id="posKilos" class="form-control" step="0.001" min="0.05" placeholder="Ej: 1.850" required>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="posCostoKg">Costo Proveedor ($/Kg)</label>
+                <input type="number" id="posCostoKg" class="form-control" placeholder="$ 0">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="posPrecioKg">Precio Venta ($/Kg)</label>
+                <input type="number" id="posPrecioKg" class="form-control" placeholder="$ 0">
+              </div>
+            </div>
+
+            <!-- BADGE OFERTA ACTIVA -->
+            <div id="activeOfferBadge" style="display: none; font-size: 0.8rem; color: var(--accent-amber); font-weight: 700; margin-bottom: 10px;"></div>
+
+            <button type="button" id="btnAddItemToCart" class="btn btn-sm btn-secondary" style="width: 100%; border-color: var(--accent-blue); color: var(--accent-blue);">
+              ➕ Agregar Este Corte al Ticket
+            </button>
+          </div>
+
+          <!-- LISTA DE CORTES CARGADOS EN ESTE TICKET -->
+          <div style="margin-bottom: 16px;">
+            <label class="form-label">CORTES EN ESTE TICKET (<span id="cartCountBadge">0</span>):</label>
+            <div id="posCartContainer" class="cart-items-container">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+                Todavía no agregaste ningún corte. Elige corte y kilos arriba y toca "Agregar".
+              </div>
             </div>
           </div>
 
-          <!-- COSTO & PRECIO SUGERIDOS (EDITABLES) -->
-          <div class="grid-2">
+          <!-- DESCUENTOS Y OFERTAS EN ESTE TICKET -->
+          <div class="grid-2" style="margin-bottom: 12px;">
             <div class="form-group">
-              <label class="form-label" for="posCostoKg">Costo Proveedor ($/Kg)</label>
-              <input type="number" id="posCostoKg" class="form-control" placeholder="$ 0">
+              <label class="form-label" for="posDescuento">Descuento Especial / Oferta ($)</label>
+              <input type="number" id="posDescuento" class="form-control" placeholder="$ 0 de descuento" value="0">
             </div>
             <div class="form-group">
-              <label class="form-label" for="posPrecioKg">Precio Venta ($/Kg)</label>
-              <input type="number" id="posPrecioKg" class="form-control" placeholder="$ 0" required>
+              <label class="form-label" for="posMotivoDescuento">Motivo / Oferta</label>
+              <input type="text" id="posMotivoDescuento" class="form-control" placeholder="Ej: Promo +5Kg / Descuento amigo">
             </div>
           </div>
 
-          <!-- RESUMEN AUTOMÁTICO EN VIVO -->
+          <!-- RESUMEN EN VIVO DEL TICKET -->
           <div class="calc-preview">
             <div class="calc-row">
-              <span>Costo Mercadería (Proveedor):</span>
+              <span>Kilos Totales del Ticket:</span>
+              <strong id="liveTotalKilos">0.00 Kg</strong>
+            </div>
+            <div class="calc-row">
+              <span>Costo Total Mercadería:</span>
               <strong id="liveCostoTotal">$ 0</strong>
+            </div>
+            <div class="calc-row">
+              <span>Subtotal Venta:</span>
+              <strong id="liveSubtotalVenta">$ 0</strong>
             </div>
             <div class="calc-row total">
               <span>TOTAL A COBRAR:</span>
               <strong id="liveTotalVenta">$ 0</strong>
             </div>
             <div class="calc-row split">
-              <span>Margen Neto Total: <strong id="liveMargenTotal" style="color: #fff;">$ 0</strong></span>
+              <span>Ganancia Neta Total: <strong id="liveMargenTotal" style="color: #fff;">$ 0</strong></span>
               <span id="liveSplitText" style="color: var(--accent-green); font-weight: 700;">Ganancia 100% Directa</span>
             </div>
           </div>
 
-          <!-- PAGO Y SALDOS -->
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label" for="posMedioPago">Medio de Pago</label>
-              <select id="posMedioPago" class="form-control">
-                <option value="MercadoPago">MercadoPago</option>
-                <option value="Efectivo">Efectivo</option>
-                <option value="Transferencia">Transferencia</option>
-              </select>
+          <!-- FORMA DE PAGO (SOPORTA PAGO MIXTO) -->
+          <div class="form-group">
+            <label class="form-label" for="posMedioPago">Medio de Pago</label>
+            <select id="posMedioPago" class="form-control">
+              <option value="MercadoPago">MercadoPago</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Mixto">Mixto (Efectivo + MercadoPago/Transf)</option>
+            </select>
+          </div>
+
+          <!-- CAMPOS CUANDO EL PAGO ES MIXTO -->
+          <div id="mixedPaymentBox" style="display: none;" class="mixed-payment-box">
+            <label class="form-label" style="color: #fff;">Detalle del Pago Mixto:</label>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="posPagoEfectivo">Monto en Efectivo ($)</label>
+                <input type="number" id="posPagoEfectivo" class="form-control" placeholder="$ 0">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="posPagoDigital">Monto Digital / MP ($)</label>
+                <input type="number" id="posPagoDigital" class="form-control" placeholder="$ 0">
+              </div>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="posMontoRecibido">Monto Cobrado ($)</label>
-              <input type="number" id="posMontoRecibido" class="form-control" placeholder="Igual al total si pagó justo">
-            </div>
+          </div>
+
+          <div class="form-group" id="singlePaymentGroup">
+            <label class="form-label" for="posMontoRecibido">Monto Total Cobrado ($)</label>
+            <input type="number" id="posMontoRecibido" class="form-control" placeholder="Igual al total si pagó justo">
           </div>
 
           <div id="saldoDiferenciaBox" style="font-size: 0.85rem; font-weight: 700; margin-bottom: 16px;"></div>
 
           <!-- BOTONES DE ACCIÓN -->
           <button type="submit" class="btn btn-primary">
-            💾 Guardar Venta
+            💾 Guardar Ticket Completo
           </button>
 
           <div class="btn-group-row">
@@ -201,7 +256,6 @@
          TAB 3: MÉTRICAS, GRÁFICAS & PROYECCIONES
          ========================================== -->
     <section id="tab-dashboard" class="tab-content">
-      <!-- FILTRO DE MES -->
       <div class="panel" style="padding: 12px 16px; margin-bottom: 14px;">
         <div style="display: flex; gap: 8px; align-items: center; overflow-x: auto;">
           <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Período:</span>
@@ -267,7 +321,7 @@
         </div>
       </div>
 
-      <!-- GRÁFICAS INTERACTIVAS (CHART.JS) -->
+      <!-- GRÁFICAS INTERACTIVAS -->
       <div class="chart-card">
         <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">📈 Evolución Mensual: Facturación vs Ganancia Neta</h4>
         <div class="chart-wrapper">
@@ -293,13 +347,47 @@
     </section>
 
     <!-- ==========================================
-         TAB 4: CLIENTES & FICHA 360°
+         TAB 4: CORTES, PRECIOS & OFERTAS
+         ========================================== -->
+    <section id="tab-cortes" class="tab-content">
+      <!-- MÓDULO DE OFERTAS & PROMOCIONES -->
+      <div class="panel" style="border-color: rgba(245, 158, 11, 0.4);">
+        <div class="panel-header">
+          <h3 class="panel-title">🔥 Ofertas & Promociones Activas</h3>
+          <span id="offersCountBadge" class="badge badge-yellow">0 Ofertas</span>
+          <button id="btnOpenNewOfferModal" class="btn btn-sm btn-primary" style="background: var(--accent-amber); color: #111;">
+            ➕ Nueva Oferta
+          </button>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+          Configura precios promocionales por tiempo limitado o por cantidad de kilos.
+        </p>
+        <div id="offersList" class="item-list"></div>
+      </div>
+
+      <!-- CATÁLOGO DE CORTES: EDITAR, AGREGAR Y ELIMINAR -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">🥩 Catálogo de Cortes & Costos</h3>
+          <span id="cutsCountBadge" class="badge badge-green">0 Cortes</span>
+          <button id="btnOpenNewCutModal" class="btn btn-sm btn-primary">➕ Agregar Corte</button>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+          Modifica costos y precios en cualquier momento. Se actualizan al instante en la balanza y cálculos.
+        </p>
+        <div id="cutsCatalogList" class="item-list"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 5: CLIENTES & FICHA 360°
          ========================================== -->
     <section id="tab-clientes" class="tab-content">
       <div class="panel">
         <div class="panel-header">
           <h2 class="panel-title">👥 Directorio de Clientes</h2>
-          <span class="badge badge-green" id="clientesCountBadge">0 Clientes</span>
+          <span id="clientesCountBadge" class="badge badge-purple">0 Clientes</span>
+          <button id="btnOpenNewClientModal" class="btn btn-sm btn-primary">➕ Nuevo Cliente</button>
         </div>
         <div class="search-bar">
           <input type="text" id="searchClienteInput" class="form-control" placeholder="🔍 Buscar por nombre, teléfono o dirección...">
@@ -309,20 +397,20 @@
     </section>
 
     <!-- ==========================================
-         TAB 5: CUENTA PROVEEDOR / MERCADERÍA
+         TAB 6: PROVEEDOR & AJUSTES
          ========================================== -->
-    <section id="tab-proveedor" class="tab-content">
+    <section id="tab-config" class="tab-content">
+      <!-- CUENTA CORRIENTE PROVEEDOR -->
       <div class="panel">
         <div class="panel-header">
           <h2 class="panel-title">🤝 Cuenta Corriente Proveedor</h2>
           <span id="proveedorSaldoBadge" class="badge badge-green">$ 0</span>
         </div>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
-          Conciliación entre costo de carne retirada de frigorífico vs. transferencias y pagos efectuados.
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+          Conciliación entre costo de carne retirada vs transferencias y pagos efectuados.
         </p>
 
-        <!-- FORMULARIO RÁPIDO REGISTRO PROVEEDOR -->
-        <form id="proveedorForm" style="margin-bottom: 20px; background: var(--bg-input); padding: 14px; border-radius: var(--radius-md);">
+        <form id="proveedorForm" style="margin-bottom: 16px; background: var(--bg-input); padding: 12px; border-radius: var(--radius-md);">
           <div class="grid-2">
             <div class="form-group">
               <label class="form-label" for="provFecha">Fecha</label>
@@ -330,16 +418,16 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="provConcepto">Concepto</label>
-              <input type="text" id="provConcepto" class="form-control" placeholder="Ej: Mercadería semana / Transferencia" required>
+              <input type="text" id="provConcepto" class="form-control" placeholder="Mercadería semana / Transferencia" required>
             </div>
           </div>
           <div class="grid-3">
             <div class="form-group">
-              <label class="form-label" for="provPago">Pago Realizado ($)</label>
+              <label class="form-label" for="provPago">Pago ($)</label>
               <input type="number" id="provPago" class="form-control" placeholder="$ 0">
             </div>
             <div class="form-group">
-              <label class="form-label" for="provCosto">Costo Carne Retirada ($)</label>
+              <label class="form-label" for="provCosto">Costo Carne ($)</label>
               <input type="number" id="provCosto" class="form-control" placeholder="$ 0">
             </div>
             <div class="form-group">
@@ -354,14 +442,10 @@
           <button type="submit" class="btn btn-sm btn-primary" style="width: auto;">➕ Registrar Movimiento</button>
         </form>
 
-        <div id="proveedorList" class="item-list"></div>
+        <div id="proveedorList" class="item-list" style="max-height: 250px;"></div>
       </div>
-    </section>
 
-    <!-- ==========================================
-         TAB 6: CONFIGURACIÓN & SINCRONIZACIÓN
-         ========================================== -->
-    <section id="tab-config" class="tab-content">
+      <!-- AJUSTES GOOGLE SHEETS -->
       <div class="panel">
         <div class="panel-header">
           <h2 class="panel-title">⚙️ Conexión con Google Sheets</h2>
@@ -370,30 +454,117 @@
           <label class="form-label" for="sheetsApiUrlInput">URL de la Web App (Google Apps Script)</label>
           <input type="url" id="sheetsApiUrlInput" class="form-control">
         </div>
-
-        <button id="btnGuardarApiUrl" class="btn btn-primary" style="margin-bottom: 10px;">
-          🔗 Guardar y Probar Conexión
-        </button>
-
-        <button id="btnSyncFromSheets" class="btn btn-secondary">
-          🔄 Sincronizar Datos desde Google Sheets Ahora
-        </button>
+        <div class="btn-group-row">
+          <button id="btnGuardarApiUrl" class="btn btn-primary">🔗 Guardar Conexión</button>
+          <button id="btnSyncFromSheets" class="btn btn-secondary">🔄 Sincronizar Ahora</button>
+        </div>
       </div>
 
       <div class="panel">
         <div class="panel-header">
-          <h3 class="panel-title">💾 Respaldos de Seguridad</h3>
+          <h3 class="panel-title">💾 Descargar Respaldos</h3>
         </div>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-          Descarga un archivo JSON completo con todas las ventas detalladas, pedidos, clientes y cuenta de proveedor.
-        </p>
-        <button id="btnExportJson" class="btn btn-secondary">
-          📥 Descargar Respaldo Completo (JSON)
-        </button>
+        <button id="btnExportJson" class="btn btn-secondary">📥 Descargar Respaldo Completo (JSON)</button>
       </div>
     </section>
 
   </main>
+
+  <!-- ==========================================
+       MODALES Y VENTANAS EMERGENTES
+       ========================================== -->
+
+  <!-- MODAL: AGREGAR / EDITAR CORTE -->
+  <div id="cutModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 id="cutModalTitle" style="font-size: 1.15rem; font-weight: 800; color: #fff;">Nuevo Corte de Carne</h3>
+        <button id="btnCloseCutModal" class="btn btn-sm btn-secondary" style="width: auto;">✕</button>
+      </div>
+      <form id="cutForm">
+        <input type="hidden" id="editCutId">
+        <div class="form-group">
+          <label class="form-label" for="cutName">Nombre del Corte</label>
+          <input type="text" id="cutName" class="form-control" placeholder="Ej: Ojo de Bife / Matambre" required>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="cutCost">Costo Proveedor ($/Kg)</label>
+            <input type="number" id="cutCost" class="form-control" placeholder="$ 0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cutPrice">Precio de Venta ($/Kg)</label>
+            <input type="number" id="cutPrice" class="form-control" placeholder="$ 0" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cutNotes">Notas / Fraccionado</label>
+          <input type="text" id="cutNotes" class="form-control" placeholder="Ej: Feteado fino / Pieza entera">
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Guardar Corte</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: AGREGAR / EDITAR OFERTA -->
+  <div id="offerModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 id="offerModalTitle" style="font-size: 1.15rem; font-weight: 800; color: #fff;">Crear Oferta Especial</h3>
+        <button id="btnCloseOfferModal" class="btn btn-sm btn-secondary" style="width: auto;">✕</button>
+      </div>
+      <form id="offerForm">
+        <input type="hidden" id="editOfferId">
+        <div class="form-group">
+          <label class="form-label" for="offerName">Título de la Oferta</label>
+          <input type="text" id="offerName" class="form-control" placeholder="Ej: Promo Asado Vacío / Combo Finde" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="offerCut">Corte Aplicable</label>
+          <select id="offerCut" class="form-control" required></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="offerValue">Precio Promocional ($/Kg)</label>
+          <input type="number" id="offerValue" class="form-control" placeholder="$ 0" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="offerDesc">Descripción / Condición</label>
+          <input type="text" id="offerDesc" class="form-control" placeholder="Ej: Válido hasta el domingo o en compras > 5Kg">
+        </div>
+        <button type="submit" class="btn btn-primary">🔥 Guardar y Activar Oferta</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: AGREGAR / EDITAR CLIENTE -->
+  <div id="clientEditModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 id="clientEditModalTitle" style="font-size: 1.15rem; font-weight: 800; color: #fff;">Nuevo Cliente</h3>
+        <button id="btnCloseClientEditModal" class="btn btn-sm btn-secondary" style="width: auto;">✕</button>
+      </div>
+      <form id="clientEditForm">
+        <input type="hidden" id="editClientId">
+        <div class="form-group">
+          <label class="form-label" for="clientEditName">Nombre y Apellido</label>
+          <input type="text" id="clientEditName" class="form-control" placeholder="Ej: Juan Pérez" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="clientEditPhone">Teléfono / WhatsApp</label>
+          <input type="text" id="clientEditPhone" class="form-control" placeholder="Ej: 54 911-5555-4444">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="clientEditAddress">Domicilio / Barrio</label>
+          <input type="text" id="clientEditAddress" class="form-control" placeholder="Ej: Suipacha 2365, Beccar / Lote 45">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="clientEditNotes">Observaciones</label>
+          <input type="text" id="clientEditNotes" class="form-control" placeholder="Ej: Coordinar entrega por la mañana">
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Guardar Cliente</button>
+      </form>
+    </div>
+  </div>
 
   <!-- MODAL FICHA DE CLIENTE 360° -->
   <div id="clientModal" class="modal-overlay">
@@ -406,7 +577,6 @@
         <button id="btnCloseClientModal" class="btn btn-sm btn-secondary" style="width: auto; padding: 4px 10px;">✕</button>
       </div>
 
-      <!-- STATS CLIENTE -->
       <div class="grid-3" style="margin-bottom: 16px;">
         <div class="proj-item">
           <div class="proj-label">Total Compras</div>
@@ -422,7 +592,6 @@
         </div>
       </div>
 
-      <!-- BOTONES ACCIÓN CLIENTE -->
       <div style="display: flex; gap: 8px; margin-bottom: 16px;">
         <a id="btnClientModalWhatsApp" href="#" target="_blank" class="btn btn-sm btn-whatsapp" style="flex: 1;">
           💬 Abrir WhatsApp
@@ -478,13 +647,13 @@
       <span class="nav-icon">📊</span>
       <span>Métricas</span>
     </button>
+    <button class="nav-item" data-tab="tab-cortes">
+      <span class="nav-icon">🥩</span>
+      <span>Cortes & Promos</span>
+    </button>
     <button class="nav-item" data-tab="tab-clientes">
       <span class="nav-icon">👥</span>
       <span>Clientes</span>
-    </button>
-    <button class="nav-item" data-tab="tab-proveedor">
-      <span class="nav-icon">🤝</span>
-      <span>Proveedor</span>
     </button>
     <button class="nav-item" data-tab="tab-config">
       <span class="nav-icon">⚙️</span>
