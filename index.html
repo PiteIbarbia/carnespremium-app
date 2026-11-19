@@ -242,11 +242,19 @@
         </form>
       </div>
 
-      <!-- LISTA DE PEDIDOS ACTIVOS -->
+      <!-- LISTA DE PEDIDOS ACTIVOS Y BÚSQUEDA -->
       <div class="panel">
         <div class="panel-header">
-          <h3 class="panel-title">📋 Agenda de Pedidos por Entregar</h3>
+          <h3 class="panel-title">📋 Agenda de Pedidos</h3>
           <span id="pedidosCountBadge" class="badge badge-purple">0 Pedidos</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <input type="text" id="searchPedidoInput" class="form-control" style="flex: 2; min-width: 170px;" placeholder="🔍 Buscar por cliente, corte, teléfono o notas...">
+          <select id="filterPedidoEstado" class="form-control" style="flex: 1; min-width: 140px;">
+            <option value="todos">Todos los Estados</option>
+            <option value="pendientes" selected>Pendientes / Por Entregar</option>
+            <option value="entregados">Ya Entregados</option>
+          </select>
         </div>
         <div id="pedidosList" class="item-list"></div>
       </div>
@@ -336,11 +344,20 @@
         </div>
       </div>
 
-      <!-- HISTÓRICO DE VENTAS DETALLADO -->
+      <!-- HISTÓRICO DE VENTAS DETALLADO & BÚSQUEDA -->
       <div class="panel">
         <div class="panel-header">
           <h3 class="panel-title">📋 Registro Histórico de Ventas</h3>
           <span id="ventasFiltradasBadge" class="badge badge-green">0</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <input type="text" id="searchVentaInput" class="form-control" style="flex: 2; min-width: 170px;" placeholder="🔍 Buscar cliente, ticket (#TCK-...), corte...">
+          <select id="filterVentaPago" class="form-control" style="flex: 1; min-width: 140px;">
+            <option value="todos">Todos los Pagos</option>
+            <option value="pagados">✅ Pagados al Día</option>
+            <option value="pendientes">🔴 Saldo Pendiente (Debe)</option>
+            <option value="favor">🟢 Saldo a Favor</option>
+          </select>
         </div>
         <div id="dashboardVentasList" class="item-list"></div>
       </div>
@@ -630,6 +647,131 @@
           Cerrar
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR PEDIDO (PREVENTA) -->
+  <div id="orderEditModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">Editar Pedido</h3>
+        <button id="btnCloseOrderEditModal" class="btn btn-sm btn-secondary" style="width: auto;">✕</button>
+      </div>
+      <form id="orderEditForm">
+        <input type="hidden" id="editOrderId">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="editOrderCliente">Cliente</label>
+            <input type="text" id="editOrderCliente" class="form-control" list="clientesDatalist" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editOrderFechaEntrega">Fecha de Entrega</label>
+            <input type="date" id="editOrderFechaEntrega" class="form-control" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="editOrderCorte">Corte Solicitado</label>
+            <select id="editOrderCorte" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editOrderKilos">Kilos Estimados (Kg)</label>
+            <input type="number" id="editOrderKilos" class="form-control" step="0.05" min="0.1" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="editOrderEstado">Estado del Pedido</label>
+            <select id="editOrderEstado" class="form-control">
+              <option value="Pendiente">Pendiente (Por entregar)</option>
+              <option value="Para Armar">Para Armar</option>
+              <option value="En Reparto">En Reparto</option>
+              <option value="Entregado">Entregado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editOrderTelefono">Teléfono / WhatsApp</label>
+            <input type="text" id="editOrderTelefono" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editOrderNotas">Instrucciones / Notas</label>
+          <input type="text" id="editOrderNotas" class="form-control">
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="submit" class="btn btn-primary" style="flex: 2;">💾 Guardar Cambios</button>
+          <button type="button" id="btnDeleteOrderFromModal" class="btn btn-secondary" style="flex: 1; border-color: var(--accent-rose); color: var(--accent-rose);">🗑️ Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR / CORREGIR VENTA HISTÓRICA -->
+  <div id="saleEditModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">Editar / Corregir Venta</h3>
+          <div id="editSaleTicketLabel" style="font-size: 0.75rem; color: var(--accent-blue);">#TCK-000000</div>
+        </div>
+        <button id="btnCloseSaleEditModal" class="btn btn-sm btn-secondary" style="width: auto;">✕</button>
+      </div>
+      <form id="saleEditForm">
+        <input type="hidden" id="editSaleId">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="editSaleFecha">Fecha</label>
+            <input type="date" id="editSaleFecha" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editSaleCliente">Cliente</label>
+            <input type="text" id="editSaleCliente" class="form-control" list="clientesDatalist" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="editSaleCorte">Corte</label>
+            <select id="editSaleCorte" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editSaleKilos">Kilos Vendidos (Kg)</label>
+            <input type="number" id="editSaleKilos" class="form-control" step="0.001" min="0.05" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="editSaleCostoKg">Costo ($/Kg)</label>
+            <input type="number" id="editSaleCostoKg" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editSalePrecioKg">Precio ($/Kg)</label>
+            <input type="number" id="editSalePrecioKg" class="form-control" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="editSaleMedioPago">Medio de Pago</label>
+            <select id="editSaleMedioPago" class="form-control">
+              <option value="MercadoPago">MercadoPago</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Mixto">Mixto</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editSaleRecibido">Monto Total Cobrado ($)</label>
+            <input type="number" id="editSaleRecibido" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editSaleObs">Observaciones / Descuento</label>
+          <input type="text" id="editSaleObs" class="form-control">
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="submit" class="btn btn-primary" style="flex: 2;">💾 Guardar Corrección</button>
+          <button type="button" id="btnDeleteSaleFromModal" class="btn btn-secondary" style="flex: 1; border-color: var(--accent-rose); color: var(--accent-rose);">🗑️ Eliminar Venta</button>
+        </div>
+      </form>
     </div>
   </div>
 

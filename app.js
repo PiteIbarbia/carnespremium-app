@@ -235,6 +235,8 @@ function populateProductSelects() {
   const posSelect = document.getElementById('posCorte');
   const orderSelect = document.getElementById('orderCorte');
   const offerSelect = document.getElementById('offerCut');
+  const editOrderSelect = document.getElementById('editOrderCorte');
+  const editSaleSelect = document.getElementById('editSaleCorte');
 
   const optionsHtml = '<option value="">Seleccionar corte...</option>' + 
     AppState.productos.map(p => `<option value="${p.corte}">${p.corte} ($ ${Number(p.precio_kg).toLocaleString('es-AR')}/Kg)</option>`).join('');
@@ -242,6 +244,8 @@ function populateProductSelects() {
   if (posSelect) posSelect.innerHTML = optionsHtml;
   if (orderSelect) orderSelect.innerHTML = optionsHtml;
   if (offerSelect) offerSelect.innerHTML = optionsHtml;
+  if (editOrderSelect) editOrderSelect.innerHTML = optionsHtml;
+  if (editSaleSelect) editSaleSelect.innerHTML = optionsHtml;
 }
 
 function populateClientDatalists() {
@@ -411,6 +415,38 @@ function setupEventListeners() {
   document.getElementById('btnCloseClientModal').addEventListener('click', () => {
     document.getElementById('clientModal').classList.remove('active');
   });
+
+  // Buscador y Filtro de Pedidos
+  const searchPed = document.getElementById('searchPedidoInput');
+  if (searchPed) searchPed.addEventListener('input', () => renderPedidos());
+  const filterPed = document.getElementById('filterPedidoEstado');
+  if (filterPed) filterPed.addEventListener('change', () => renderPedidos());
+
+  // Modal Editar Pedido
+  const closeOrderEditBtn = document.getElementById('btnCloseOrderEditModal');
+  if (closeOrderEditBtn) closeOrderEditBtn.addEventListener('click', () => {
+    document.getElementById('orderEditModal').classList.remove('active');
+  });
+  const orderEditForm = document.getElementById('orderEditForm');
+  if (orderEditForm) orderEditForm.addEventListener('submit', handleSaveOrderEdit);
+  const deleteOrderModalBtn = document.getElementById('btnDeleteOrderFromModal');
+  if (deleteOrderModalBtn) deleteOrderModalBtn.addEventListener('click', handleDeleteOrderFromModal);
+
+  // Buscador y Filtro de Histórico de Ventas
+  const searchVta = document.getElementById('searchVentaInput');
+  if (searchVta) searchVta.addEventListener('input', () => renderDashboard());
+  const filterVta = document.getElementById('filterVentaPago');
+  if (filterVta) filterVta.addEventListener('change', () => renderDashboard());
+
+  // Modal Editar Venta
+  const closeSaleEditBtn = document.getElementById('btnCloseSaleEditModal');
+  if (closeSaleEditBtn) closeSaleEditBtn.addEventListener('click', () => {
+    document.getElementById('saleEditModal').classList.remove('active');
+  });
+  const saleEditForm = document.getElementById('saleEditForm');
+  if (saleEditForm) saleEditForm.addEventListener('submit', handleSaveSaleEdit);
+  const deleteSaleModalBtn = document.getElementById('btnDeleteSaleFromModal');
+  if (deleteSaleModalBtn) deleteSaleModalBtn.addEventListener('click', handleDeleteSaleFromModal);
 
   // MODAL CORTES: Abrir / Cerrar / Guardar
   document.getElementById('btnOpenNewCutModal').addEventListener('click', openNewCutModal);
@@ -971,10 +1007,11 @@ function renderPedidos() {
   const frigoContainer = document.getElementById('frigoCutsContainer');
   if (!container) return;
 
-  const activeOrders = AppState.pedidos.filter(p => p.estado !== 'Entregado');
-  if (countBadge) countBadge.textContent = `${activeOrders.length} Pendientes`;
+  const searchQuery = (document.getElementById('searchPedidoInput')?.value || '').toLowerCase().trim();
+  const estadoFilter = document.getElementById('filterPedidoEstado')?.value || 'pendientes';
 
-  // Calcular consolidado para frigorífico
+  // Consolidado para frigorífico: siempre sobre los pedidos pendientes de entrega
+  const activeOrders = AppState.pedidos.filter(p => p.estado !== 'Entregado');
   const cutsTally = {};
   let totalKilosFrigo = 0;
 
@@ -993,13 +1030,33 @@ function renderPedidos() {
     }
   }
 
+  // Filtrado de la lista de pedidos
+  let filtered = AppState.pedidos;
+  if (estadoFilter === 'pendientes') {
+    filtered = filtered.filter(p => p.estado !== 'Entregado');
+  } else if (estadoFilter === 'entregados') {
+    filtered = filtered.filter(p => p.estado === 'Entregado');
+  }
+
+  if (searchQuery) {
+    filtered = filtered.filter(p =>
+      (p.cliente && p.cliente.toLowerCase().includes(searchQuery)) ||
+      (p.corte && p.corte.toLowerCase().includes(searchQuery)) ||
+      (p.notas && p.notas.toLowerCase().includes(searchQuery)) ||
+      (p.telefono && String(p.telefono).includes(searchQuery)) ||
+      (p.id && String(p.id).toLowerCase().includes(searchQuery))
+    );
+  }
+
+  if (countBadge) countBadge.textContent = `${filtered.length} Pedidos`;
+
   container.innerHTML = '';
-  if (AppState.pedidos.length === 0) {
-    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No hay pedidos agendados en preventa.</div>';
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No se encontraron pedidos con los filtros seleccionados.</div>';
     return;
   }
 
-  AppState.pedidos.forEach(p => {
+  filtered.forEach(p => {
     const item = document.createElement('div');
     item.className = 'list-item';
 
@@ -1010,7 +1067,9 @@ function renderPedidos() {
 
     item.innerHTML = `
       <div class="item-main">
-        <div class="item-title">${p.cliente} <span class="badge ${badgeClass}" style="margin-left: 6px;">${p.estado}</span></div>
+        <div class="item-title">
+          ${p.cliente} <span class="badge ${badgeClass}" style="margin-left: 6px;">${p.estado}</span>
+        </div>
         <div class="item-desc">📅 Entrega: <strong>${p.fecha_entrega}</strong> | 🥩 ${p.corte} (~${p.kg_estimados} Kg)</div>
         ${p.notas ? `<div style="font-size: 0.75rem; color: var(--accent-amber);">📝 ${p.notas}</div>` : ''}
       </div>
@@ -1025,11 +1084,74 @@ function renderPedidos() {
             📲 WA
           </a>
         ` : ''}
+        <button type="button" class="btn-icon" onclick="openEditOrderModal('${p.id}')" title="Editar / Corregir pedido">
+          ✏️
+        </button>
+        <button type="button" class="btn-icon danger" onclick="deletePedido('${p.id}')" title="Eliminar pedido">
+          🗑️
+        </button>
       </div>
     `;
     container.appendChild(item);
   });
 }
+
+// Modal Editar Pedido
+window.openEditOrderModal = function(orderId) {
+  const p = AppState.pedidos.find(x => String(x.id) === String(orderId));
+  if (!p) return;
+
+  populateProductSelects();
+  document.getElementById('editOrderId').value = p.id;
+  document.getElementById('editOrderCliente').value = p.cliente;
+  document.getElementById('editOrderFechaEntrega').value = p.fecha_entrega;
+  document.getElementById('editOrderCorte').value = p.corte;
+  document.getElementById('editOrderKilos').value = p.kg_estimados;
+  document.getElementById('editOrderEstado').value = p.estado || 'Pendiente';
+  document.getElementById('editOrderTelefono').value = p.telefono || '';
+  document.getElementById('editOrderNotas').value = p.notas || '';
+
+  document.getElementById('orderEditModal').classList.add('active');
+};
+
+function handleSaveOrderEdit(e) {
+  e.preventDefault();
+  const id = document.getElementById('editOrderId').value;
+  const p = AppState.pedidos.find(x => String(x.id) === String(id));
+  if (!p) return;
+
+  p.cliente = document.getElementById('editOrderCliente').value.trim();
+  p.fecha_entrega = document.getElementById('editOrderFechaEntrega').value;
+  p.corte = document.getElementById('editOrderCorte').value;
+  p.kg_estimados = parseFloat(document.getElementById('editOrderKilos').value) || 0;
+  p.estado = document.getElementById('editOrderEstado').value;
+  p.telefono = document.getElementById('editOrderTelefono').value.trim();
+  p.notas = document.getElementById('editOrderNotas').value.trim();
+
+  saveLocalData();
+  renderPedidos();
+  document.getElementById('orderEditModal').classList.remove('active');
+  alert(`¡Pedido de ${p.cliente} actualizado con éxito!`);
+}
+
+function handleDeleteOrderFromModal() {
+  const id = document.getElementById('editOrderId').value;
+  if (!id) return;
+  deletePedido(id);
+  document.getElementById('orderEditModal').classList.remove('active');
+}
+
+window.deletePedido = function(orderId) {
+  const p = AppState.pedidos.find(x => String(x.id) === String(orderId));
+  if (!p) return;
+
+  if (confirm(`¿Estás seguro de eliminar el pedido de ${p.cliente} (${p.corte})?`)) {
+    AppState.pedidos = AppState.pedidos.filter(x => String(x.id) !== String(orderId));
+    saveLocalData();
+    renderPedidos();
+    alert('Pedido eliminado correctamente.');
+  }
+};
 
 // Convertir pedido futuro en venta en POS
 window.convertirPedidoAVenta = function(pedidoId) {
@@ -1543,8 +1665,10 @@ window.abrirFichaCliente = function(nombreCliente) {
           <div style="font-weight: 700; font-size: 0.85rem;">${v.fecha} — ${v.corte || 'Carne'}</div>
           <div style="font-size: 0.75rem; color: var(--text-muted);">${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}</div>
         </div>
-        <div style="font-weight: 800; color: var(--accent-green); font-size: 0.9rem;">
-          ${formatMoney(v.total_venta)}
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <strong style="color: var(--accent-green); font-size: 0.9rem;">${formatMoney(v.total_venta)}</strong>
+          <button type="button" class="btn-icon" onclick="event.stopPropagation(); verTicketHistorico('${v.id_ticket || v.id}')" title="Ver comprobante">📄</button>
+          <button type="button" class="btn-icon" onclick="event.stopPropagation(); document.getElementById('clientModal').classList.remove('active'); openEditSaleModal('${v.id}')" title="Editar venta">✏️</button>
         </div>
       `;
       historyList.appendChild(row);
@@ -1662,27 +1786,87 @@ function renderDashboard() {
   document.getElementById('kpiNetoTotal').textContent = formatMoney(totalNeto);
   document.getElementById('kpiMargenPromedio').textContent = `${formatMoney(margenPromedio)}/Kg`;
 
+  // Filtros de búsqueda y estado de cobro para el listado histórico
+  const searchVentaQuery = (document.getElementById('searchVentaInput')?.value || '').toLowerCase().trim();
+  const filterPago = document.getElementById('filterVentaPago')?.value || 'todos';
+
+  let listFiltered = filtered;
+
+  if (filterPago === 'pagados') {
+    listFiltered = listFiltered.filter(v => (v.saldo_cliente || 0) === 0);
+  } else if (filterPago === 'pendientes') {
+    listFiltered = listFiltered.filter(v => (v.saldo_cliente || 0) < 0);
+  } else if (filterPago === 'favor') {
+    listFiltered = listFiltered.filter(v => (v.saldo_cliente || 0) > 0);
+  }
+
+  if (searchVentaQuery) {
+    listFiltered = listFiltered.filter(v =>
+      (v.cliente && v.cliente.toLowerCase().includes(searchVentaQuery)) ||
+      (v.id_ticket && v.id_ticket.toLowerCase().includes(searchVentaQuery)) ||
+      (v.id && String(v.id).toLowerCase().includes(searchVentaQuery)) ||
+      (v.corte && v.corte.toLowerCase().includes(searchVentaQuery)) ||
+      (v.medio_pago && v.medio_pago.toLowerCase().includes(searchVentaQuery)) ||
+      (v.observaciones && v.observaciones.toLowerCase().includes(searchVentaQuery))
+    );
+  }
+
   // Render lista de ventas
-  document.getElementById('ventasFiltradasBadge').textContent = `${filtered.length} ventas`;
+  document.getElementById('ventasFiltradasBadge').textContent = `${listFiltered.length} ventas`;
   const container = document.getElementById('dashboardVentasList');
   container.innerHTML = '';
 
-  filtered.slice(0, 50).forEach(v => {
+  if (listFiltered.length === 0) {
+    container.innerHTML = '<div style="color: var(--text-muted); padding: 16px; text-align: center;">No se encontraron registros con los filtros seleccionados.</div>';
+    calculateProjectionSimulator();
+    return;
+  }
+
+  listFiltered.slice(0, 70).forEach(v => {
     const item = document.createElement('div');
     item.className = 'list-item';
 
-    const saldoBadge = v.saldo_cliente < 0 
-      ? `<span class="badge badge-red">Debe ${formatMoney(Math.abs(v.saldo_cliente))}</span>`
-      : (v.saldo_cliente > 0 ? `<span class="badge badge-green">+${formatMoney(v.saldo_cliente)} a favor</span>` : '');
+    let saldoBadge = '';
+    const saldo = Number(v.saldo_cliente) || 0;
+    if (saldo < 0) {
+      saldoBadge = `<span class="badge badge-red">Debe ${formatMoney(Math.abs(saldo))}</span>`;
+    } else if (saldo > 0) {
+      saldoBadge = `<span class="badge badge-green">+${formatMoney(saldo)} a favor</span>`;
+    } else {
+      saldoBadge = `<span class="badge badge-green">Pagó exacto</span>`;
+    }
+
+    const ticketId = v.id_ticket || v.id || '';
 
     item.innerHTML = `
       <div class="item-main">
-        <div class="item-title">${v.cliente}</div>
-        <div class="item-desc">${v.fecha} | ${v.corte ? v.corte + ' • ' : ''}${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}</div>
+        <div class="item-title">
+          ${v.cliente} <span style="font-size: 0.75rem; color: var(--accent-blue); font-weight: normal;">#${ticketId}</span>
+        </div>
+        <div class="item-desc">
+          ${v.fecha} | ${v.corte ? v.corte + ' • ' : ''}${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}
+        </div>
+        ${v.observaciones ? `<div style="font-size: 0.75rem; color: var(--accent-amber); margin-top: 2px;">📌 ${v.observaciones}</div>` : ''}
       </div>
-      <div class="item-actions">
-        ${saldoBadge}
-        <strong style="color: var(--accent-green); font-size: 1rem;">${formatMoney(v.total_venta)}</strong>
+      <div class="item-actions" style="flex-direction: column; align-items: flex-end; gap: 4px;">
+        <div style="display: flex; gap: 6px; align-items: center;">
+          ${saldoBadge}
+          <strong style="color: var(--accent-green); font-size: 1rem;">${formatMoney(v.total_venta || (v.kg_vendidos * v.precio_x_kg))}</strong>
+        </div>
+        <div style="display: flex; gap: 4px; margin-top: 2px;">
+          <button type="button" class="btn-icon" onclick="verTicketHistorico('${ticketId}')" title="Ver / Imprimir Comprobante">
+            📄
+          </button>
+          <button type="button" class="btn-icon" onclick="reenviarWhatsAppVenta('${ticketId}')" title="Enviar comprobante por WhatsApp">
+            📲
+          </button>
+          <button type="button" class="btn-icon" onclick="openEditSaleModal('${v.id}')" title="Editar / Corregir venta">
+            ✏️
+          </button>
+          <button type="button" class="btn-icon danger" onclick="deleteVenta('${v.id}')" title="Eliminar registro">
+            🗑️
+          </button>
+        </div>
       </div>
     `;
     container.appendChild(item);
@@ -1690,6 +1874,156 @@ function renderDashboard() {
 
   calculateProjectionSimulator();
 }
+
+// Modal Editar / Corregir Venta
+window.openEditSaleModal = function(saleId) {
+  const v = AppState.ventas.find(x => String(x.id) === String(saleId));
+  if (!v) return;
+
+  populateProductSelects();
+  document.getElementById('editSaleId').value = v.id;
+  document.getElementById('editSaleTicketLabel').textContent = '#' + (v.id_ticket || v.id);
+  document.getElementById('editSaleFecha').value = v.fecha;
+  document.getElementById('editSaleCliente').value = v.cliente;
+  document.getElementById('editSaleCorte').value = v.corte || '';
+  document.getElementById('editSaleKilos').value = v.kg_vendidos || 0;
+  document.getElementById('editSaleCostoKg').value = v.costo_x_kg || 0;
+  document.getElementById('editSalePrecioKg').value = v.precio_x_kg || 0;
+  document.getElementById('editSaleMedioPago').value = v.medio_pago || 'MercadoPago';
+  document.getElementById('editSaleRecibido').value = v.monto_recibido || v.total_venta || 0;
+  document.getElementById('editSaleObs').value = v.observaciones || '';
+
+  document.getElementById('saleEditModal').classList.add('active');
+};
+
+function handleSaveSaleEdit(e) {
+  e.preventDefault();
+  const id = document.getElementById('editSaleId').value;
+  const v = AppState.ventas.find(x => String(x.id) === String(id));
+  if (!v) return;
+
+  const fecha = document.getElementById('editSaleFecha').value;
+  const cliente = document.getElementById('editSaleCliente').value.trim();
+  const corte = document.getElementById('editSaleCorte').value;
+  const kilos = parseFloat(document.getElementById('editSaleKilos').value) || 0;
+  const costoKg = parseFloat(document.getElementById('editSaleCostoKg').value) || 0;
+  const precioKg = parseFloat(document.getElementById('editSalePrecioKg').value) || 0;
+  const medioPago = document.getElementById('editSaleMedioPago').value;
+  const montoRecibido = parseFloat(document.getElementById('editSaleRecibido').value) || 0;
+  const obs = document.getElementById('editSaleObs').value.trim();
+
+  const meses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const mIdx = parseInt(fecha.split('-')[1], 10);
+  const mes = meses[mIdx] || v.mes;
+
+  const subtotal = kilos * precioKg;
+  const costoTotal = kilos * costoKg;
+  const totalVenta = subtotal;
+  const margenTotal = totalVenta - costoTotal;
+
+  // Regla de ganancia histórica
+  let gananciaNeta = margenTotal;
+  if (fecha <= '2026-06-22') {
+    gananciaNeta = margenTotal * 0.5;
+  }
+
+  const saldoCliente = montoRecibido - totalVenta;
+
+  v.fecha = fecha;
+  v.mes = mes;
+  v.cliente = cliente;
+  v.corte = corte;
+  v.kg_vendidos = kilos;
+  v.costo_x_kg = costoKg;
+  v.costo_total = costoTotal;
+  v.precio_x_kg = precioKg;
+  v.subtotal_venta = subtotal;
+  v.total_venta = totalVenta;
+  v.margen_bruto = margenTotal;
+  v.ganancia_neta = gananciaNeta;
+  v.etapa_margen = fecha <= '2026-06-22' ? '50% Compartida' : '100% Directa';
+  v.medio_pago = medioPago;
+  v.monto_recibido = montoRecibido;
+  v.saldo_cliente = saldoCliente;
+  v.estado_pago = saldoCliente >= 0 ? 'Pagó' : 'Saldo Pendiente';
+  v.observaciones = obs;
+
+  calculateClientBalances();
+  saveLocalData();
+  renderDashboard();
+  renderClientes();
+  document.getElementById('saleEditModal').classList.remove('active');
+  alert(`¡Venta #${v.id} corregida con éxito!`);
+}
+
+function handleDeleteSaleFromModal() {
+  const id = document.getElementById('editSaleId').value;
+  if (!id) return;
+  deleteVenta(id);
+  document.getElementById('saleEditModal').classList.remove('active');
+}
+
+window.deleteVenta = function(saleId) {
+  const v = AppState.ventas.find(x => String(x.id) === String(saleId));
+  if (!v) return;
+
+  const ticketId = v.id_ticket || v.id;
+  const itemsEnTicket = AppState.ventas.filter(x => (x.id_ticket && x.id_ticket === ticketId) || String(x.id) === String(ticketId));
+
+  let confirmMsg = `¿Estás seguro de eliminar este registro de venta (${v.cliente} — ${v.corte})?`;
+  if (itemsEnTicket.length > 1) {
+    confirmMsg = `Este corte pertenece al Ticket #${ticketId} que tiene ${itemsEnTicket.length} cortes.\n¿Deseas eliminar este registro de venta?`;
+  }
+
+  if (confirm(confirmMsg)) {
+    AppState.ventas = AppState.ventas.filter(x => String(x.id) !== String(saleId));
+    calculateClientBalances();
+    saveLocalData();
+    renderDashboard();
+    renderClientes();
+    alert('Venta eliminada. Se recalcularon los saldos del cliente y métricas.');
+  }
+};
+
+window.verTicketHistorico = function(idTicket) {
+  const matching = AppState.ventas.filter(v => (v.id_ticket && v.id_ticket === idTicket) || String(v.id) === String(idTicket));
+  if (matching.length === 0) return;
+
+  const first = matching[0];
+  const items = matching.map(m => ({
+    corte: m.corte,
+    kg_vendidos: m.kg_vendidos,
+    precio_x_kg: m.precio_x_kg,
+    subtotal: m.total_venta || (m.kg_vendidos * m.precio_x_kg)
+  }));
+
+  const subtotal = matching.reduce((acc, m) => acc + (m.total_venta || 0), 0);
+  const total = first.total_ticket || subtotal;
+  const recibido = first.monto_recibido || total;
+
+  const ticketData = {
+    id_ticket: first.id_ticket || first.id,
+    fecha: first.fecha,
+    cliente: first.cliente,
+    items: items,
+    subtotal: subtotal,
+    descuento: first.descuento_ticket || 0,
+    motivo_descuento: first.observaciones || '',
+    total_venta: total,
+    medio_pago: first.medio_pago,
+    monto_recibido: recibido,
+    saldo_cliente: first.saldo_cliente || (recibido - total)
+  };
+
+  AppState.lastSavedTicket = ticketData;
+  renderTicketModal(ticketData);
+  document.getElementById('ticketModal').classList.add('active');
+};
+
+window.reenviarWhatsAppVenta = function(idTicket) {
+  window.verTicketHistorico(idTicket);
+  handleEnviarWhatsApp();
+};
 
 function calculateProjectionSimulator() {
   const metaGanancia = parseFloat(document.getElementById('inputMetaGanancia').value) || 1500000;
