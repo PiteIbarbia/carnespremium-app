@@ -6,6 +6,9 @@ on:
     - cron: '0 3 * * *'
   workflow_dispatch: # Permite disparar el respaldo manualmente con 1 clic en GitHub
 
+permissions:
+  contents: write
+
 jobs:
   backup:
     runs-on: ubuntu-latest
@@ -19,13 +22,11 @@ jobs:
           python-version: '3.11'
 
       - name: Ejecutar Script de Respaldo
-        env:
-          SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
         run: |
           python -c "
           import os, urllib.request, json, datetime
           
-          api_url = os.environ.get('SHEETS_API_URL', '') or 'https://script.google.com/macros/s/AKfycbzE0NUBtDRgMQDmtDeUcy4QpO82lutlR-66wvWYpMLUsA2e0-01vcu3LrTFMlIdk7nFXg/exec'
+          api_url = 'https://script.google.com/macros/s/AKfycbzE0NUBtDRgMQDmtDeUcy4QpO82lutlR-66wvWYpMLUsA2e0-01vcu3LrTFMlIdk7nFXg/exec'
               
           today = datetime.datetime.now().strftime('%Y-%m-%d')
           os.makedirs('backups', exist_ok=True)
@@ -44,12 +45,12 @@ jobs:
 
       - name: Commit y Push del Respaldo
         run: |
-          git config --global user.name "Carniceria Backup Bot"
-          git config --global user.email "bot@carniceria.app"
+          git config --global user.name "Carnes Premium Backup Bot"
+          git config --global user.email "bot@carnespremium.app"
           git add backups/
           if git diff --staged --quiet; then
-            print "No hay cambios para respaldar hoy."
+            echo "No hay cambios para respaldar hoy."
           else
-            git commit -m "chore(backup): respaldo automático $(date +'%Y-%m-%d')"
+            git commit -m "chore(backup): respaldo automatico $(date +'%Y-%m-%d')"
             git push
           fi
