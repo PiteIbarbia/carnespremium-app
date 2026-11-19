@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Carnicería - Gestión & Tickets</title>
+  <title>Carnes Premium — Gestión, Pedidos & Ventas</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0f19">
+  <!-- Chart.js para gráficos táctiles interactivos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -14,7 +16,7 @@
   <header class="navbar">
     <div class="brand">
       <span class="brand-icon">🥩</span>
-      <span>Carnes Juanito & Lucas</span>
+      <span>Carnes Premium</span>
     </div>
     <div id="connectionStatus" class="status-badge">
       <span class="status-dot"></span>
@@ -35,14 +37,26 @@
           <span style="font-size: 0.8rem; color: var(--text-muted);" id="currentDateDisplay"></span>
         </div>
 
+        <!-- ALERTA DE BILLETERA / SALDO A FAVOR DEL CLIENTE -->
+        <div id="walletAlertBox" style="display: none;" class="wallet-credit-alert">
+          <span id="walletAlertText"></span>
+          <button type="button" id="btnApplyWalletCredit" class="btn btn-sm btn-primary">Aplicar Saldo</button>
+        </div>
+
         <form id="posForm">
-          <!-- CLIENTE -->
-          <div class="form-group">
-            <label class="form-label" for="posCliente">Cliente</label>
-            <input type="text" id="posCliente" class="form-control" list="clientesDatalist" placeholder="Buscar o escribir cliente..." required autocomplete="off">
-            <datalist id="clientesDatalist"></datalist>
-            <div id="clienteInfoBadge" style="margin-top: 6px; font-size: 0.75rem; color: var(--text-muted); display: none;"></div>
+          <!-- FECHA Y CLIENTE -->
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="posFecha">Fecha de Venta</label>
+              <input type="date" id="posFecha" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="posCliente">Cliente</label>
+              <input type="text" id="posCliente" class="form-control" list="clientesDatalist" placeholder="Buscar cliente..." required autocomplete="off">
+              <datalist id="clientesDatalist"></datalist>
+            </div>
           </div>
+          <div id="clienteInfoBadge" style="margin-top: -8px; margin-bottom: 14px; font-size: 0.75rem; color: var(--text-muted); display: none;"></div>
 
           <!-- CORTE & KILOS -->
           <div class="grid-2">
@@ -54,14 +68,14 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="posKilos">Kilos Vendidos (Kg)</label>
-              <input type="number" id="posKilos" class="form-control" step="0.001" min="0.1" placeholder="Ej: 1.850" required>
+              <input type="number" id="posKilos" class="form-control" step="0.001" min="0.05" placeholder="Ej: 1.850" required>
             </div>
           </div>
 
           <!-- COSTO & PRECIO SUGERIDOS (EDITABLES) -->
           <div class="grid-2">
             <div class="form-group">
-              <label class="form-label" for="posCostoKg">Costo Lucas ($/Kg)</label>
+              <label class="form-label" for="posCostoKg">Costo Proveedor ($/Kg)</label>
               <input type="number" id="posCostoKg" class="form-control" placeholder="$ 0">
             </div>
             <div class="form-group">
@@ -73,7 +87,7 @@
           <!-- RESUMEN AUTOMÁTICO EN VIVO -->
           <div class="calc-preview">
             <div class="calc-row">
-              <span>Costo Mercadería (Lucas):</span>
+              <span>Costo Mercadería (Proveedor):</span>
               <strong id="liveCostoTotal">$ 0</strong>
             </div>
             <div class="calc-row total">
@@ -81,8 +95,8 @@
               <strong id="liveTotalVenta">$ 0</strong>
             </div>
             <div class="calc-row split">
-              <span>Margen Neto Total: <span id="liveMargenTotal">$ 0</span></span>
-              <span>(50% Juanito: <strong id="liveNetoJuanito" style="color: #fff;">$ 0</strong> | 50% Lucas: <strong id="liveNetoLucas" style="color: #fff;">$ 0</strong>)</span>
+              <span>Margen Neto Total: <strong id="liveMargenTotal" style="color: #fff;">$ 0</strong></span>
+              <span id="liveSplitText" style="color: var(--accent-green); font-weight: 700;">Ganancia 100% Directa</span>
             </div>
           </div>
 
@@ -97,7 +111,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="posMontoRecibido">Monto Recibido ($)</label>
+              <label class="form-label" for="posMontoRecibido">Monto Cobrado ($)</label>
               <input type="number" id="posMontoRecibido" class="form-control" placeholder="Igual al total si pagó justo">
             </div>
           </div>
@@ -122,13 +136,75 @@
     </section>
 
     <!-- ==========================================
-         TAB 2: DASHBOARD
+         TAB 2: PEDIDOS PROGRAMADOS / TICKETS FUTUROS
+         ========================================== -->
+    <section id="tab-pedidos" class="tab-content">
+      <!-- CONSOLIDADOR PARA FRIGORÍFICO / PROVEEDOR -->
+      <div class="frigo-box">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 1rem; font-weight: 800; color: #fff;">📦 Consolidado para Proveedor / Frigorífico</h3>
+          <button id="btnCopiarPedidoFrigo" class="btn btn-sm btn-whatsapp">📋 Copiar Lista WhatsApp</button>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+          Total de kilos que necesitas encargar para los pedidos programados de esta semana:
+        </p>
+        <div id="frigoCutsContainer" class="frigo-cuts-list"></div>
+      </div>
+
+      <!-- FORMULARIO AGENDAR PEDIDO FUTURO -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">📅 Agendar Pedido Futuro (Preventa)</h3>
+        </div>
+        <form id="orderForm">
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="orderCliente">Cliente</label>
+              <input type="text" id="orderCliente" class="form-control" list="clientesDatalist" placeholder="Cliente..." required autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="orderFechaEntrega">Fecha de Entrega</label>
+              <input type="date" id="orderFechaEntrega" class="form-control" required>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="orderCorte">Corte Solicitado</label>
+              <select id="orderCorte" class="form-control" required>
+                <option value="">Seleccionar corte...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="orderKilos">Kilos Estimados (Kg)</label>
+              <input type="number" id="orderKilos" class="form-control" step="0.05" min="0.1" placeholder="Ej: 2.0" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="orderNotas">Instrucciones de Corte / Entrega</label>
+            <input type="text" id="orderNotas" class="form-control" placeholder="Ej: Medallones gruesos / Entregar antes de las 13hs">
+          </div>
+          <button type="submit" class="btn btn-primary">➕ Guardar Pedido en Agenda</button>
+        </form>
+      </div>
+
+      <!-- LISTA DE PEDIDOS ACTIVOS -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">📋 Agenda de Pedidos por Entregar</h3>
+          <span id="pedidosCountBadge" class="badge badge-purple">0 Pedidos</span>
+        </div>
+        <div id="pedidosList" class="item-list"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 3: MÉTRICAS, GRÁFICAS & PROYECCIONES
          ========================================== -->
     <section id="tab-dashboard" class="tab-content">
       <!-- FILTRO DE MES -->
       <div class="panel" style="padding: 12px 16px; margin-bottom: 14px;">
         <div style="display: flex; gap: 8px; align-items: center; overflow-x: auto;">
-          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Filtrar Mes:</span>
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Período:</span>
           <select id="dashMonthFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
             <option value="all">Todo el Año (2026)</option>
             <option value="Abril">Abril</option>
@@ -145,28 +221,68 @@
       <!-- KPI GRID -->
       <div class="kpi-grid">
         <div class="kpi-card">
-          <div class="kpi-title">Total Facturado</div>
+          <div class="kpi-title">Facturación Total</div>
           <div class="kpi-value" id="kpiTotalVentas">$ 0</div>
           <div class="kpi-sub" id="kpiVentasCount">0 ventas registradas</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-title">Kilos Totales</div>
           <div class="kpi-value" id="kpiTotalKilos">0 Kg</div>
-          <div class="kpi-sub">Promedio en carnes</div>
+          <div class="kpi-sub" id="kpiKilosSub">Volumen entregado</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-title">Ganancia Juanito (50%)</div>
-          <div class="kpi-value" id="kpiNetoJuanito" style="color: var(--accent-green);">$ 0</div>
-          <div class="kpi-sub">Libre de costo mercadería</div>
+          <div class="kpi-title">Ganancia Neta</div>
+          <div class="kpi-value" id="kpiNetoTotal" style="color: var(--accent-green);">$ 0</div>
+          <div class="kpi-sub">Rentabilidad neta del negocio</div>
         </div>
-        <div class="kpi-card lucas">
-          <div class="kpi-title">Saldo Cuenta Lucas</div>
-          <div class="kpi-value" id="kpiSaldoLucas">$ 0</div>
-          <div class="kpi-sub" id="kpiEstadoLucas">Calculando conciliación...</div>
+        <div class="kpi-card purple">
+          <div class="kpi-title">Margen Promedio</div>
+          <div class="kpi-value" id="kpiMargenPromedio">$ 0/Kg</div>
+          <div class="kpi-sub">Ganancia por kilo vendido</div>
         </div>
       </div>
 
-      <!-- ÚLTIMAS VENTAS -->
+      <!-- PROYECCIONES & SIMULADOR DE METAS -->
+      <div class="projection-box">
+        <h3 style="font-size: 1rem; font-weight: 800; color: #fff;">🎯 Proyección y Simulador de Metas</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+          Cálculo inteligente basado en tu ritmo de venta real.
+        </p>
+        <div class="projection-grid">
+          <div class="proj-item">
+            <div class="proj-label">Ritmo Mensual Estimado</div>
+            <div class="proj-val" id="projFacturacionMes">$ 0</div>
+            <div style="font-size: 0.75rem; color: var(--accent-green); margin-top: 4px;">Run-rate proyectado</div>
+          </div>
+          <div class="proj-item">
+            <div class="proj-label">Ganancia Neta Proyectada</div>
+            <div class="proj-val" id="projGananciaMes" style="color: var(--accent-green);">$ 0</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Libre de costo mercadería</div>
+          </div>
+          <div class="proj-item">
+            <div class="proj-label">Meta de Ganancia Neta ($)</div>
+            <input type="number" id="inputMetaGanancia" class="form-control" style="padding: 6px 10px; margin-top: 6px;" value="1500000" step="50000">
+            <div id="metaKilosResult" style="font-size: 0.75rem; color: var(--accent-blue); margin-top: 6px;">Necesitas vender ~350 Kg</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRÁFICAS INTERACTIVAS (CHART.JS) -->
+      <div class="chart-card">
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">📈 Evolución Mensual: Facturación vs Ganancia Neta</h4>
+        <div class="chart-wrapper">
+          <canvas id="monthlyEvolutionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">🥩 Demanda por Corte (Kilos Totales)</h4>
+        <div class="chart-wrapper">
+          <canvas id="cutsVolumeChart"></canvas>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO DE VENTAS DETALLADO -->
       <div class="panel">
         <div class="panel-header">
           <h3 class="panel-title">📋 Registro Histórico de Ventas</h3>
@@ -177,7 +293,7 @@
     </section>
 
     <!-- ==========================================
-         TAB 3: CLIENTES & CUENTAS CORRIENTES
+         TAB 4: CLIENTES & FICHA 360°
          ========================================== -->
     <section id="tab-clientes" class="tab-content">
       <div class="panel">
@@ -193,36 +309,66 @@
     </section>
 
     <!-- ==========================================
-         TAB 4: CUENTA LUCAS
+         TAB 5: CUENTA PROVEEDOR / MERCADERÍA
          ========================================== -->
-    <section id="tab-lucas" class="tab-content">
+    <section id="tab-proveedor" class="tab-content">
       <div class="panel">
         <div class="panel-header">
-          <h2 class="panel-title">🤝 Cuenta Corriente de Lucas</h2>
+          <h2 class="panel-title">🤝 Cuenta Corriente Proveedor</h2>
+          <span id="proveedorSaldoBadge" class="badge badge-green">$ 0</span>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
-          Conciliación entre costo de carne retirada de frigorífico vs. transferencias y pagos directos.
+          Conciliación entre costo de carne retirada de frigorífico vs. transferencias y pagos efectuados.
         </p>
 
-        <div id="lucasList" class="item-list"></div>
+        <!-- FORMULARIO RÁPIDO REGISTRO PROVEEDOR -->
+        <form id="proveedorForm" style="margin-bottom: 20px; background: var(--bg-input); padding: 14px; border-radius: var(--radius-md);">
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="provFecha">Fecha</label>
+              <input type="date" id="provFecha" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="provConcepto">Concepto</label>
+              <input type="text" id="provConcepto" class="form-control" placeholder="Ej: Mercadería semana / Transferencia" required>
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="form-group">
+              <label class="form-label" for="provPago">Pago Realizado ($)</label>
+              <input type="number" id="provPago" class="form-control" placeholder="$ 0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="provCosto">Costo Carne Retirada ($)</label>
+              <input type="number" id="provCosto" class="form-control" placeholder="$ 0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="provMedio">Medio</label>
+              <select id="provMedio" class="form-control">
+                <option value="MercadoPago">MercadoPago</option>
+                <option value="Transferencia">Transferencia</option>
+                <option value="Efectivo">Efectivo</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-sm btn-primary" style="width: auto;">➕ Registrar Movimiento</button>
+        </form>
+
+        <div id="proveedorList" class="item-list"></div>
       </div>
     </section>
 
     <!-- ==========================================
-         TAB 5: CONFIGURACIÓN & SINCRONIZACIÓN
+         TAB 6: CONFIGURACIÓN & SINCRONIZACIÓN
          ========================================== -->
     <section id="tab-config" class="tab-content">
       <div class="panel">
         <div class="panel-header">
           <h2 class="panel-title">⚙️ Conexión con Google Sheets</h2>
         </div>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-          Pega la URL de la aplicación web que obtienes al implementar el script <code>Code.gs</code> en tu hoja de Google Drive.
-        </p>
-
         <div class="form-group">
           <label class="form-label" for="sheetsApiUrlInput">URL de la Web App (Google Apps Script)</label>
-          <input type="url" id="sheetsApiUrlInput" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+          <input type="url" id="sheetsApiUrlInput" class="form-control">
         </div>
 
         <button id="btnGuardarApiUrl" class="btn btn-primary" style="margin-bottom: 10px;">
@@ -236,10 +382,10 @@
 
       <div class="panel">
         <div class="panel-header">
-          <h3 class="panel-title">💾 Descargar Copias de Respaldo</h3>
+          <h3 class="panel-title">💾 Respaldos de Seguridad</h3>
         </div>
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-          Descarga un archivo JSON completo con todas las ventas, clientes y saldos para guardarlo en tu computadora.
+          Descarga un archivo JSON completo con todas las ventas detalladas, pedidos, clientes y cuenta de proveedor.
         </p>
         <button id="btnExportJson" class="btn btn-secondary">
           📥 Descargar Respaldo Completo (JSON)
@@ -249,21 +395,61 @@
 
   </main>
 
+  <!-- MODAL FICHA DE CLIENTE 360° -->
+  <div id="clientModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div>
+          <h3 id="clientModalName" style="font-size: 1.25rem; font-weight: 800; color: #fff;">Nombre Cliente</h3>
+          <div id="clientModalContact" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;"></div>
+        </div>
+        <button id="btnCloseClientModal" class="btn btn-sm btn-secondary" style="width: auto; padding: 4px 10px;">✕</button>
+      </div>
+
+      <!-- STATS CLIENTE -->
+      <div class="grid-3" style="margin-bottom: 16px;">
+        <div class="proj-item">
+          <div class="proj-label">Total Compras</div>
+          <div class="proj-val" id="clientModalTotalVentas" style="font-size: 1.1rem;">$ 0</div>
+        </div>
+        <div class="proj-item">
+          <div class="proj-label">Kilos Totales</div>
+          <div class="proj-val" id="clientModalTotalKilos" style="font-size: 1.1rem;">0 Kg</div>
+        </div>
+        <div class="proj-item">
+          <div class="proj-label">Billetera / Saldo</div>
+          <div class="proj-val" id="clientModalSaldo" style="font-size: 1.1rem;">$ 0</div>
+        </div>
+      </div>
+
+      <!-- BOTONES ACCIÓN CLIENTE -->
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <a id="btnClientModalWhatsApp" href="#" target="_blank" class="btn btn-sm btn-whatsapp" style="flex: 1;">
+          💬 Abrir WhatsApp
+        </a>
+        <button id="btnClientModalNewOrder" class="btn btn-sm btn-primary" style="flex: 1;">
+          📅 Tomar Pedido
+        </button>
+      </div>
+
+      <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">HISTORIAL DE COMPRAS</h4>
+      <div id="clientModalHistoryList" class="item-list" style="max-height: 250px;"></div>
+    </div>
+  </div>
+
   <!-- MODAL DE TICKET TÉRMICO / DIGITAL -->
   <div id="ticketModal" class="modal-overlay">
     <div class="ticket-container">
       <div class="ticket-header">
         <div class="ticket-title">🥩 CARNES PREMIUM</div>
-        <div class="ticket-sub">JUANITO & LUCAS</div>
-        <div class="ticket-sub" id="ticketFecha">16/11/2026</div>
+        <div class="ticket-sub">COMPROBANTE DE COMPRA</div>
+        <div class="ticket-sub" id="ticketFecha">19/11/2026</div>
       </div>
 
-      <div id="ticketBody">
-        <!-- Render dinámico del pedido -->
-      </div>
+      <div id="ticketBody"></div>
 
       <div class="ticket-footer">
-        <div>¡Gracias por tu compra!</div>
+        <div>¡Muchas gracias por elegirnos!</div>
         <div style="font-size: 0.65rem; margin-top: 4px;">Atención personalizada por WhatsApp</div>
       </div>
 
@@ -278,23 +464,27 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION BAR -->
+  <!-- BOTTOM NAVIGATION BAR (6 BOTONES) -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-tab="tab-pos">
       <span class="nav-icon">📝</span>
       <span>Vender</span>
     </button>
+    <button class="nav-item" data-tab="tab-pedidos">
+      <span class="nav-icon">📅</span>
+      <span>Pedidos</span>
+    </button>
     <button class="nav-item" data-tab="tab-dashboard">
       <span class="nav-icon">📊</span>
-      <span>Dashboard</span>
+      <span>Métricas</span>
     </button>
     <button class="nav-item" data-tab="tab-clientes">
       <span class="nav-icon">👥</span>
       <span>Clientes</span>
     </button>
-    <button class="nav-item" data-tab="tab-lucas">
+    <button class="nav-item" data-tab="tab-proveedor">
       <span class="nav-icon">🤝</span>
-      <span>Lucas</span>
+      <span>Proveedor</span>
     </button>
     <button class="nav-item" data-tab="tab-config">
       <span class="nav-icon">⚙️</span>

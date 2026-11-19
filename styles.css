@@ -1,5 +1,5 @@
 /* ====================================================================
-   ESTILOS MODERNOS - CARNICERÍA APP (SLATE & EMERALD)
+   ESTILOS MODERNOS - CARNES PREMIUM (SLATE & EMERALD)
    ==================================================================== */
 
 :root {
@@ -35,7 +35,7 @@ body {
   background-color: var(--bg-main);
   color: var(--text-main);
   min-height: 100vh;
-  padding-bottom: 90px;
+  padding-bottom: 95px;
   overflow-x: hidden;
 }
 
@@ -44,7 +44,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 50;
-  background-color: rgba(15, 23, 42, 0.9);
+  background-color: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   padding: 12px 16px;
@@ -58,8 +58,9 @@ body {
   align-items: center;
   gap: 10px;
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #fff;
+  letter-spacing: 0.5px;
 }
 
 .brand-icon {
@@ -88,7 +89,7 @@ body {
 
 /* CONTAINER */
 .container {
-  max-width: 900px;
+  max-width: 950px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -111,7 +112,7 @@ body {
 /* KPI CARDS GRID */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -136,13 +137,17 @@ body {
   background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
 }
 
-.kpi-card.lucas::before {
+.kpi-card.purple::before {
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-amber));
 }
 
+.kpi-card.amber::before {
+  background: linear-gradient(90deg, var(--accent-amber), var(--accent-rose));
+}
+
 .kpi-title {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -150,7 +155,7 @@ body {
 }
 
 .kpi-value {
-  font-size: 1.6rem;
+  font-size: 1.55rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.5px;
@@ -162,7 +167,7 @@ body {
   margin-top: 4px;
 }
 
-/* CARDS & PANELS */
+/* PANELS */
 .panel {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -187,7 +192,7 @@ body {
   gap: 8px;
 }
 
-/* FORM STYLES */
+/* FORMS */
 .form-group {
   margin-bottom: 16px;
 }
@@ -250,7 +255,7 @@ body {
 }
 
 .calc-row.total {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
   padding-top: 8px;
   border-top: 1px solid var(--border-color);
@@ -260,6 +265,20 @@ body {
 .calc-row.split {
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+/* ALERT PILL FOR WALLET CREDIT */
+.wallet-credit-alert {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #fff;
 }
 
 /* BUTTONS */
@@ -277,6 +296,13 @@ body {
   border: none;
   transition: all 0.2s ease;
   text-decoration: none;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  width: auto;
 }
 
 .btn-primary {
@@ -310,16 +336,89 @@ body {
   margin-top: 12px;
 }
 
-/* LISTS & TABLES */
-.search-bar {
-  margin-bottom: 14px;
+/* CHARTS CONTAINER */
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+/* PROJECTION SIMULATOR BOX */
+.projection-box {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.projection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.proj-item {
+  background: rgba(15, 23, 42, 0.6);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.proj-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.proj-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 4px;
+}
+
+/* FRIGORÍFICO SUMMARY BANNER */
+.frigo-box {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(139, 92, 246, 0.12));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.frigo-cuts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.frigo-cut-tag {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* LISTS & ITEMS */
 .item-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 500px;
+  max-height: 520px;
   overflow-y: auto;
 }
 
@@ -331,11 +430,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: background 0.15s;
+  transition: all 0.15s;
+  cursor: pointer;
 }
 
 .list-item:hover {
   background: var(--bg-card-hover);
+  border-color: rgba(59, 130, 246, 0.4);
 }
 
 .item-main {
@@ -365,42 +466,46 @@ body {
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .badge-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
 .badge-red { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); }
 .badge-yellow { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+.badge-blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+.badge-purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
 
-/* BOTTOM NAVIGATION */
+/* BOTTOM NAVIGATION (6 TABS) */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 50;
-  background-color: rgba(15, 23, 42, 0.95);
+  background-color: rgba(15, 23, 42, 0.96);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: space-around;
-  padding: 8px 6px;
+  padding: 6px 4px;
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 6px 10px;
+  padding: 6px 6px;
   border-radius: var(--radius-md);
-  transition: all 0.2s;
+  transition: all 0.15s;
   background: transparent;
   border: none;
+  flex: 1;
 }
 
 .nav-item.active {
@@ -409,10 +514,10 @@ body {
 }
 
 .nav-icon {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 
-/* MODAL TICKET */
+/* MODAL OVERLAY & POPUPS */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -432,6 +537,20 @@ body {
   display: flex;
 }
 
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+/* THERMAL TICKET */
 .ticket-container {
   background: #fff;
   color: #111;
@@ -451,7 +570,7 @@ body {
 }
 
 .ticket-title {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 900;
   letter-spacing: 1px;
 }
@@ -470,7 +589,7 @@ body {
 }
 
 .ticket-total {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 900;
   border-top: 2px dashed #ccc;
   border-bottom: 2px dashed #ccc;
@@ -485,14 +604,9 @@ body {
   margin-top: 12px;
 }
 
-/* PRINT STYLES FOR THERMAL PRINTER */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  .ticket-container, .ticket-container * {
-    visibility: visible;
-  }
+  body * { visibility: hidden; }
+  .ticket-container, .ticket-container * { visibility: visible; }
   .ticket-container {
     position: absolute;
     left: 0;
@@ -503,7 +617,5 @@ body {
     padding: 0;
     margin: 0;
   }
-  .modal-overlay {
-    background: transparent;
-  }
+  .modal-overlay { background: transparent; }
 }

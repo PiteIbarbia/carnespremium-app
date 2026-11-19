@@ -1,0 +1,4 @@
+raw_full_data.txt
+raw_turn1_full.txt
+*.pyc
+__pycache__/

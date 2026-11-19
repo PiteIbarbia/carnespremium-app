@@ -1,6 +1,6 @@
 /**
  * ====================================================================
- * GESTIÓN DE CARNICERÍA - JUANITO & LUCAS
+ * CARNES PREMIUM — SISTEMA INTEGRAL
  * Backend API & Automatizaciones para Google Sheets
  * ====================================================================
  */
@@ -34,7 +34,7 @@ function obtenerHoja(ss, nombres) {
 }
 
 /**
- * ENDPOINT GET: Retorna productos, clientes, ventas y saldo de Lucas en JSON
+ * ENDPOINT GET: Retorna productos, clientes, ventas, pedidos y proveedor en JSON
  */
 function doGet(e) {
   try {
@@ -52,8 +52,11 @@ function doGet(e) {
     if (action === 'all' || action === 'ventas') {
       data.ventas = leerHojaComoJSON(obtenerHoja(ss, ['VENTAS', 'Ventas', 'Registro de Ventas']));
     }
-    if (action === 'all' || action === 'lucas') {
-      data.lucas = leerHojaComoJSON(obtenerHoja(ss, ['LUCAS', 'Lucas', 'cta cte Lucas', 'Cta cte Lucas']));
+    if (action === 'all' || action === 'pedidos') {
+      data.pedidos = leerHojaComoJSON(obtenerHoja(ss, ['PEDIDOS', 'Pedidos', 'Pedidos Programados']));
+    }
+    if (action === 'all' || action === 'proveedor') {
+      data.lucas = leerHojaComoJSON(obtenerHoja(ss, ['PROVEEDOR', 'Proveedor', 'LUCAS', 'Lucas', 'cta cte Lucas', 'Cta cte Lucas']));
     }
 
     return ContentService.createTextOutput(JSON.stringify({ status: 'success', data: data }))
@@ -65,7 +68,7 @@ function doGet(e) {
 }
 
 /**
- * ENDPOINT POST: Recibe nuevas ventas o pagos desde la App Móvil
+ * ENDPOINT POST: Recibe nuevas ventas, pedidos o movimientos desde la App
  */
 function doPost(e) {
   try {
@@ -79,8 +82,8 @@ function doPost(e) {
         sheetVentas = ss.insertSheet('VENTAS');
         sheetVentas.appendRow([
           'ID', 'FECHA', 'MES', 'CLIENTE', 'CORTE', 'KG_VENDIDOS', 'COSTO_X_KG',
-          'COSTO_TOTAL', 'PRECIO_X_KG', 'TOTAL_VENTA', 'GANANCIA_TOTAL', 'NETO_JUANITO',
-          'NETO_LUCAS', 'MEDIO_PAGO', 'MONTO_RECIBIDO', 'SALDO_CLIENTE', 'ESTADO_PAGO', 'OBSERVACIONES'
+          'COSTO_TOTAL', 'PRECIO_X_KG', 'TOTAL_VENTA', 'MARGEN_BRUTO', 'GANANCIA_NETA',
+          'ETAPA_MARGEN', 'MEDIO_PAGO', 'MONTO_RECIBIDO', 'SALDO_CLIENTE', 'ESTADO_PAGO', 'OBSERVACIONES'
         ]);
       }
       const v = payload.venta;
@@ -96,9 +99,9 @@ function doPost(e) {
         Number(v.costo_total) || 0,
         Number(v.precio_x_kg) || 0,
         Number(v.total_venta) || 0,
-        Number(v.ganancia_total) || 0,
-        Number(v.neto_juanito) || 0,
-        Number(v.neto_lucas) || 0,
+        Number(v.margen_bruto) || 0,
+        Number(v.ganancia_neta) || 0,
+        v.etapa_margen || (v.fecha <= '2026-06-22' ? '50% Compartida' : '100% Directa'),
         v.medio_pago || 'MercadoPago',
         v.monto_recibido || 0,
         v.saldo_cliente || 0,
@@ -115,32 +118,20 @@ function doPost(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    if (action === 'nuevo_pago_lucas') {
-      let sheetLucas = obtenerHoja(ss, ['LUCAS', 'Lucas', 'cta cte Lucas']);
-      if (!sheetLucas) {
-        sheetLucas = ss.insertSheet('LUCAS');
-        sheetLucas.appendRow(['ID', 'FECHA', 'CONCEPTO', 'MEDIO_PAGO', 'PAGO_A_LUCAS', 'COSTO_CARNE', 'SALDO', 'NOTAS']);
+    if (action === 'nuevo_pedido') {
+      let sheetPedidos = obtenerHoja(ss, ['PEDIDOS', 'Pedidos', 'Pedidos Programados']);
+      if (!sheetPedidos) {
+        sheetPedidos = ss.insertSheet('PEDIDOS');
+        sheetPedidos.appendRow(['ID', 'FECHA_PEDIDO', 'FECHA_ENTREGA', 'CLIENTE', 'CORTE', 'KG_ESTIMADOS', 'PRECIO_X_KG', 'ESTADO', 'NOTAS', 'TELEFONO']);
       }
-      const l = payload.lucas;
-      
-      const newRow = [
-        l.id || Utilities.getUuid().substring(0, 8),
-        l.fecha || Utilities.formatDate(new Date(), "GMT-3", "yyyy-MM-dd"),
-        l.concepto,
-        l.medio_pago || 'MercadoPago',
-        Number(l.pago_a_lucas) || 0,
-        Number(l.costo_carne) || 0,
-        Number(l.saldo) || 0,
-        l.notas || ''
-      ];
+      const p = payload.pedido;
+      sheetPedidos.appendRow([
+        p.id, p.fecha_pedido, p.fecha_entrega, p.cliente, p.corte,
+        Number(p.kg_estimados) || 0, Number(p.precio_x_kg) || 0, p.estado || 'Pendiente', p.notas || '', p.telefono || ''
+      ]);
 
-      sheetLucas.appendRow(newRow);
-
-      return ContentService.createTextOutput(JSON.stringify({ 
-        status: 'success', 
-        message: 'Movimiento con Lucas registrado',
-        id: newRow[0]
-      })).setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Pedido agendado' }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
 
     return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Acción no reconocida' }))
@@ -177,14 +168,14 @@ function leerHojaComoJSON(sheet) {
 }
 
 function recalcularTodo() {
-  SpreadsheetApp.getActiveSpreadsheet().toast('Todas las fórmulas y totales están al día.', '✅ Listo');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Todas las fórmulas y totales están al día.', '✅ Carnes Premium');
 }
 
 function mostrarInfoAPI() {
   const ui = SpreadsheetApp.getUi();
   ui.alert(
-    'Conexión API Activa',
-    'Tu API de Google Sheets está conectada correctamente con tu App de Carnes Premium en GitHub Pages.',
+    'Carnes Premium — API Activa',
+    'Tu API de Google Sheets está conectada correctamente con tu App en GitHub Pages.',
     ui.ButtonSet.OK
   );
 }

@@ -1,187 +1,314 @@
-id,fecha,mes,cliente,medio_pago,total_venta,monto_recibido,saldo_cliente,estado_pago,observaciones
-1,2026-04-26,Abril,JuanMa,MercadoPago,33000.0,33000.0,0.0,Pagó,
-2,2026-04-27,Abril,Muncha,Efectivo,26400.0,27000.0,-600.0,Saldo Pendiente,Debe AR$ 600.0
-3,2026-04-29,Abril,Annette,MercadoPago,39600.0,39600.0,0.0,Pagó,
-4,2026-04-30,Abril,Isa,MercadoPago,24200.000000000004,24200.000000000004,0.0,Pagó,
-5,2025-05-07,Mayo,Ale S,MercadoPago,198400.0,198400.0,0.0,Pagó,
-6,2026-05-07,Mayo,Tomi Rivero,MercadoPago,27300.0,27300.0,0.0,Pagó,
-7,2026-05-11,Mayo,Laura,MercadoPago,22000.0,22000.0,0.0,Pagó,
-8,2026-05-11,Mayo,Isa,MercadoPago,20700.0,20700.0,0.0,Pagó,
-9,2026-05-11,Mayo,Sonia,MercadoPago,48400.0,48400.0,0.0,Pagó,
-10,2026-05-12,Mayo,Jime,MercadoPago,46400.0,46400.0,0.0,Pagó,
-11,2026-05-13,Mayo,Mariano,MercadoPago,147800.0,147800.0,0.0,Pagó,
-12,2026-05-14,Mayo,Tomi Rivero,MercadoPago,81000.0,81000.0,0.0,Pagó,
-13,2026-05-14,Mayo,JuanMa,MercadoPago,63800.0,63800.0,0.0,Pagó,
-14,2026-05-14,Mayo,Peter,MercadoPago,185500.0,185500.0,0.0,Pagó,
-15,2026-05-15,Mayo,Carlos Rivero,MercadoPago,146400.0,146400.0,0.0,Pagó,
-16,2026-05-16,Mayo,Muncha,Efectivo,36800.0,36200.0,600.0,Pagó,A favor AR$ 600.0
-17,2026-05-19,Mayo,Matias de Blasi,MercadoPago,115600.0,115600.0,0.0,Pagó,
-18,2026-05-19,Mayo,Mariano,MercadoPago,168200.0,168200.0,0.0,Pagó,
-19,2026-05-20,Mayo,Gaston Uzin,Efectivo,83200.0,83200.0,0.0,Pagó,
-20,2026-05-20,Mayo,Isa,MercadoPago,23000.0,23000.0,0.0,Pagó,
-21,2026-05-20,Mayo,Jime,MercadoPago,40600.0,40600.0,0.0,Pagó,
-22,2026-05-21,Mayo,Adela,MercadoPago,127000.0,127000.0,0.0,Pagó,
-23,2026-05-21,Mayo,Matias,MercadoPago,18400.0,18400.0,0.0,Pagó,
-24,2026-05-21,Mayo,Rodillo,MercadoPago,81000.0,81000.0,0.0,Pagó,
-25,2026-05-22,Mayo,Muncha,Efectivo,59800.0,60000.0,-200.0,Saldo Pendiente,Debe AR$ 200.0
-26,2026-05-22,Mayo,Annette,MercadoPago,46400.0,46400.0,0.0,Pagó,
-27,2026-05-22,Mayo,Tomi Rivero,MercadoPago,59400.0,59400.0,0.0,Pagó,
-28,2026-05-22,Mayo,Breide,MercadoPago,70200.0,70200.0,0.0,Pagó,
-29,2026-05-23,Mayo,Carola,Efectivo,34500.0,34500.0,0.0,Pagó,
-30,2026-05-26,Mayo,Gaston Uzin,Efectivo,72900.0,73000.0,-100.0,Saldo Pendiente,Debe AR$ 100.0
-31,2026-05-27,Mayo,Matias de Blasi,MercadoPago,142400.0,142400.0,0.0,Pagó,
-32,2026-05-27,Mayo,Lourdes,MercadoPago,68250.0,68250.0,0.0,Pagó,
-33,2026-05-27,Mayo,Delia,Efectivo,74100.0,74100.0,0.0,Pagó,
-34,2026-05-27,Mayo,Jime,MercadoPago,122000.0,122000.0,0.0,Pagó,
-35,2026-05-28,Mayo,Laura,MercadoPago,49950.0,49950.0,0.0,Pagó,
-36,2026-05-28,Mayo,Rochi Melazza,MercadoPago,173900.0,173900.0,0.0,Pagó,
-37,2026-05-28,Mayo,Ines,Efectivo,91800.0,91800.0,0.0,Pagó,
-38,2026-05-28,Mayo,Ana del Pino,MercadoPago,70200.0,70200.0,0.0,Pagó,
-39,2026-05-28,Mayo,Juan S,MercadoPago,67400.0,67400.0,0.0,Pagó,
-40,2026-06-01,Junio,Diego,MercadoPago,189800.0,189800.0,0.0,Pagó,
-41,2026-06-01,Junio,Rodolfo Melazza,MercadoPago,108000.0,108000.0,0.0,Pagó,
-42,2026-06-02,Junio,Adela,MercadoPago,35100.0,35100.0,0.0,Pagó,
-43,2026-06-02,Junio,Laura Costu,Efectivo,53750.0,53800.0,-50.0,Saldo Pendiente,Debe AR$ 50.0
-44,2026-06-02,Junio,Lourdes,MercadoPago,25350.0,25350.0,0.0,Pagó,
-45,2026-06-03,Junio,Ale S,MercadoPago,202800.0,202800.0,0.0,Pagó,
-46,2026-06-03,Junio,Delia,Efectivo,76600.0,80000.0,-3400.0,Saldo Pendiente,Debe AR$ 3400.0
-47,2026-06-04,Junio,Matias Ureta,MercadoPago,171900.0,171900.0,0.0,Pagó,
-48,2026-06-04,Junio,Jime,MercadoPago,52200.0,52200.0,0.0,Pagó,
-49,2026-06-04,Junio,Ezequiel,Efectivo,578900.0,579000.0,-100.0,Saldo Pendiente,Debe AR$ 100.0
-50,2026-06-04,Junio,Breide,MercadoPago,23000.0,23000.0,0.0,Pagó,
-51,2026-06-05,Junio,Gaston Uzin,Efectivo,202400.0,202400.0,0.0,Pagó,
-52,2026-06-05,Junio,Tomas Koch,MercadoPago,442200.0,442200.0,0.0,Pagó,
-53,2026-06-05,Junio,Patricio Cabrini,Efectivo,217500.0,217600.0,-100.0,Saldo Pendiente,Debe AR$ 100.0
-54,2026-06-09,Junio,Gaston Uzin,Efectivo,192000.0,192000.0,0.0,Pagó,
-55,2026-06-09,Junio,Laura Costu,MercadoPago,55900.0,55900.0,0.0,Pagó,
-56,2026-06-09,Junio,Maria Eizayaga,MercadoPago,55200.0,55200.0,0.0,Pagó,
-57,2026-06-09,Junio,Matias,MercadoPago,84100.0,84100.0,0.0,Pagó,
-58,2026-06-10,Junio,Fernando Zambra,Efectivo,94300.0,94300.0,0.0,Pagó,
-59,2026-06-10,Junio,Delia,Efectivo,203100.0,164500.0,38600.0,Pagó,A favor AR$ 38600.0
-60,2026-06-11,Junio,Jime,MercadoPago,37700.0,37700.0,0.0,Pagó,
-61,2026-06-11,Junio,Breide,MercadoPago,119950.0,119950.0,0.0,Pagó,
-62,2026-06-11,Junio,Adela,MercadoPago,74100.0,74100.0,0.0,Pagó,
-63,2026-06-11,Junio,Bettina,Efectivo,143700.0,143700.0,0.0,Pagó,
-64,2026-06-12,Junio,Laura,MercadoPago,133000.0,133000.0,0.0,Pagó,
-65,2026-06-12,Junio,Carlos Rivero,MercadoPago,165200.0,165200.0,0.0,Pagó,
-66,2026-06-12,Junio,Juanito,MercadoPago,20400.0,20400.0,0.0,Pagó,
-67,2026-06-16,Junio,Tomi Suarez,MercadoPago,62000.0,62000.0,0.0,Pagó,
-68,2026-06-16,Junio,Joaquin Reichart,MercadoPago,139900.0,139900.0,0.0,Pagó,
-69,2026-06-16,Junio,Matias de Blasi,Efectivo,115000.0,110000.0,5000.0,Pagó,A favor AR$ 5000.0
-70,2026-06-16,Junio,Matias de Blasi,MercadoPago,0.0,5000.0,-5000.0,Saldo Pendiente,Debe AR$ 5000.0
-71,2026-06-17,Junio,Jime,MercadoPago,43160.0,43160.0,0.0,Pagó,
-72,2026-06-17,Junio,Matias,MercadoPago,32200.0,32200.0,0.0,Pagó,
-73,2026-06-17,Junio,Annette,MercadoPago,25300.0,25300.0,0.0,Pagó,
-74,2026-06-19,Junio,Pato O'Reilly,MercadoPago,199900.0,199900.0,0.0,Pagó,
-75,2026-06-19,Junio,Isa,MercadoPago,40840.0,40840.0,0.0,Pagó,
-76,2026-06-19,Junio,Carola,MercadoPago,50830.0,50830.0,0.0,Pagó,
-77,2026-06-19,Junio,Juanito,MercadoPago,15840.0,15840.0,0.0,Pagó,
-78,2026-06-23,Junio,Annette,MercadoPago,82400.0,82400.0,0.0,Pagó,
-79,2026-06-23,Junio,Jime,MercadoPago,37700.0,37700.0,0.0,Pagó,
-80,2026-06-23,Junio,Cristina Igarzabal,MercadoPago,106700.0,106700.0,0.0,Pagó,
-81,2026-06-24,Junio,Muncha,Efectivo,62600.0,63000.0,-400.0,Saldo Pendiente,Debe AR$ 400.0
-82,2026-06-26,Junio,Joaquin Reichart,MercadoPago,168200.0,168200.0,0.0,Pagó,
-83,2026-06-26,Junio,Peter,MercadoPago,137600.0,137600.0,0.0,Pagó,
-84,2026-06-26,Junio,Diego Gonzalez Bonorino,Efectivo,109000.0,109000.0,0.0,Pagó,
-85,2026-06-27,Junio,JuanMa,MercadoPago,25300.0,25300.0,0.0,Pagó,
-86,2026-06-30,Junio,Annette,MercadoPago,22000.0,22000.0,0.0,Pagó,
-87,2026-06-30,Junio,Rochi Melazza,MercadoPago,123500.0,123500.0,0.0,Pagó,
-88,2026-06-30,Junio,Ale S,MercadoPago,171100.0,171100.0,0.0,Pagó,
-89,2026-07-01,Julio,Carola,MercadoPago,23000.0,23000.0,0.0,Pagó,
-90,2026-07-02,Julio,Pato O'Reilly,MercadoPago,122300.0,122300.0,0.0,Pagó,
-91,2026-07-02,Julio,Laura Guidi,MercadoPago,79200.0,79200.0,0.0,Pagó,
-92,2026-07-08,Julio,Jime,MercadoPago,46400.0,46400.0,0.0,Pagó,
-93,2026-07-08,Julio,Annette,MercadoPago,65500.0,65500.0,0.0,Pagó,
-94,2026-07-08,Julio,Tomas Koch,MercadoPago,358100.0,358100.0,0.0,Pagó,
-95,2026-07-08,Julio,Pato O'Reilly,MercadoPago,90000.0,90000.0,0.0,Pagó,
-96,2026-07-09,Julio,Breide,MercadoPago,132900.0,132900.0,0.0,Pagó,
-97,2026-07-09,Julio,Tomi Rivero,MercadoPago,64000.0,64000.0,0.0,Pagó,
-98,2026-07-10,Julio,Nacho Gabancho,MercadoPago,34800.0,34800.0,0.0,Pagó,
-99,2026-07-10,Julio,Ramón,Efectivo,48200.0,50000.0,-1800.0,Saldo Pendiente,Debe AR$ 1800.0
-100,2026-07-10,Julio,Jaime,MercadoPago,90000.0,90000.0,0.0,Pagó,
-101,2026-07-10,Julio,Ezequiel,MercadoPago,188500.0,188500.0,0.0,Pagó,
-102,2026-07-14,Julio,Nacho Gabancho,MercadoPago,69900.0,69900.0,0.0,Pagó,
-103,2026-07-14,Julio,Amparo Nogueira,MercadoPago,87000.0,87000.0,0.0,Pagó,
-104,2026-07-14,Julio,Jime,MercadoPago,62700.0,62700.0,0.0,Pagó,
-105,2026-06-15,Junio,Sole Ezcurra,MercadoPago,58400.0,58400.0,0.0,Pagó,
-106,2026-07-15,Julio,Laura Guidi,Efectivo,44000.0,44000.0,0.0,Pagó,
-107,2026-07-17,Julio,Isa,MercadoPago,19200.0,19200.0,0.0,Pagó,
-108,2026-07-17,Julio,JuanMa,MercadoPago,16100.0,16100.0,0.0,Pagó,
-109,2026-07-17,Julio,Fernando Zambra,Efectivo,59800.0,60000.0,-200.0,Saldo Pendiente,Debe AR$ 200.0
-110,2026-07-18,Julio,Santi Perrota,MercadoPago,126110.0,126110.0,0.0,Pagó,
-111,2026-07-18,Julio,Muncha,Efectivo,64400.0,65000.0,-600.0,Saldo Pendiente,Debe AR$ 600.0
-112,2026-07-23,Julio,Ezequiel,MercadoPago,68970.0,68970.0,0.0,Pagó,
-113,2026-07-23,Julio,Tomas Suarez,MercadoPago,44950.0,44950.0,0.0,Pagó,
-114,2026-07-23,Julio,Isa,MercadoPago,31395.0,31395.0,0.0,Pagó,
-115,2026-07-23,Julio,Peter,MercadoPago,200820.0,200820.0,0.0,Pagó,
-116,2026-07-23,Julio,Lourdes,MercadoPago,70785.0,70785.0,0.0,Pagó,
-117,2026-07-29,Julio,Carola,MercadoPago,44735.0,44735.0,0.0,Pagó,
-118,2026-07-29,Julio,Tomas Koch,MercadoPago,131780.0,131780.0,0.0,Pagó,
-119,2026-07-31,Julio,JuanMa,MercadoPago,59340.0,59340.0,0.0,Pagó,
-120,2026-07-31,Julio,Nacho Gabancho,MercadoPago,52247.5,52247.5,0.0,Pagó,
-121,2026-08-09,Agosto,Muncha,MercadoPago,31395.0,31000.0,395.0,Pagó,A favor AR$ 395.0
-122,2026-08-09,Agosto,Breide,MercadoPago,52250.0,52250.0,0.0,Pagó,
-123,2026-08-12,Agosto,Maria Aramburu,MercadoPago,198935.0,198935.0,0.0,Pagó,
-124,2026-08-13,Agosto,Bettina,Efectivo,148170.0,150000.0,-1830.0,Saldo Pendiente,Debe AR$ 1830.0
-125,2026-08-13,Agosto,Carola,MercadoPago,24750.0,24750.0,0.0,Pagó,
-126,2026-08-13,Agosto,Sole Ezcurra,MercadoPago,78765.0,78765.0,0.0,Pagó,
-127,2026-08-13,Agosto,Isa,MercadoPago,20355.0,20355.0,0.0,Pagó,
-128,2026-08-13,Agosto,Annette,MercadoPago,26950.0,26950.0,0.0,Pagó,
-129,2026-08-13,Agosto,Tomi Rivero,MercadoPago,39490.0,39490.0,0.0,Pagó,
-130,2026-08-13,Agosto,Laura,MercadoPago,89175.0,89175.0,0.0,Pagó,
-131,2026-08-13,Agosto,Laura Guidi,MercadoPago,72710.0,72710.0,0.0,Pagó,
-132,2026-08-14,Agosto,Agustin Breide,MercadoPago,112510.0,112510.0,0.0,Pagó,
-133,2026-08-14,Agosto,Matias Sonzini,MercadoPago,68065.0,68065.0,0.0,Pagó,
-134,2026-08-14,Agosto,Marcos Bruno,MercadoPago,299695.0,299695.0,0.0,Pagó,
-135,2026-08-14,Agosto,Tomi Rivero,MercadoPago,52675.0,52675.0,0.0,Pagó,
-136,2026-08-19,Agosto,Cristina Igarzabal,MercadoPago,100675.0,100675.0,0.0,Pagó,
-137,2026-08-24,Agosto,Jime,MercadoPago,41120.0,41120.0,0.0,Pagó,
-138,2026-08-24,Agosto,Annette,MercadoPago,29590.0,29590.0,0.0,Pagó,
-139,2026-08-24,Agosto,Ana del Pino,MercadoPago,40940.0,40940.0,0.0,Pagó,
-140,2026-08-25,Agosto,Santi Perrota,MercadoPago,122760.0,122760.0,0.0,Pagó,
-141,2026-08-26,Agosto,Sole Ezcurra,MercadoPago,54395.0,54395.0,0.0,Pagó,
-142,2026-08-26,Agosto,Laura Guidi,MercadoPago,54340.0,54340.0,0.0,Pagó,
-143,2026-08-27,Agosto,Joaquin Reichart,MercadoPago,157055.0,157055.0,0.0,Pagó,
-144,2026-08-27,Agosto,Santiago Reichart,MercadoPago,107765.0,107765.0,0.0,Pagó,
-145,2026-08-27,Agosto,Laura Guidi,MercadoPago,29810.0,29810.0,0.0,Pagó,
-146,2026-09-02,Septiembre,Annette,MercadoPago,47125.0,47125.0,0.0,Pagó,
-147,2026-09-02,Septiembre,Ana del Pino,MercadoPago,71272.5,71272.5,0.0,Pagó,
-148,2026-09-02,Septiembre,Tomas Suarez,MercadoPago,178582.5,178582.5,0.0,Pagó,
-149,2026-09-03,Septiembre,Muncha,MercadoPago,30820.0,30015.0,805.0,Pagó,A favor AR$ 805.0
-150,2026-09-03,Septiembre,Isa,MercadoPago,21735.0,21735.0,0.0,Pagó,
-151,2026-09-04,Septiembre,Jorge Galache,MercadoPago,69600.0,69600.0,0.0,Pagó,
-152,2026-09-05,Septiembre,Peter,MercadoPago,195950.0,195950.0,0.0,Pagó,
-153,2026-09-05,Septiembre,Amparo Nogueira,MercadoPago,92510.0,92510.0,0.0,Pagó,
-154,2026-09-05,Septiembre,Tomi Rivero,MercadoPago,48840.0,48840.0,0.0,Pagó,
-155,2026-09-09,Septiembre,Francisco Vazquez,MercadoPago,7425.0,7425.0,0.0,Pagó,
-156,2026-09-09,Septiembre,Breide,MercadoPago,89760.0,89760.0,0.0,Pagó,
-157,2026-09-11,Septiembre,JuanMa,MercadoPago,50485.0,50485.0,0.0,Pagó,
-158,2026-09-11,Septiembre,Laura Igarzabal,MercadoPago,45425.0,45425.0,0.0,Pagó,
-159,2026-09-15,Septiembre,Jime,MercadoPago,68320.0,68320.0,0.0,Pagó,
-160,2026-09-16,Septiembre,Tomas Koch,MercadoPago,206830.0,206830.0,0.0,Pagó,
-161,2026-09-16,Septiembre,Muncha,MercadoPago,86825.0,86825.0,0.0,Pagó,
-162,2026-09-17,Septiembre,Annette,MercadoPago,67620.0,67620.0,0.0,Pagó,
-163,2026-09-17,Septiembre,Carola,MercadoPago,74360.0,74360.0,0.0,Pagó,
-164,2026-09-17,Septiembre,Agustin Reichart,MercadoPago,126295.0,127000.0,-705.0,Saldo Pendiente,Debe AR$ 705.0
-165,2026-09-17,Septiembre,Isa,MercadoPago,31650.0,31650.0,0.0,Pagó,
-166,2026-09-17,Septiembre,JuanMa,MercadoPago,18515.0,18515.0,0.0,Pagó,
-167,2026-09-18,Septiembre,Santiago Reichart,MercadoPago,53385.0,53385.0,0.0,Pagó,
-168,2026-09-24,Septiembre,Pato O'Reilly,MercadoPago,105700.0,105700.0,0.0,Pagó,
-169,2026-09-24,Septiembre,Fernando Zambra,Efectivo,50600.0,60000.0,-9400.0,Saldo Pendiente,Debe AR$ 9400.0
-170,2026-09-26,Septiembre,Muncha,MercadoPago,50005.0,50005.0,0.0,Pagó,
-171,2026-09-29,Septiembre,Jime,MercadoPago,71790.0,71790.0,0.0,Pagó,
-172,2026-10-01,Octubre,Lucia Fernandez,MercadoPago,49665.0,49665.0,0.0,Pagó,
-173,2026-10-01,Octubre,Fernando Zambra,Efectivo,54165.0,45000.0,9165.0,Pagó,A favor AR$ 9165.0
-174,2026-10-02,Octubre,Santi Breide,MercadoPago,95480.0,95480.0,0.0,Pagó,
-175,2026-10-07,Octubre,Jime,MercadoPago,51450.0,51450.0,0.0,Pagó,
-176,2026-10-07,Octubre,Laura Guidi,MercadoPago,33110.0,33110.0,0.0,Pagó,
-177,2026-10-08,Octubre,Lucia Fernandez,Efectivo,20240.0,20300.0,-60.0,Saldo Pendiente,Debe AR$ 60.0
-178,2026-10-08,Octubre,Matias Sonzini,MercadoPago,64415.0,64415.0,0.0,Pagó,
-179,2026-10-08,Octubre,Annette,MercadoPago,22000.0,22000.0,0.0,Pagó,
-180,2026-10-09,Octubre,Marcos Bruno,MercadoPago,116440.0,116440.0,0.0,Pagó,
-181,2026-10-10,Octubre,Muncha,MercadoPago,54855.0,54855.0,0.0,Pagó,
-182,2026-10-14,Octubre,Carola,MercadoPago,82830.0,82830.0,0.0,Pagó,
-183,2026-10-14,Octubre,Adela,MercadoPago,40320.0,40320.0,0.0,Pagó,
-184,2026-10-14,Octubre,Lucia Fernandez,Efectivo,71185.0,71100.0,85.0,Pagó,A favor AR$ 85.0
-185,2026-10-17,Octubre,Bettina,Efectivo,137755.0,136000.0,1755.0,Pagó,A favor AR$ 1755.0
-186,2026-10-17,Octubre,Mati Sonzini,MercadoPago,53705.0,53705.0,0.0,Pagó,
+id,fecha,mes,cliente,corte,kg_vendidos,costo_x_kg,costo_total,precio_x_kg,total_venta,margen_bruto,ganancia_neta,comision_socio,etapa_margen,medio_pago,monto_recibido,saldo_cliente,estado_pago,observaciones
+313,2026-10-14,Octubre,Mati Sonzini,Colita,2.335,21000.0,49035.0,23000.0,53705.0,4670.0,4670.0,0.0,100% Directa,MercadoPago,53705.0,0.0,Pagó,Pagó
+312,2026-10-14,Octubre,Bettina,Picada especial,2.275,14000.0,31850.0,16000.0,36400.0,4550.0,4550.0,0.0,100% Directa,Efectivo,36400.0,0.0,Pagó,Pagó
+311,2026-10-14,Octubre,Bettina,Lomo,3.495,27000.0,94365.0,29000.0,101355.0,6990.0,6990.0,0.0,100% Directa,Efectivo,101430.0,75.0,Pagó,A favor AR$75
+310,2026-10-13,Octubre,Lucia Fernandez,Colita,0.92,21000.0,19320.0,23000.0,21160.0,1840.0,1840.0,0.0,100% Directa,Efectivo,21160.0,0.0,Pagó,Pagó
+309,2026-10-13,Octubre,Lucia Fernandez,Lomo,1.725,27000.0,46575.0,29000.0,50025.0,3450.0,3450.0,0.0,100% Directa,Efectivo,50000.0,-25.0,Saldo Pendiente,Debe AR$25
+308,2026-10-13,Octubre,Adela Igarzabal,Picada especial,2.52,14000.0,35280.0,16000.0,40320.0,5040.0,5040.0,0.0,100% Directa,MercadoPago,40320.0,0.0,Pagó,Pagó
+307,2026-10-13,Octubre,Santi Breide,Colita,1.775,21000.0,37275.0,23000.0,40825.0,3550.0,3550.0,0.0,100% Directa,MercadoPago,40825.0,0.0,Pagó,Pagó
+306,2026-10-13,Octubre,Carola,Bife Ch,2.595,20000.0,51900.0,22000.0,57090.0,5190.0,5190.0,0.0,100% Directa,MercadoPago,57090.0,0.0,Pagó,Pagó
+305,2026-10-13,Octubre,Carola,Nalga Feteada,1.17,19000.0,22230.0,22000.0,25740.0,3510.0,3510.0,0.0,100% Directa,MercadoPago,25740.0,0.0,Pagó,Pagó
+304,2026-10-09,Octubre,Marcos Bruno,Colita,0.845,21000.0,17745.0,23000.0,19435.0,1690.0,1690.0,0.0,100% Directa,MercadoPago,19435.0,0.0,Pagó,Pagó
+303,2026-10-09,Octubre,Marcos Bruno,Lomo,3.345,27000.0,90315.0,29000.0,97005.0,6690.0,6690.0,0.0,100% Directa,MercadoPago,97005.0,0.0,Pagó,Pagó
+302,2026-10-08,Octubre,Annette,Nalga Feteada,1.0,19000.0,19000.0,22000.0,22000.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,22000.0,0.0,Pagó,Pagó
+301,2026-10-08,Octubre,Matias Sonzini,Lomo,1.555,27000.0,41985.0,29000.0,45095.0,3110.0,3110.0,0.0,100% Directa,MercadoPago,45095.0,0.0,Pagó,Pagó
+300,2026-10-08,Octubre,Matias Sonzini,Colita,0.84,21000.0,17640.0,23000.0,19320.0,1680.0,1680.0,0.0,100% Directa,MercadoPago,19320.0,0.0,Pagó,Pagó
+299,2026-10-07,Octubre,Muncha,Picaña,2.385,19000.0,45315.0,23000.0,54855.0,9540.0,9540.0,0.0,100% Directa,MercadoPago,54855.0,0.0,Pagó,Pagó
+298,2026-10-07,Octubre,Laura Guidi,Peceto Feteado,1.505,19000.0,28595.0,22000.0,33110.0,4515.0,4515.0,0.0,100% Directa,MercadoPago,33110.0,0.0,Pagó,Pagó
+297,2026-10-07,Octubre,Lucia Fernandez,Colita,0.88,21000.0,18480.0,23000.0,20240.0,1760.0,1760.0,0.0,100% Directa,Efectivo,20300.0,60.0,Pagó,A favor AR$60
+296,2026-10-07,Octubre,Jime,Picada especial,1.27,14000.0,17780.0,16000.0,20320.0,2540.0,2540.0,0.0,100% Directa,MercadoPago,20320.0,0.0,Pagó,Pagó
+295,2026-10-07,Octubre,Jime,Peceto Feteado,1.415,19000.0,26885.0,22000.0,31130.0,4245.0,4245.0,0.0,100% Directa,MercadoPago,31130.0,0.0,Pagó,Pagó
+294,2026-10-02,Octubre,Santi Breide,Bife Ch,4.34,20000.0,86800.0,22000.0,95480.0,8680.0,8680.0,0.0,100% Directa,MercadoPago,95480.0,0.0,Pagó,Pagó
+293,2026-09-29,Septiembre,Jime,Picada especial,2.46,14000.0,34440.0,16000.0,39360.0,4920.0,4920.0,0.0,100% Directa,MercadoPago,39360.0,0.0,Pagó,Pagó
+292,2026-09-29,Septiembre,Jime,Peceto Feteado,1.41,19000.0,26790.0,22000.0,31020.0,4230.0,4230.0,0.0,100% Directa,MercadoPago,31020.0,0.0,Pagó,Pagó
+291,2026-09-29,Septiembre,Lucia Fernandez,Colita,0.935,21000.0,19635.0,23000.0,21505.0,1870.0,1870.0,0.0,100% Directa,MercadoPago,21505.0,0.0,Pagó,Pagó
+290,2026-09-29,Septiembre,Lucia Fernandez,Nalga Feteada,1.28,19000.0,24320.0,22000.0,28160.0,3840.0,3840.0,0.0,100% Directa,MercadoPago,28160.0,0.0,Pagó,Pagó
+289,2026-09-28,Septiembre,Fernando Zambra,Picaña,2.355,19000.0,44745.0,23000.0,54165.0,9420.0,9420.0,0.0,100% Directa,Efectivo,54600.0,435.0,Pagó,A favor AR$435
+288,2026-09-25,Septiembre,Muncha,Picada especial,1.12,14000.0,15680.0,16000.0,17920.0,2240.0,2240.0,0.0,100% Directa,MercadoPago,17920.0,0.0,Pagó,Pagó
+287,2026-09-25,Septiembre,Muncha,Picaña,1.395,19000.0,26505.0,23000.0,32085.0,5580.0,5580.0,0.0,100% Directa,MercadoPago,32085.0,0.0,Pagó,Pagó
+286,2026-09-24,Septiembre,Fernando Zambra,Picaña,2.2,19000.0,41800.0,23000.0,50600.0,8800.0,8800.0,0.0,100% Directa,Efectivo,60000.0,9400.0,Pagó,A favor AR$9.400
+285,2026-09-22,Septiembre,Pato O'Reilly,Vacio,5.285,17000.0,89845.0,20000.0,105700.0,15855.0,15855.0,0.0,100% Directa,MercadoPago,105700.0,0.0,Pagó,Pagó
+284,2026-09-17,Septiembre,JuanMa,Colita,0.805,21000.0,16905.0,23000.0,18515.0,1610.0,1610.0,0.0,100% Directa,MercadoPago,18515.0,0.0,Pagó,Pagó
+283,2026-09-17,Septiembre,Annette,Nalga Feteada,1.215,19000.0,23085.0,22000.0,26730.0,3645.0,3645.0,0.0,100% Directa,MercadoPago,26730.0,0.0,Pagó,Pagó
+282,2026-09-17,Septiembre,Annette,Lomo,1.41,27000.0,38070.0,29000.0,40890.0,2820.0,2820.0,0.0,100% Directa,MercadoPago,40890.0,0.0,Pagó,Pagó
+281,2026-09-16,Septiembre,Carola,Bife Ch,2.235,20000.0,44700.0,22000.0,49170.0,4470.0,4470.0,0.0,100% Directa,MercadoPago,49170.0,0.0,Pagó,Pagó
+280,2026-09-16,Septiembre,Carola,Nalga Feteada,1.145,19000.0,21755.0,22000.0,25190.0,3435.0,3435.0,0.0,100% Directa,MercadoPago,25190.0,0.0,Pagó,Pagó
+279,2026-09-15,Septiembre,Isa,Bife Ch Fraccionado,1.315,20000.0,26300.0,24000.0,31560.0,5260.0,5260.0,0.0,100% Directa,MercadoPago,31560.0,0.0,Pagó,Pagó
+278,2026-09-15,Septiembre,Muncha,Picaña,1.025,19000.0,19475.0,23000.0,23575.0,4100.0,4100.0,0.0,100% Directa,MercadoPago,23575.0,0.0,Pagó,Pagó
+277,2026-09-15,Septiembre,Muncha,Vacio Fraccionado,1.535,17000.0,26095.0,22000.0,33770.0,7675.0,7675.0,0.0,100% Directa,MercadoPago,33770.0,0.0,Pagó,Pagó
+276,2026-09-15,Septiembre,Muncha,Peceto Feteado,1.34,19000.0,25460.0,22000.0,29480.0,4020.0,4020.0,0.0,100% Directa,MercadoPago,29480.0,0.0,Pagó,Pagó
+275,2026-09-15,Septiembre,Agustin Reichart,Lomo,4.355,27000.0,117585.0,29000.0,126295.0,8710.0,8710.0,0.0,100% Directa,Efectivo,127000.0,705.0,Pagó,A favor AR$705
+274,2026-09-15,Septiembre,Santiago Reichart,Peceto,1.54,19000.0,29260.0,21000.0,32340.0,3080.0,3080.0,0.0,100% Directa,MercadoPago,32340.0,0.0,Pagó,Pagó
+273,2026-09-15,Septiembre,Santiago Reichart,Colita,0.915,21000.0,19215.0,23000.0,21045.0,1830.0,1830.0,0.0,100% Directa,MercadoPago,21045.0,0.0,Pagó,Pagó
+272,2026-09-15,Septiembre,Tomas Koch,Lomo,4.2,27000.0,113400.0,29000.0,121800.0,8400.0,8400.0,0.0,100% Directa,MercadoPago,121800.0,0.0,Pagó,Pagó
+271,2026-09-15,Septiembre,Tomas Koch,Nalga Feteada,2.165,19000.0,41135.0,22000.0,47630.0,6495.0,6495.0,0.0,100% Directa,MercadoPago,47630.0,0.0,Pagó,Pagó
+270,2026-09-15,Septiembre,Tomas Koch,Peceto Feteado,1.7,19000.0,32300.0,22000.0,37400.0,5100.0,5100.0,0.0,100% Directa,MercadoPago,37400.0,0.0,Pagó,Pagó
+269,2026-09-15,Septiembre,Jime,Peceto Feteado,1.32,19000.0,25080.0,22000.0,29040.0,3960.0,3960.0,0.0,100% Directa,MercadoPago,29040.0,0.0,Pagó,Pagó
+268,2026-09-15,Septiembre,Jime,Picada especial,2.455,14000.0,34370.0,16000.0,39280.0,4910.0,4910.0,0.0,100% Directa,MercadoPago,39280.0,0.0,Pagó,Pagó
+267,2026-09-11,Septiembre,Laura Igarzabal,Colita,0.965,21000.0,20265.0,23000.0,22195.0,1930.0,1930.0,0.0,100% Directa,MercadoPago,22195.0,0.0,Pagó,Pagó
+266,2026-09-11,Septiembre,Laura Igarzabal,Picaña,1.01,19000.0,19190.0,23000.0,23230.0,4040.0,4040.0,0.0,100% Directa,MercadoPago,23230.0,0.0,Pagó,Pagó
+265,2026-09-11,Septiembre,JuanMa,Colita,2.155,21000.0,45255.0,23000.0,49565.0,4310.0,4310.0,0.0,100% Directa,MercadoPago,49565.0,0.0,Pagó,Pagó
+264,2026-09-09,Septiembre,Santi Breide,Colita,1.76,21000.0,36960.0,23000.0,40480.0,3520.0,3520.0,0.0,100% Directa,MercadoPago,40480.0,0.0,Pagó,Pagó
+263,2026-09-09,Septiembre,Santi Breide,Bife Ch,2.24,20000.0,44800.0,22000.0,49280.0,4480.0,4480.0,0.0,100% Directa,MercadoPago,49280.0,0.0,Pagó,Pagó
+262,2026-09-09,Septiembre,Francisco Vazquez,Chorizo,0.99,7500.0,7425.0,7500.0,7425.0,0.0,0.0,0.0,100% Directa,MercadoPago,7425.0,0.0,Pagó,Pagó
+261,2026-09-05,Septiembre,Amparo Nogueira,Lomo,3.19,27000.0,86130.0,29000.0,92510.0,6380.0,6380.0,0.0,100% Directa,MercadoPago,92510.0,0.0,Pagó,Pagó
+260,2026-09-03,Septiembre,Jorge Galache,Picaña,1.16,19000.0,22040.0,23000.0,26680.0,4640.0,4640.0,0.0,100% Directa,MercadoPago,26680.0,0.0,Pagó,Pagó
+259,2026-09-03,Septiembre,Jorge Galache,Lomo,1.48,27000.0,39960.0,29000.0,42920.0,2960.0,2960.0,0.0,100% Directa,MercadoPago,42920.0,0.0,Pagó,Pagó
+258,2026-09-03,Septiembre,Muncha,Picaña,1.34,19000.0,25460.0,23000.0,30820.0,5360.0,5360.0,0.0,100% Directa,MercadoPago,30820.0,0.0,Pagó,Pagó
+257,2026-09-03,Septiembre,Peter,Bife Ch,2.56,20000.0,51200.0,22000.0,56320.0,5120.0,5120.0,0.0,100% Directa,MercadoPago,56320.0,0.0,Pagó,Pagó
+256,2026-09-03,Septiembre,Peter,Lomo,1.83,27000.0,49410.0,29000.0,53070.0,3660.0,3660.0,0.0,100% Directa,MercadoPago,53070.0,0.0,Pagó,Pagó
+255,2026-09-03,Septiembre,Peter,Nalga Feteada,0.995,19000.0,18905.0,22000.0,21890.0,2985.0,2985.0,0.0,100% Directa,MercadoPago,21890.0,0.0,Pagó,Pagó
+254,2026-09-03,Septiembre,Peter,Peceto Feteado,1.34,19000.0,25460.0,22000.0,29480.0,4020.0,4020.0,0.0,100% Directa,MercadoPago,29480.0,0.0,Pagó,Pagó
+253,2026-09-03,Septiembre,Peter,Colita,1.53,21000.0,32130.0,23000.0,35190.0,3060.0,3060.0,0.0,100% Directa,MercadoPago,35190.0,0.0,Pagó,Pagó
+252,2026-09-02,Septiembre,Isa,Colita,0.945,21000.0,19845.0,23000.0,21735.0,1890.0,1890.0,0.0,100% Directa,MercadoPago,21735.0,0.0,Pagó,Pagó
+251,2026-09-02,Septiembre,Ana del Pino,Nalga sin Tapa,3.655,17500.0,63962.5,19500.0,71272.5,7310.0,7310.0,0.0,100% Directa,MercadoPago,71272.5,0.0,Pagó,Pagó
+250,2026-09-02,Septiembre,Annette,Lomo,1.625,27000.0,43875.0,29000.0,47125.0,3250.0,3250.0,0.0,100% Directa,MercadoPago,47125.0,0.0,Pagó,Pagó
+249,2026-09-02,Septiembre,Tomi Suarez,Colita,0.84,21000.0,17640.0,23000.0,19320.0,1680.0,1680.0,0.0,100% Directa,MercadoPago,19320.0,0.0,Pagó,Pagó
+248,2026-09-02,Septiembre,Tomi Suarez,Vacio,3.585,17000.0,60945.0,20000.0,71700.0,10755.0,10755.0,0.0,100% Directa,MercadoPago,71700.0,0.0,Pagó,Pagó
+247,2026-09-02,Septiembre,Tomi Suarez,Nalga Feteada,1.095,19000.0,20805.0,22000.0,24090.0,3285.0,3285.0,0.0,100% Directa,MercadoPago,24090.0,0.0,Pagó,Pagó
+246,2026-09-02,Septiembre,Tomi Suarez,Nalga sin Tapa,3.255,17500.0,56962.5,19500.0,63472.5,6510.0,6510.0,0.0,100% Directa,MercadoPago,63472.5,0.0,Pagó,Pagó
+245,2026-09-01,Septiembre,Tomi Rivero,Bife Ch,2.22,20000.0,44400.0,22000.0,48840.0,4440.0,4440.0,0.0,100% Directa,MercadoPago,48840.0,0.0,Pagó,Pagó
+244,2026-08-27,Agosto,Laura Guidi,Nalga Feteada,1.355,19000.0,25745.0,22000.0,29810.0,4065.0,4065.0,0.0,100% Directa,MercadoPago,29810.0,0.0,Pagó,Pagó
+243,2026-08-26,Agosto,Santiago Reichart,Peceto Feteado,1.905,19000.0,36195.0,22000.0,41910.0,5715.0,5715.0,0.0,100% Directa,MercadoPago,41910.0,0.0,Pagó,Pagó
+242,2026-08-26,Agosto,Santiago Reichart,Lomo,1.565,27000.0,42255.0,29000.0,45385.0,3130.0,3130.0,0.0,100% Directa,MercadoPago,45385.0,0.0,Pagó,Pagó
+241,2026-08-26,Agosto,Santiago Reichart,Colita,0.89,21000.0,18690.0,23000.0,20470.0,1780.0,1780.0,0.0,100% Directa,MercadoPago,20470.0,0.0,Pagó,Pagó
+240,2026-08-26,Agosto,Joaquin Reichart,Peceto Feteado,3.125,19000.0,59375.0,22000.0,68750.0,9375.0,9375.0,0.0,100% Directa,MercadoPago,68750.0,0.0,Pagó,Pagó
+239,2026-08-26,Agosto,Joaquin Reichart,Lomo,3.045,27000.0,82215.0,29000.0,88305.0,6090.0,6090.0,0.0,100% Directa,MercadoPago,88305.0,0.0,Pagó,Pagó
+238,2026-08-26,Agosto,Tomi Rivero,Vacio,1.785,17000.0,30345.0,20000.0,35700.0,5355.0,5355.0,0.0,100% Directa,MercadoPago,35700.0,0.0,Pagó,Pagó
+237,2026-08-25,Agosto,Sole Ezcurra,Colita,2.365,21000.0,49665.0,23000.0,54395.0,4730.0,4730.0,0.0,100% Directa,MercadoPago,54395.0,0.0,Pagó,Pagó
+236,2026-08-24,Agosto,Santi Perrota,Picada especial,1.265,14000.0,17710.0,16000.0,20240.0,2530.0,2530.0,0.0,100% Directa,MercadoPago,20240.0,0.0,Pagó,Pagó
+235,2026-08-24,Agosto,Santi Perrota,Bife Ch,2.98,20000.0,59600.0,22000.0,65560.0,5960.0,5960.0,0.0,100% Directa,MercadoPago,65560.0,0.0,Pagó,Pagó
+234,2026-08-24,Agosto,Santi Perrota,Vacio,1.68,17000.0,28560.0,22000.0,36960.0,8400.0,8400.0,0.0,100% Directa,MercadoPago,36960.0,0.0,Pagó,Pagó
+233,2026-08-24,Agosto,Ana del Pino,Colita,1.78,21000.0,37380.0,23000.0,40940.0,3560.0,3560.0,0.0,100% Directa,MercadoPago,40940.0,0.0,Pagó,Pagó
+232,2026-08-24,Agosto,Jime,Picada especial,2.57,14000.0,35980.0,16000.0,41120.0,5140.0,5140.0,0.0,100% Directa,MercadoPago,41120.0,0.0,Pagó,Pagó
+231,2026-08-24,Agosto,Annette,Nalga Feteada,1.345,19000.0,25555.0,22000.0,29590.0,4035.0,4035.0,0.0,100% Directa,MercadoPago,29590.0,0.0,Pagó,Pagó
+230,2026-08-24,Agosto,Laura Guidi,Peceto Feteado,2.47,19000.0,46930.0,22000.0,54340.0,7410.0,7410.0,0.0,100% Directa,MercadoPago,54340.0,0.0,Pagó,Pagó
+229,2026-08-18,Agosto,Cristina Igarzabal,Lomo,1.465,27000.0,39555.0,29000.0,42485.0,2930.0,2930.0,0.0,100% Directa,MercadoPago,42485.0,0.0,Pagó,Pagó
+228,2026-08-18,Agosto,Cristina Igarzabal,Picaña,2.53,19000.0,48070.0,23000.0,58190.0,10120.0,10120.0,0.0,100% Directa,MercadoPago,58190.0,0.0,Pagó,Pagó
+227,2026-08-14,Agosto,Tomi Rivero,Picaña,1.305,19000.0,24795.0,23000.0,30015.0,5220.0,5220.0,0.0,100% Directa,MercadoPago,30015.0,0.0,Pagó,Pagó
+226,2026-08-14,Agosto,Tomi Rivero,Vacio,1.03,17000.0,17510.0,22000.0,22660.0,5150.0,5150.0,0.0,100% Directa,MercadoPago,22660.0,0.0,Pagó,Pagó
+225,2026-08-14,Agosto,Matias Sonzini,Lomo,1.55,27000.0,41850.0,29000.0,44950.0,3100.0,3100.0,0.0,100% Directa,MercadoPago,44950.0,0.0,Pagó,Pagó
+224,2026-08-14,Agosto,Matias Sonzini,Colita,1.005,21000.0,21105.0,23000.0,23115.0,2010.0,2010.0,0.0,100% Directa,MercadoPago,23115.0,0.0,Pagó,Pagó
+223,2026-08-14,Agosto,Agustin Breide,Picaña,1.3,19000.0,24700.0,23000.0,29900.0,5200.0,5200.0,0.0,100% Directa,MercadoPago,29900.0,0.0,Pagó,Pagó
+222,2026-08-14,Agosto,Agustin Breide,Colita,0.98,21000.0,20580.0,23000.0,22540.0,1960.0,1960.0,0.0,100% Directa,MercadoPago,22540.0,0.0,Pagó,Pagó
+221,2026-08-14,Agosto,Agustin Breide,Vacio,2.775,17000.0,47175.0,22000.0,61050.0,13875.0,13875.0,0.0,100% Directa,MercadoPago,61050.0,0.0,Pagó,Pagó
+220,2026-08-13,Agosto,Sole Ezcurra,Lomo,1.415,27000.0,38205.0,29000.0,41035.0,2830.0,2830.0,0.0,100% Directa,MercadoPago,41035.0,0.0,Pagó,Pagó
+219,2026-08-13,Agosto,Sole Ezcurra,Vacio,1.715,17000.0,29155.0,22000.0,37730.0,8575.0,8575.0,0.0,100% Directa,MercadoPago,37730.0,0.0,Pagó,Pagó
+218,2026-08-12,Agosto,Marcos Bruno,Lomo,7.725,27000.0,208575.0,29000.0,224025.0,15450.0,15450.0,0.0,100% Directa,MercadoPago,224025.0,0.0,Pagó,Pagó
+217,2026-08-12,Agosto,Marcos Bruno,Colita,3.02,21000.0,63420.0,23000.0,69460.0,6040.0,6040.0,0.0,100% Directa,MercadoPago,69460.0,0.0,Pagó,Pagó
+216,2026-08-12,Agosto,Bettina,Lomo,4.215,27000.0,113805.0,29000.0,122235.0,8430.0,8430.0,0.0,100% Directa,Efectivo,122235.0,0.0,Pagó,Pagó
+215,2026-08-12,Agosto,Bettina,Peceto,1.235,19000.0,23465.0,21000.0,25935.0,2470.0,2470.0,0.0,100% Directa,Efectivo,27765.0,1830.0,Pagó,A favor AR$1.830
+214,2026-08-12,Agosto,Laura Guidi,Peceto Feteado,3.305,19000.0,62795.0,22000.0,72710.0,9915.0,9915.0,0.0,100% Directa,MercadoPago,72710.0,0.0,Pagó,Pagó
+213,2026-08-12,Agosto,Isa,Colita,0.885,21000.0,18585.0,23000.0,20355.0,1770.0,1770.0,0.0,100% Directa,MercadoPago,20355.0,0.0,Pagó,Pagó
+212,2026-08-12,Agosto,Carola,Nalga Feteada,1.125,19000.0,21375.0,22000.0,24750.0,3375.0,3375.0,0.0,100% Directa,MercadoPago,24750.0,0.0,Pagó,Pagó
+211,2026-08-12,Agosto,Annette,Nalga Feteada,1.225,19000.0,23275.0,22000.0,26950.0,3675.0,3675.0,0.0,100% Directa,MercadoPago,26950.0,0.0,Pagó,Pagó
+210,2026-08-12,Agosto,Tomi Rivero,Bife Ch,1.795,20000.0,35900.0,22000.0,39490.0,3590.0,3590.0,0.0,100% Directa,MercadoPago,39490.0,0.0,Pagó,Pagó
+209,2026-08-10,Agosto,Laura Igarzabal,Lomo,3.075,27000.0,83025.0,29000.0,89175.0,6150.0,6150.0,0.0,100% Directa,MercadoPago,89175.0,0.0,Pagó,Pagó
+208,2026-08-10,Agosto,Maria Aramburu,Vacio,2.625,17000.0,44625.0,22000.0,57750.0,13125.0,13125.0,0.0,100% Directa,MercadoPago,57750.0,0.0,Pagó,Pagó
+207,2026-08-10,Agosto,Maria Aramburu,Lomo,3.08,27000.0,83160.0,29000.0,89320.0,6160.0,6160.0,0.0,100% Directa,MercadoPago,89320.0,0.0,Pagó,Pagó
+206,2026-08-10,Agosto,Maria Aramburu,Picaña,2.255,19000.0,42845.0,23000.0,51865.0,9020.0,9020.0,0.0,100% Directa,MercadoPago,51865.0,0.0,Pagó,Pagó
+205,2026-08-06,Agosto,Santi Breide,Nalga Feteada,2.375,19000.0,45125.0,22000.0,52250.0,7125.0,7125.0,0.0,100% Directa,MercadoPago,52250.0,0.0,Pagó,Pagó
+204,2026-08-06,Agosto,Muncha,Picaña,1.365,19000.0,25935.0,23000.0,31395.0,5460.0,5460.0,0.0,100% Directa,MercadoPago,31395.0,0.0,Pagó,Pagó
+203,2026-07-31,Julio,JuanMa,Colita,2.58,21000.0,54180.0,23000.0,59340.0,5160.0,5160.0,0.0,100% Directa,MercadoPago,59340.0,0.0,Pagó,Pagó
+202,2026-07-31,Julio,Nacho Gabancho,Chorizo,0.625,7500.0,4687.5,7500.0,4687.5,0.0,0.0,0.0,100% Directa,MercadoPago,4687.5,0.0,Pagó,Pagó
+201,2026-07-31,Julio,Nacho Gabancho,Lomo,1.64,27000.0,44280.0,29000.0,47560.0,3280.0,3280.0,0.0,100% Directa,MercadoPago,47560.0,0.0,Pagó,Pagó
+200,2026-07-30,Julio,Isa,Colita,1.125,21000.0,23625.0,23000.0,25875.0,2250.0,2250.0,0.0,100% Directa,MercadoPago,25875.0,0.0,Pagó,Pagó
+199,2026-07-30,Julio,Agustin,Lomo,3.075,27000.0,83025.0,29000.0,89175.0,6150.0,6150.0,0.0,100% Directa,MercadoPago,89175.0,0.0,Pagó,Pagó
+198,2026-07-30,Julio,Agustin,Colita,5.07,21000.0,106470.0,23000.0,116610.0,10140.0,10140.0,0.0,100% Directa,MercadoPago,116610.0,0.0,Pagó,Pagó
+197,2026-07-30,Julio,Gaston,Colita,1.045,21000.0,21945.0,23000.0,24035.0,2090.0,2090.0,0.0,100% Directa,MercadoPago,24035.0,0.0,Pagó,Pagó
+196,2026-07-29,Julio,Carola,Colita,1.145,21000.0,24045.0,23000.0,26335.0,2290.0,2290.0,0.0,100% Directa,MercadoPago,26335.0,0.0,Pagó,Pagó
+195,2026-07-29,Julio,Carola,Picada especial,1.15,14000.0,16100.0,16000.0,18400.0,2300.0,2300.0,0.0,100% Directa,MercadoPago,18400.0,0.0,Pagó,Pagó
+194,2026-07-29,Julio,Tomas Koch,Nalga Feteada,3.075,19000.0,58425.0,22000.0,67650.0,9225.0,9225.0,0.0,100% Directa,MercadoPago,67650.0,0.0,Pagó,Pagó
+193,2026-07-29,Julio,Tomas Koch,Peceto Feteado,2.915,19000.0,55385.0,22000.0,64130.0,8745.0,8745.0,0.0,100% Directa,MercadoPago,64130.0,0.0,Pagó,Pagó
+192,2026-07-23,Julio,Tomi Suarez,Nalga Feteada,1.225,19000.0,23275.0,22000.0,26950.0,3675.0,3675.0,0.0,100% Directa,MercadoPago,26950.0,0.0,Pagó,Pagó
+191,2026-07-23,Julio,Tomi Suarez,Picada especial,1.125,14000.0,15750.0,16000.0,18000.0,2250.0,2250.0,0.0,100% Directa,MercadoPago,18000.0,0.0,Pagó,Pagó
+190,2026-07-23,Julio,Ezequiel,Bife Ch,1.94,20000.0,38800.0,22000.0,42680.0,3880.0,3880.0,0.0,100% Directa,MercadoPago,42680.0,0.0,Pagó,Pagó
+189,2026-07-23,Julio,Ezequiel,Nalga Feteada,1.195,19000.0,22705.0,22000.0,26290.0,3585.0,3585.0,0.0,100% Directa,MercadoPago,26290.0,0.0,Pagó,Pagó
+188,2026-07-23,Julio,Isa,Colita,1.365,21000.0,28665.0,23000.0,31395.0,2730.0,2730.0,0.0,100% Directa,MercadoPago,31395.0,0.0,Pagó,Pagó
+187,2026-07-23,Julio,Peter,Vacio,3.295,17000.0,56015.0,20000.0,65900.0,9885.0,9885.0,0.0,100% Directa,MercadoPago,65900.0,0.0,Pagó,Pagó
+186,2026-07-23,Julio,Peter,Bife Ch,1.815,20000.0,36300.0,22000.0,39930.0,10030.0,10030.0,0.0,100% Directa,MercadoPago,39930.0,0.0,Pagó,Pagó
+185,2026-07-23,Julio,Peter,Lomo,1.495,27000.0,40365.0,29000.0,43355.0,2990.0,2990.0,0.0,100% Directa,MercadoPago,43355.0,0.0,Pagó,Pagó
+184,2026-07-23,Julio,Peter,Colita,2.245,21000.0,47145.0,23000.0,51635.0,4490.0,4490.0,0.0,100% Directa,MercadoPago,51635.0,0.0,Pagó,Pagó
+183,2026-07-23,Julio,Lourdes,Nalga sin Tapa,3.63,16500.0,59895.0,19500.0,70785.0,10890.0,10890.0,0.0,100% Directa,MercadoPago,70785.0,0.0,Pagó,Pagó
+182,2026-07-17,Julio,Fernando Zambra,Picaña,2.6,19000.0,49400.0,23000.0,59800.0,10400.0,10400.0,0.0,100% Directa,Efectivo,60000.0,200.0,Pagó,A favor AR$200
+181,2026-07-17,Julio,Jaime,Vacio,4.3,17000.0,73100.0,20000.0,86000.0,12900.0,12900.0,0.0,100% Directa,MercadoPago,86000.0,0.0,Pagó,Pagó
+180,2026-07-17,Julio,Muncha,Picaña,2.8,19000.0,53200.0,23000.0,64400.0,11200.0,11200.0,0.0,100% Directa,Efectivo,65000.0,600.0,Pagó,A favor AR$600
+179,2026-07-16,Julio,Santi Perrota,Vacio,1.255,17000.0,21335.0,22000.0,27610.0,6275.0,6275.0,0.0,100% Directa,MercadoPago,27610.0,0.0,Pagó,Pagó
+178,2026-07-16,Julio,Santi Perrota,Lomo,1.5,27000.0,40500.0,29000.0,43500.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,43500.0,0.0,Pagó,Pagó
+177,2026-07-16,Julio,Santi Perrota,Bife Ch,2.5,20000.0,50000.0,22000.0,55000.0,5000.0,5000.0,0.0,100% Directa,MercadoPago,55000.0,0.0,Pagó,Pagó
+176,2026-07-16,Julio,JuanMa,Colita,0.7,21000.0,14700.0,23000.0,16100.0,1400.0,1400.0,0.0,100% Directa,MercadoPago,16100.0,0.0,Pagó,Pagó
+175,2026-07-14,Julio,Isa,Picada especial,1.2,14000.0,16800.0,16000.0,19200.0,2400.0,2400.0,0.0,100% Directa,MercadoPago,19200.0,0.0,Pagó,Pagó
+174,2026-07-14,Julio,Sole Ezcurra,Lomo,1.3,27000.0,35100.0,29000.0,37700.0,2600.0,2600.0,0.0,100% Directa,MercadoPago,37700.0,0.0,Pagó,Pagó
+173,2026-07-14,Julio,Sole Ezcurra,Colita,0.9,21000.0,18900.0,23000.0,20700.0,1800.0,1800.0,0.0,100% Directa,MercadoPago,20700.0,0.0,Pagó,Pagó
+172,2026-07-13,Julio,Amparo Nogueira,Lomo,3.0,27000.0,81000.0,29000.0,87000.0,6000.0,6000.0,0.0,100% Directa,MercadoPago,87000.0,0.0,Pagó,Pagó
+171,2026-07-13,Julio,Laura Guidi,Peceto Feteado,2.0,19000.0,38000.0,22000.0,44000.0,6000.0,6000.0,0.0,100% Directa,Efectivo,44000.0,0.0,Pagó,Pagó
+170,2026-07-13,Julio,Jime,Picada especial,1.2,14000.0,16800.0,16000.0,19200.0,2400.0,2400.0,0.0,100% Directa,MercadoPago,19200.0,0.0,Pagó,Pagó
+169,2026-07-13,Julio,Jime,Lomo,1.5,27000.0,40500.0,29000.0,43500.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,43500.0,0.0,Pagó,Pagó
+168,2026-07-13,Julio,Nacho Gabancho,Lomo,1.5,27000.0,40500.0,29000.0,43500.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,43500.0,0.0,Pagó,Pagó
+167,2026-07-13,Julio,Nacho Gabancho,Vacio,1.2,17000.0,20400.0,22000.0,26400.0,6000.0,6000.0,0.0,100% Directa,MercadoPago,26400.0,0.0,Pagó,Pagó
+166,2026-07-10,Julio,Ramón,Peceto,1.2,19000.0,22800.0,21000.0,25200.0,2400.0,2400.0,0.0,100% Directa,Efectivo,25200.0,0.0,Pagó,Pagó
+165,2026-07-10,Julio,Ramón,Colita,1.0,21000.0,21000.0,23000.0,23000.0,2000.0,2000.0,0.0,100% Directa,Efectivo,24800.0,1800.0,Pagó,A favor AR$1.800
+164,2026-07-09,Julio,Ezequiel Cardoni,Lomo,6.5,27000.0,175500.0,29000.0,188500.0,13000.0,13000.0,0.0,100% Directa,MercadoPago,188500.0,0.0,Pagó,Pagó
+163,2026-07-09,Julio,Nacho Gabancho,Lomo,1.2,27000.0,32400.0,29000.0,34800.0,2400.0,2400.0,0.0,100% Directa,MercadoPago,34800.0,0.0,Pagó,Pagó
+162,2026-07-09,Julio,Jaime Lorenzo,Vacio,4.5,17000.0,76500.0,20000.0,90000.0,13500.0,13500.0,0.0,100% Directa,MercadoPago,90000.0,0.0,Pagó,Pagó
+161,2026-07-08,Julio,Tomi Rivero,Vacio,3.2,17000.0,54400.0,20000.0,64000.0,9600.0,9600.0,0.0,100% Directa,MercadoPago,64000.0,0.0,Pagó,Pagó
+160,2026-07-07,Julio,Annette,Nalga Feteada,1.0,19000.0,19000.0,22000.0,22000.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,22000.0,0.0,Pagó,Pagó
+159,2026-07-07,Julio,Annette,Lomo,1.5,27000.0,40500.0,29000.0,43500.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,43500.0,0.0,Pagó,Pagó
+158,2026-07-07,Julio,Jime,Lomo,1.6,27000.0,43200.0,29000.0,46400.0,3200.0,3200.0,0.0,100% Directa,MercadoPago,46400.0,0.0,Pagó,Pagó
+157,2026-07-07,Julio,Tomas Koch,Vacio,3.1,17000.0,52700.0,22000.0,68200.0,15500.0,15500.0,0.0,100% Directa,MercadoPago,68200.0,0.0,Pagó,Pagó
+156,2026-07-07,Julio,Tomas Koch,Nalga Feteada,2.5,19000.0,47500.0,22000.0,55000.0,7500.0,7500.0,0.0,100% Directa,MercadoPago,55000.0,0.0,Pagó,Pagó
+155,2026-07-07,Julio,Tomas Koch,Lomo,8.1,27000.0,218700.0,29000.0,234900.0,16200.0,16200.0,0.0,100% Directa,MercadoPago,234900.0,0.0,Pagó,Pagó
+154,2026-07-07,Julio,Pato O'Reilly,Vacio,4.5,17000.0,76500.0,20000.0,90000.0,13500.0,13500.0,0.0,100% Directa,MercadoPago,90000.0,0.0,Pagó,Pagó
+153,2026-07-06,Julio,Santi Breide,Bife Ch,2.9,20000.0,58000.0,22000.0,63800.0,5800.0,5800.0,0.0,100% Directa,MercadoPago,63800.0,0.0,Pagó,Pagó
+152,2026-07-06,Julio,Santi Breide,Colita,0.9,21000.0,18900.0,23000.0,20700.0,1800.0,1800.0,0.0,100% Directa,MercadoPago,20700.0,0.0,Pagó,Pagó
+151,2026-07-06,Julio,Santi Breide,Nalga Feteada,2.2,19000.0,41800.0,22000.0,48400.0,6600.0,6600.0,0.0,100% Directa,MercadoPago,48400.0,0.0,Pagó,Pagó
+150,2026-07-01,Julio,Pato O'Reilly,Colita,1.9,21000.0,39900.0,23000.0,43700.0,3800.0,3800.0,0.0,100% Directa,MercadoPago,43700.0,0.0,Pagó,Pagó
+149,2026-07-01,Julio,Pato O'Reilly,Nalga Feteada,1.1,19000.0,20900.0,22000.0,24200.0,3300.0,3300.0,0.0,100% Directa,MercadoPago,24200.0,0.0,Pagó,Pagó
+148,2026-07-01,Julio,Pato O'Reilly,Picada especial,3.4,14000.0,47600.0,16000.0,54400.0,6800.0,6800.0,0.0,100% Directa,MercadoPago,54400.0,0.0,Pagó,Pagó
+147,2026-06-30,Junio,Carola,Colita,1.0,21000.0,21000.0,23000.0,23000.0,2000.0,2000.0,0.0,100% Directa,MercadoPago,23000.0,0.0,Pagó,Pagó
+146,2026-06-30,Junio,Ale Silveyra,Lomo,5.9,27000.0,159300.0,29000.0,171100.0,11800.0,11800.0,0.0,100% Directa,MercadoPago,171100.0,0.0,Pagó,Pagó
+145,2026-06-30,Junio,Annette,Nalga Feteada,1.0,19000.0,19000.0,22000.0,22000.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,22000.0,0.0,Pagó,Pagó
+144,2026-06-29,Junio,Rochi Melazza,Lomo,1.5,27000.0,40500.0,29000.0,43500.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,43500.0,0.0,Pagó,Pagó
+143,2026-06-29,Junio,Rochi Melazza,Vacio,4.0,17000.0,68000.0,20000.0,80000.0,12000.0,12000.0,0.0,100% Directa,MercadoPago,80000.0,0.0,Pagó,Pagó
+142,2026-06-29,Junio,Laura Guidi,Peceto Feteado,3.6,19000.0,68400.0,22000.0,79200.0,10800.0,10800.0,0.0,100% Directa,MercadoPago,79200.0,0.0,Pagó,Pagó
+141,2026-06-25,Junio,Diego Gonzalez Bonorino,Colita,1.7,21000.0,35700.0,23000.0,39100.0,3400.0,3400.0,0.0,100% Directa,MercadoPago,39100.0,0.0,Pagó,Pagó
+140,2026-06-25,Junio,Diego Gonzalez Bonorino,Lomo,1.3,27000.0,35100.0,29000.0,37700.0,2600.0,2600.0,0.0,100% Directa,MercadoPago,37700.0,0.0,Pagó,Pagó
+139,2026-06-25,Junio,Diego Gonzalez Bonorino,Picaña,1.4,19000.0,26600.0,23000.0,32200.0,5600.0,5600.0,0.0,100% Directa,MercadoPago,32200.0,0.0,Pagó,Pagó
+138,2026-06-24,Junio,JuanMa,Colita,1.1,21000.0,23100.0,23000.0,25300.0,2200.0,2200.0,0.0,100% Directa,MercadoPago,25300.0,0.0,Pagó,Pagó
+137,2026-06-23,Junio,Cristina Igarzabal,Lomo,1.3,27000.0,35100.0,29000.0,37700.0,2600.0,2600.0,0.0,100% Directa,MercadoPago,37700.0,0.0,Pagó,Pagó
+136,2026-06-23,Junio,Cristina Igarzabal,Picaña,1.5,19000.0,28500.0,23000.0,34500.0,6000.0,6000.0,0.0,100% Directa,MercadoPago,34500.0,0.0,Pagó,Pagó
+135,2026-06-23,Junio,Cristina Igarzabal,Colita,1.5,21000.0,31500.0,23000.0,34500.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,34500.0,0.0,Pagó,Pagó
+134,2026-06-23,Junio,Peter,Nalga Feteada,2.5,19000.0,47500.0,22000.0,55000.0,7500.0,7500.0,0.0,100% Directa,MercadoPago,55000.0,0.0,Pagó,Pagó
+133,2026-06-23,Junio,Peter,Lomo,1.5,27000.0,40500.0,29000.0,43500.0,3000.0,3000.0,0.0,100% Directa,MercadoPago,43500.0,0.0,Pagó,Pagó
+132,2026-06-23,Junio,Peter,Colita,1.7,21000.0,35700.0,23000.0,39100.0,3400.0,3400.0,0.0,100% Directa,MercadoPago,39100.0,0.0,Pagó,Pagó
+131,2026-06-23,Junio,Muncha,Peceto Feteado,1.8,19000.0,34200.0,22000.0,39600.0,5400.0,5400.0,0.0,100% Directa,Efectivo,39600.0,0.0,Pagó,Pagó
+130,2026-06-23,Junio,Muncha,Picaña,1.0,19000.0,19000.0,23000.0,23000.0,4000.0,4000.0,0.0,100% Directa,Efectivo,27000.0,4000.0,Pagó,A favor AR$4000
+129,2026-06-23,Junio,Jime,Lomo,1.3,27000.0,35100.0,29000.0,37700.0,2600.0,2600.0,0.0,100% Directa,MercadoPago,37700.0,0.0,Pagó,Pagó
+128,2026-06-23,Junio,Annette,Nalga Feteada,1.2,19000.0,22800.0,22000.0,26400.0,3600.0,3600.0,0.0,100% Directa,MercadoPago,26400.0,0.0,Pagó,Pagó
+127,2026-06-23,Junio,Annette,Vacio,2.8,17000.0,47600.0,20000.0,56000.0,8400.0,8400.0,0.0,100% Directa,MercadoPago,56000.0,0.0,Pagó,Pagó
+126,2026-06-23,Junio,Joaquin Reichart,Lomo,5.8,27000.0,156600.0,29000.0,168200.0,11600.0,11600.0,0.0,100% Directa,MercadoPago,168200.0,0.0,Pagó,Pagó
+125,2026-06-19,Junio,Carola,Picada especial,1.355,14000.0,18970.0,16000.0,21680.0,2710.0,1355.0,1355.0,50% Compartida,MercadoPago,21680.0,0.0,Pagó,Pagó
+124,2026-06-19,Junio,Carola,Nalga Feteada,1.325,19000.0,25175.0,22000.0,29150.0,3975.0,1987.5,1987.5,50% Compartida,MercadoPago,29150.0,0.0,Pagó,Pagó
+123,2026-06-19,Junio,Isa,Picada especial,1.115,14000.0,15610.0,16000.0,17840.0,2230.0,1115.0,1115.0,50% Compartida,MercadoPago,17840.0,0.0,Pagó,Pagó
+122,2026-06-19,Junio,Isa,Colita,1.0,18000.0,18000.0,23000.0,23000.0,5000.0,2500.0,2500.0,50% Compartida,MercadoPago,23000.0,0.0,Pagó,Pagó
+121,2026-06-19,Junio,Pato O'Reilly,Lomo,3.1,25000.0,77500.0,29000.0,89900.0,12400.0,6200.0,6200.0,50% Compartida,MercadoPago,89900.0,0.0,Pagó,Pagó
+120,2026-06-19,Junio,Pato O'Reilly,Vacio,5.5,15000.0,82500.0,20000.0,110000.0,27500.0,13750.0,13750.0,50% Compartida,MercadoPago,110000.0,0.0,Pagó,Pagó
+119,2026-06-17,Junio,Annette,Nalga Feteada,1.15,19000.0,21850.0,22000.0,25300.0,3450.0,1725.0,1725.0,50% Compartida,MercadoPago,25300.0,0.0,Pagó,Pagó
+118,2026-06-17,Junio,Matias Sonzini,Picaña,1.4,17000.0,23800.0,23000.0,32200.0,8400.0,4200.0,4200.0,50% Compartida,MercadoPago,32200.0,0.0,Pagó,Pagó
+117,2026-06-17,Junio,Jime,Picaña,1.0,17000.0,17000.0,23000.0,23000.0,6000.0,3000.0,3000.0,50% Compartida,MercadoPago,23000.0,0.0,Pagó,Pagó
+116,2026-06-17,Junio,Jime,Picada especial,1.26,14000.0,17640.0,16000.0,20160.0,2520.0,1260.0,1260.0,50% Compartida,MercadoPago,20160.0,0.0,Pagó,Pagó
+115,2026-06-16,Junio,Matias de Blasi,Picaña,5.0,17000.0,85000.0,23000.0,115000.0,30000.0,15000.0,15000.0,50% Compartida,Efectivo,115000.0,0.0,Pagó,Pagó
+114,2026-06-16,Junio,Jaime Lorenzo,Vacio,4.5,15000.0,67500.0,20000.0,90000.0,22500.0,11250.0,11250.0,50% Compartida,MercadoPago,90000.0,0.0,Pagó,Pagó
+113,2026-06-16,Junio,Joaquin Reichart,Colita,2.3,18000.0,41400.0,23000.0,52900.0,11500.0,5750.0,5750.0,50% Compartida,MercadoPago,52900.0,0.0,Pagó,Pagó
+112,2026-06-16,Junio,Joaquin Reichart,Lomo,3.0,25000.0,75000.0,29000.0,87000.0,12000.0,6000.0,6000.0,50% Compartida,MercadoPago,87000.0,0.0,Pagó,Pagó
+111,2026-06-16,Junio,Tomi Suarez,Nalga Feteada,1.125,19000.0,21375.0,22000.0,24750.0,3375.0,1687.5,1687.5,50% Compartida,MercadoPago,24750.0,0.0,Pagó,Pagó
+110,2026-06-16,Junio,Tomi Suarez,Picada especial,1.215,14000.0,17010.0,16000.0,19440.0,2430.0,1215.0,1215.0,50% Compartida,MercadoPago,19440.0,0.0,Pagó,Pagó
+109,2026-06-16,Junio,Tomi Suarez,Colita,0.8,18000.0,14400.0,23000.0,18400.0,4000.0,2000.0,2000.0,50% Compartida,MercadoPago,18400.0,0.0,Pagó,Pagó
+108,2026-06-12,Junio,Juanito,Picaña,1.2,17000.0,20400.0,23000.0,27600.0,7200.0,3600.0,3600.0,50% Compartida,MercadoPago,27600.0,0.0,Pagó,Pagó
+107,2026-06-12,Junio,Carlos Rivero,Picada especial,1.0,14000.0,14000.0,16000.0,16000.0,2000.0,1000.0,1000.0,50% Compartida,MercadoPago,16000.0,0.0,Pagó,Pagó
+106,2026-06-12,Junio,Carlos Rivero,Bife Ch,2.6,18000.0,46800.0,22000.0,57200.0,10400.0,5200.0,5200.0,50% Compartida,MercadoPago,57200.0,0.0,Pagó,Pagó
+105,2026-06-12,Junio,Carlos Rivero,Vacio,4.6,15000.0,69000.0,20000.0,92000.0,23000.0,11500.0,11500.0,50% Compartida,MercadoPago,92000.0,0.0,Pagó,Pagó
+104,2026-06-12,Junio,Laura,Colita,2.0,18000.0,36000.0,23000.0,46000.0,10000.0,5000.0,5000.0,50% Compartida,MercadoPago,46000.0,0.0,Pagó,Pagó
+103,2026-06-12,Junio,Laura,Lomo,3.0,25000.0,75000.0,29000.0,87000.0,12000.0,6000.0,6000.0,50% Compartida,MercadoPago,87000.0,0.0,Pagó,Pagó
+102,2026-06-11,Junio,Bettina,Colita,1.7,18000.0,30600.0,23000.0,39100.0,8500.0,4250.0,4250.0,50% Compartida,Efectivo,39100.0,0.0,Pagó,Pagó
+101,2026-06-11,Junio,Bettina,Lomo,1.4,25000.0,35000.0,29000.0,40600.0,5600.0,2800.0,2800.0,50% Compartida,Efectivo,40600.0,0.0,Pagó,Pagó
+100,2026-06-11,Junio,Bettina,Vacio,3.2,15000.0,48000.0,20000.0,64000.0,16000.0,8000.0,8000.0,50% Compartida,Efectivo,64300.0,300.0,Pagó,A favor AR$300
+99,2026-06-11,Junio,Adela,Nalga sin Tapa,3.8,16500.0,62700.0,19500.0,74100.0,11400.0,5700.0,5700.0,50% Compartida,MercadoPago,74100.0,0.0,Pagó,Pagó
+98,2026-06-11,Junio,Breide,Colita,4.0,18000.0,72000.0,23000.0,92000.0,20000.0,10000.0,10000.0,50% Compartida,MercadoPago,92000.0,0.0,Pagó,Pagó
+97,2026-06-11,Junio,Breide,Nalga Feteada,1.3,19000.0,24700.0,21500.0,27950.0,3250.0,1625.0,1625.0,50% Compartida,MercadoPago,27950.0,0.0,Pagó,Pagó
+96,2026-06-11,Junio,Jime,Lomo,1.3,25000.0,32500.0,29000.0,37700.0,5200.0,2600.0,2600.0,50% Compartida,MercadoPago,37700.0,0.0,Pagó,Pagó
+95,2026-06-10,Junio,Delia,Peceto,1.6,17000.0,27200.0,22000.0,35200.0,8000.0,4000.0,4000.0,50% Compartida,Efectivo,35200.0,0.0,Pagó,Pagó
+94,2026-06-10,Junio,Delia,Nalga sin Tapa,4.2,16500.0,69300.0,19500.0,81900.0,12600.0,6300.0,6300.0,50% Compartida,Efectivo,81900.0,0.0,Pagó,Pagó
+93,2026-06-10,Junio,Delia,Vacio,4.3,15000.0,64500.0,20000.0,86000.0,21500.0,10750.0,10750.0,50% Compartida,Efectivo,86000.0,0.0,Pagó,Pagó
+92,2026-06-10,Junio,Fernando Zambra,Picaña,2.5,17000.0,42500.0,23000.0,57500.0,15000.0,7500.0,7500.0,50% Compartida,Efectivo,57500.0,0.0,Pagó,Pagó
+91,2026-06-10,Junio,Fernando Zambra,Colita,1.6,18000.0,28800.0,23000.0,36800.0,8000.0,4000.0,4000.0,50% Compartida,Efectivo,36800.0,0.0,Pagó,Pagó
+90,2026-06-09,Junio,Matias,Lomo,2.9,25000.0,72500.0,29000.0,84100.0,11600.0,5800.0,5800.0,50% Compartida,MercadoPago,84100.0,0.0,Pagó,Pagó
+89,2026-06-09,Junio,Maria Eizayaga,Colita,2.4,18000.0,43200.0,23000.0,55200.0,12000.0,6000.0,6000.0,50% Compartida,MercadoPago,55200.0,0.0,Pagó,Pagó
+88,2026-06-09,Junio,Laura Costu,Peceto Feteado,2.6,19000.0,49400.0,21500.0,55900.0,6500.0,3250.0,3250.0,50% Compartida,MercadoPago,55900.0,0.0,Pagó,Pagó
+87,2026-06-09,Junio,Zurdo,Vacio,9.6,15000.0,144000.0,20000.0,192000.0,48000.0,24000.0,24000.0,50% Compartida,Efectivo,192000.0,0.0,Pagó,Pagó
+86,2026-06-05,Junio,Patricio Cabrini,Lomo,7.5,25000.0,187500.0,29000.0,217500.0,30000.0,15000.0,15000.0,50% Compartida,Efectivo,217600.0,100.0,Pagó,A favor AR$100
+85,2026-06-05,Junio,Tomas Koch,Bife Ch,2.3,18000.0,41400.0,22000.0,50600.0,9200.0,4600.0,4600.0,50% Compartida,MercadoPago,50600.0,0.0,Pagó,Pagó
+84,2026-06-05,Junio,Tomas Koch,Vacio,4.5,15000.0,67500.0,20000.0,90000.0,22500.0,11250.0,11250.0,50% Compartida,MercadoPago,90000.0,0.0,Pagó,Pagó
+83,2026-06-05,Junio,Tomas Koch,Lomo,10.4,25000.0,260000.0,29000.0,301600.0,41600.0,20800.0,20800.0,50% Compartida,MercadoPago,301600.0,0.0,Pagó,Pagó
+82,2026-06-05,Junio,Zurdo,Bife Ch,2.3,18000.0,41400.0,22000.0,50600.0,9200.0,4600.0,4600.0,50% Compartida,Efectivo,50600.0,0.0,Pagó,Pagó
+81,2026-06-05,Junio,Zurdo,Colita,2.6,18000.0,46800.0,23000.0,59800.0,13000.0,6500.0,6500.0,50% Compartida,Efectivo,59800.0,0.0,Pagó,Pagó
+80,2026-06-05,Junio,Zurdo,Vacio,4.6,15000.0,69000.0,20000.0,92000.0,23000.0,11500.0,11500.0,50% Compartida,Efectivo,92000.0,0.0,Pagó,Pagó
+79,2026-06-04,Junio,Breide,Colita,1.0,18000.0,18000.0,23000.0,23000.0,5000.0,2500.0,2500.0,50% Compartida,MercadoPago,23000.0,0.0,Pagó,Pagó
+78,2026-06-04,Junio,Ezequiel,Picaña,2.7,17000.0,45900.0,21000.0,56700.0,10800.0,5400.0,5400.0,50% Compartida,Efectivo,56700.0,0.0,Pagó,Pagó
+77,2026-06-04,Junio,Ezequiel,Lomo,7.0,25000.0,175000.0,27500.0,192500.0,17500.0,8750.0,8750.0,50% Compartida,Efectivo,192500.0,0.0,Pagó,Pagó
+76,2026-06-04,Junio,Ezequiel,Bife Ch,7.3,18000.0,131400.0,21000.0,153300.0,21900.0,10950.0,10950.0,50% Compartida,Efectivo,153300.0,0.0,Pagó,Pagó
+75,2026-06-04,Junio,Ezequiel,Vacio,9.8,15000.0,147000.0,18000.0,176400.0,29400.0,14700.0,14700.0,50% Compartida,Efectivo,176500.0,100.0,Pagó,A favor AR$100
+74,2026-06-04,Junio,Jime,Lomo,1.8,25000.0,45000.0,29000.0,52200.0,7200.0,3600.0,3600.0,50% Compartida,MercadoPago,52200.0,0.0,Pagó,Pagó
+73,2026-06-04,Junio,Matias Ureta,Picaña,2.5,17000.0,42500.0,21000.0,52500.0,10000.0,5000.0,5000.0,50% Compartida,MercadoPago,52500.0,0.0,Pagó,Pagó
+72,2026-06-04,Junio,Matias Ureta,Peceto,1.2,17000.0,20400.0,19500.0,23400.0,3000.0,1500.0,1500.0,50% Compartida,MercadoPago,23400.0,0.0,Pagó,Pagó
+71,2026-06-04,Junio,Matias Ureta,Vacio,4.8,15000.0,72000.0,20000.0,96000.0,24000.0,12000.0,12000.0,50% Compartida,MercadoPago,96000.0,0.0,Pagó,Pagó
+70,2026-06-03,Junio,Delia,Picaña,1.3,17000.0,22100.0,21000.0,27300.0,5200.0,2600.0,2600.0,50% Compartida,Efectivo,27300.0,0.0,Pagó,Pagó
+69,2026-06-03,Junio,Delia,Lomo,1.7,25000.0,42500.0,29000.0,49300.0,6800.0,3400.0,3400.0,50% Compartida,Efectivo,52700.0,3400.0,Pagó,A favor AR$3.400
+68,2026-06-03,Junio,Ale S,Bife Ch,2.3,18000.0,41400.0,22000.0,50600.0,9200.0,4600.0,4600.0,50% Compartida,MercadoPago,50600.0,0.0,Pagó,Pagó
+67,2026-06-03,Junio,Ale S,Vacio,5.0,15000.0,75000.0,20000.0,100000.0,25000.0,12500.0,12500.0,50% Compartida,MercadoPago,100000.0,0.0,Pagó,Pagó
+66,2026-06-03,Junio,Ale S,Lomo,1.8,25000.0,45000.0,29000.0,52200.0,7200.0,3600.0,3600.0,50% Compartida,MercadoPago,52200.0,0.0,Pagó,Pagó
+65,2026-06-02,Junio,Lourdes,Peceto,1.3,17000.0,22100.0,19500.0,25350.0,3250.0,1625.0,1625.0,50% Compartida,MercadoPago,25350.0,0.0,Pagó,Pagó
+64,2026-06-02,Junio,Laura Costu,Peceto Feteado,2.5,19000.0,47500.0,21500.0,53750.0,6250.0,3125.0,3125.0,50% Compartida,Efectivo,53800.0,50.0,Pagó,A favor AR$50
+63,2026-06-02,Junio,Adela,Peceto,1.8,17000.0,30600.0,19500.0,35100.0,4500.0,2250.0,2250.0,50% Compartida,MercadoPago,35100.0,0.0,Pagó,Pagó
+62,2026-06-01,Junio,Rodolfo Melazza,Vacio,5.4,15000.0,81000.0,20000.0,108000.0,27000.0,13500.0,13500.0,50% Compartida,MercadoPago,108000.0,0.0,Pagó,Pagó
+61,2026-06-01,Junio,Diego,Vacio,6.3,15000.0,94500.0,20000.0,126000.0,31500.0,15750.0,15750.0,50% Compartida,MercadoPago,126000.0,0.0,Pagó,Pagó
+60,2026-06-01,Junio,Diego,Bife Ch,2.9,18000.0,52200.0,22000.0,63800.0,11600.0,5800.0,5800.0,50% Compartida,MercadoPago,63800.0,0.0,Pagó,Pagó
+59,2026-05-28,Mayo,Juan S,Lomo,1.6,25000.0,40000.0,29000.0,46400.0,6400.0,3200.0,3200.0,50% Compartida,MercadoPago,46400.0,0.0,Pagó,Pagó
+58,2026-05-28,Mayo,Juan S,Picaña,1.0,17000.0,17000.0,21000.0,21000.0,4000.0,2000.0,2000.0,50% Compartida,MercadoPago,21000.0,0.0,Pagó,Pagó
+57,2026-05-28,Mayo,Ana del Pino,Nalga sin Tapa,3.6,16500.0,59400.0,19500.0,70200.0,10800.0,5400.0,5400.0,50% Compartida,MercadoPago,70200.0,0.0,Pagó,Pagó
+56,2026-05-28,Mayo,Ines,Vacio,5.1,15000.0,76500.0,18000.0,91800.0,15300.0,7650.0,7650.0,50% Compartida,Efectivo,91800.0,0.0,Pagó,Pagó
+55,2026-05-28,Mayo,Rochi Melazza,Lomo,1.6,25000.0,40000.0,29000.0,46400.0,6400.0,3200.0,3200.0,50% Compartida,MercadoPago,46400.0,0.0,Pagó,Pagó
+54,2026-05-28,Mayo,Rochi Melazza,Vacio,4.4,15000.0,66000.0,18000.0,79200.0,13200.0,6600.0,6600.0,50% Compartida,MercadoPago,79200.0,0.0,Pagó,Pagó
+53,2026-05-28,Mayo,Rochi Melazza,Picaña,2.3,17000.0,39100.0,21000.0,48300.0,9200.0,4600.0,4600.0,50% Compartida,MercadoPago,48300.0,0.0,Pagó,Pagó
+52,2026-05-28,Mayo,Laura,Colita,0.9,18000.0,16200.0,23000.0,20700.0,4500.0,2250.0,2250.0,50% Compartida,MercadoPago,20700.0,0.0,Pagó,Pagó
+51,2026-05-28,Mayo,Laura,Peceto,1.5,17000.0,25500.0,19500.0,29250.0,3750.0,1875.0,1875.0,50% Compartida,MercadoPago,29250.0,0.0,Pagó,Pagó
+50,2026-05-27,Mayo,Jime,Vacio,4.2,15000.0,63000.0,18000.0,75600.0,12600.0,6300.0,6300.0,50% Compartida,MercadoPago,75600.0,0.0,Pagó,Pagó
+49,2026-05-27,Mayo,Jime,Lomo,1.6,25000.0,40000.0,29000.0,46400.0,6400.0,3200.0,3200.0,50% Compartida,MercadoPago,46400.0,0.0,Pagó,Pagó
+48,2026-05-27,Mayo,Delia,Nalga sin Tapa,3.8,16500.0,62700.0,19500.0,74100.0,11400.0,5700.0,5700.0,50% Compartida,Efectivo,74100.0,0.0,Pagó,Pagó
+47,2026-05-27,Mayo,Lourdes,Nalga sin Tapa,3.5,16500.0,57750.0,19500.0,68250.0,10500.0,5250.0,5250.0,50% Compartida,MercadoPago,68250.0,0.0,Pagó,Pagó
+46,2026-05-27,Mayo,Matias de Blasi,Vacio,4.0,15000.0,60000.0,18000.0,72000.0,12000.0,6000.0,6000.0,50% Compartida,MercadoPago,72000.0,0.0,Pagó,Pagó
+45,2026-05-27,Mayo,Matias de Blasi,Bife Ch,3.2,18000.0,57600.0,22000.0,70400.0,12800.0,6400.0,6400.0,50% Compartida,MercadoPago,70400.0,0.0,Pagó,Pagó
+44,2026-05-26,Mayo,Gaston,Colita,0.9,18000.0,16200.0,23000.0,20700.0,4500.0,2250.0,2250.0,50% Compartida,Efectivo,20700.0,0.0,Pagó,Pagó
+43,2026-05-26,Mayo,Gaston,Lomo,1.8,25000.0,45000.0,29000.0,52200.0,7200.0,3600.0,3600.0,50% Compartida,Efectivo,52300.0,100.0,Pagó,A favor AR$100
+42,2026-05-23,Mayo,Carola,Peceto,1.5,17000.0,25500.0,23000.0,34500.0,9000.0,4500.0,4500.0,50% Compartida,Efectivo,34500.0,0.0,Pagó,Pagó
+41,2026-05-22,Mayo,Breide,Vacio,3.9,15000.0,58500.0,18000.0,70200.0,11700.0,5850.0,5850.0,50% Compartida,MercadoPago,70200.0,0.0,Pagó,Pagó
+40,2026-05-22,Mayo,Tomi,Bife Ch,2.7,18000.0,48600.0,22000.0,59400.0,10800.0,5400.0,5400.0,50% Compartida,MercadoPago,59400.0,0.0,Pagó,Pagó
+39,2026-05-22,Mayo,Muncha,Colita,0.8,18000.0,14400.0,23000.0,18400.0,4000.0,2000.0,2000.0,50% Compartida,Efectivo,18400.0,0.0,Pagó,Pagó
+38,2026-05-22,Mayo,Muncha,Picaña,1.8,17000.0,30600.0,23000.0,41400.0,10800.0,5400.0,5400.0,50% Compartida,Efectivo,41600.0,200.0,Pagó,A favor AR$200
+37,2026-05-21,Mayo,Rodillo,Vacio,4.5,15000.0,67500.0,18000.0,81000.0,13500.0,6750.0,6750.0,50% Compartida,MercadoPago,81000.0,0.0,Pagó,Pagó
+36,2026-05-21,Mayo,Matias,Colita,0.8,18000.0,14400.0,23000.0,18400.0,4000.0,2000.0,2000.0,50% Compartida,MercadoPago,18400.0,0.0,Pagó,Pagó
+35,2026-05-22,Mayo,Annette,Lomo,1.6,25000.0,40000.0,29000.0,46400.0,6400.0,3200.0,3200.0,50% Compartida,MercadoPago,46400.0,0.0,Pagó,Pagó
+34,2026-05-21,Mayo,Adela,Lomo,1.4,25000.0,35000.0,29000.0,40600.0,5600.0,2800.0,2800.0,50% Compartida,MercadoPago,40600.0,0.0,Pagó,Pagó
+33,2026-05-21,Mayo,Adela,Vacio,4.8,15000.0,72000.0,18000.0,86400.0,14400.0,7200.0,7200.0,50% Compartida,MercadoPago,86400.0,0.0,Pagó,Pagó
+32,2026-05-20,Mayo,Jime,Lomo,1.4,25000.0,35000.0,29000.0,40600.0,5600.0,2800.0,2800.0,50% Compartida,MercadoPago,40600.0,0.0,Pagó,Pagó
+31,2026-05-20,Mayo,Isa,Colita,1.0,18000.0,18000.0,23000.0,23000.0,5000.0,2500.0,2500.0,50% Compartida,MercadoPago,23000.0,0.0,Pagó,Pagó
+30,2026-05-20,Mayo,Zurdo,Colita,0.8,18000.0,14400.0,23000.0,18400.0,4000.0,2000.0,2000.0,50% Compartida,Efectivo,18400.0,0.0,Pagó,Pagó
+29,2026-05-20,Mayo,Zurdo,Vacio,3.6,15000.0,54000.0,18000.0,64800.0,10800.0,5400.0,5400.0,50% Compartida,Efectivo,64800.0,0.0,Pagó,Pagó
+28,2026-05-19,Mayo,Mariano,Picaña,2.5,17000.0,42500.0,23000.0,57500.0,15000.0,7500.0,7500.0,50% Compartida,MercadoPago,57500.0,0.0,Pagó,Pagó
+27,2026-05-19,Mayo,Mariano,Colita,0.9,18000.0,16200.0,23000.0,20700.0,4500.0,2250.0,2250.0,50% Compartida,MercadoPago,20700.0,0.0,Pagó,Pagó
+26,2026-05-19,Mayo,Mariano,Vacio,5.0,15000.0,75000.0,18000.0,90000.0,15000.0,7500.0,7500.0,50% Compartida,MercadoPago,90000.0,0.0,Pagó,Pagó
+25,2026-05-19,Mayo,Matias de Blasi,Colita,0.8,18000.0,14400.0,23000.0,18400.0,4000.0,2000.0,2000.0,50% Compartida,MercadoPago,18400.0,0.0,Pagó,Pagó
+24,2026-05-19,Mayo,Matias de Blasi,Vacio,5.4,15000.0,81000.0,18000.0,97200.0,16200.0,8100.0,8100.0,50% Compartida,MercadoPago,97200.0,0.0,Pagó,Pagó
+23,2026-05-16,Mayo,Muncha,Picaña,1.6,17000.0,27200.0,23000.0,36800.0,9600.0,4800.0,4800.0,50% Compartida,Efectivo,73000.0,36200.0,Pagó,Paga $36.200 (tenía a favor $600)
+22,2026-05-15,Mayo,Carlos Rivero,Picaña,2.1,17000.0,35700.0,23000.0,48300.0,12600.0,6300.0,6300.0,50% Compartida,MercadoPago,48300.0,0.0,Pagó,Pagó
+21,2026-05-15,Mayo,Carlos Rivero,Vacio,4.3,15000.0,64500.0,18000.0,77400.0,12900.0,6450.0,6450.0,50% Compartida,MercadoPago,77400.0,0.0,Pagó,Pagó
+20,2026-05-15,Mayo,Carlos Rivero,Colita,0.9,18000.0,16200.0,23000.0,20700.0,4500.0,2250.0,2250.0,50% Compartida,MercadoPago,20700.0,0.0,Pagó,Pagó
+19,2026-05-14,Mayo,Peter,Bife Ch,3.2,18000.0,57600.0,22000.0,70400.0,12800.0,6400.0,6400.0,50% Compartida,MercadoPago,70400.0,0.0,Pagó,Pagó
+18,2026-05-14,Mayo,Peter,Colita,1.6,18000.0,28800.0,23000.0,36800.0,8000.0,4000.0,4000.0,50% Compartida,MercadoPago,36800.0,0.0,Pagó,Pagó
+17,2026-05-14,Mayo,Peter,Lomo,2.7,25000.0,67500.0,29000.0,78300.0,10800.0,5400.0,5400.0,50% Compartida,MercadoPago,78300.0,0.0,Pagó,Pagó
+16,2026-05-14,Mayo,JuanMa,Bife Ch,2.9,18000.0,52200.0,22000.0,63800.0,11600.0,5800.0,5800.0,50% Compartida,MercadoPago,63800.0,0.0,Pagó,Pagó
+15,2026-05-13,Mayo,Tomi Rivero,Vacio,4.5,15000.0,67500.0,18000.0,81000.0,13500.0,6750.0,6750.0,50% Compartida,MercadoPago,81000.0,0.0,Pagó,Pagó a través de Juan
+14,2026-05-13,Mayo,Mariano,Vacio,4.4,15000.0,66000.0,20000.0,88000.0,22000.0,11000.0,11000.0,50% Compartida,MercadoPago,88000.0,0.0,Pagó,Pagó
+13,2026-05-13,Mayo,Mariano,Picaña,2.6,17000.0,44200.0,23000.0,59800.0,15600.0,7800.0,7800.0,50% Compartida,MercadoPago,59800.0,0.0,Pagó,Pagó
+12,2026-05-12,Mayo,Jime,Lomo,1.6,25000.0,40000.0,29000.0,46400.0,6400.0,3200.0,3200.0,50% Compartida,MercadoPago,46400.0,0.0,Pagó,Pagó
+11,2026-05-11,Mayo,Sonia,Colita,1.0,18000.0,18000.0,22000.0,22000.0,4000.0,2000.0,2000.0,50% Compartida,MercadoPago,22000.0,0.0,Pagó,Pagó
+10,2026-05-11,Mayo,Sonia,Picaña,1.2,17000.0,20400.0,22000.0,26400.0,6000.0,3000.0,3000.0,50% Compartida,MercadoPago,26400.0,0.0,Pagó,Pagó
+9,2026-05-11,Mayo,Isa,Colita,0.9,18000.0,16200.0,23000.0,20700.0,4500.0,2250.0,2250.0,50% Compartida,MercadoPago,20700.0,0.0,Pagó,Pagó
+8,2026-05-11,Mayo,Laura,Picaña,1.1,17000.0,18700.0,20000.0,22000.0,3300.0,1650.0,1650.0,50% Compartida,MercadoPago,22000.0,0.0,Pagó,Pagó
+7,2026-05-07,Mayo,Tomi Rivero,Picaña,1.3,17000.0,22100.0,21000.0,27300.0,5200.0,2600.0,2600.0,50% Compartida,MercadoPago,27300.0,0.0,Pagó,Pagó
+6,2026-05-07,Mayo,Ale S,Vacio,4.7,15000.0,70500.0,20000.0,94000.0,23500.0,11750.0,11750.0,50% Compartida,MercadoPago,94000.0,0.0,Pagó,Pagó
+5,2026-05-07,Mayo,Ale S,Lomo,3.6,25000.0,90000.0,29000.0,104400.0,14400.0,7200.0,7200.0,50% Compartida,MercadoPago,104400.0,0.0,Pagó,Pagó
+4,2026-04-29,Abril,Annette,Colita,1.8,18000.0,32400.0,22000.0,39600.0,7200.0,3600.0,3600.0,50% Compartida,MercadoPago,39600.0,0.0,Pagó,Pagó
+3,2026-04-30,Abril,Isa,Colita,1.1,18000.0,19800.0,22000.0,24200.0,4400.0,2200.0,2200.0,50% Compartida,MercadoPago,24200.0,0.0,Pagó,Pagó
+2,2026-04-27,Abril,Muncha,Picaña,1.2,17000.0,20400.0,22000.0,26400.0,6000.0,3000.0,3000.0,50% Compartida,Efectivo,27000.0,600.0,Pagó,A favor AR$600
+1,2026-04-26,Abril,JuanMa,Colita,1.5,18000.0,27000.0,22000.0,33000.0,6000.0,3000.0,3000.0,50% Compartida,MercadoPago,33000.0,0.0,Pagó,Pagó

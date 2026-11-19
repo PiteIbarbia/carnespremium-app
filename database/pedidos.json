@@ -1,0 +1,50 @@
+[
+  {
+    "id": "PED-101",
+    "fecha_pedido": "2026-11-18",
+    "fecha_entrega": "2026-11-21",
+    "cliente": "Ale Silveyra",
+    "corte": "Lomo",
+    "kg_estimados": 3.5,
+    "precio_x_kg": 29000,
+    "estado": "Para Armar",
+    "notas": "Cortar medallones gruesos para el sábado",
+    "telefono": "54 911-5720-1983"
+  },
+  {
+    "id": "PED-102",
+    "fecha_pedido": "2026-11-18",
+    "fecha_entrega": "2026-11-21",
+    "cliente": "Ale Silveyra",
+    "corte": "Vacio",
+    "kg_estimados": 5.0,
+    "precio_x_kg": 20000,
+    "estado": "Para Armar",
+    "notas": "Vacío entero sin desgrasar mucho",
+    "telefono": "54 911-5720-1983"
+  },
+  {
+    "id": "PED-103",
+    "fecha_pedido": "2026-11-19",
+    "fecha_entrega": "2026-11-22",
+    "cliente": "Peter",
+    "corte": "Colita de Cuadril",
+    "kg_estimados": 1.8,
+    "precio_x_kg": 23000,
+    "estado": "Pendiente",
+    "notas": "Entregar después de las 14hs",
+    "telefono": "54 911-5452-4573"
+  },
+  {
+    "id": "PED-104",
+    "fecha_pedido": "2026-11-19",
+    "fecha_entrega": "2026-11-22",
+    "cliente": "Muncha",
+    "corte": "Picaña",
+    "kg_estimados": 1.5,
+    "precio_x_kg": 23000,
+    "estado": "Pendiente",
+    "notas": "Tiene $600 a favor de la compra anterior",
+    "telefono": "54 911-4416-8375"
+  }
+]

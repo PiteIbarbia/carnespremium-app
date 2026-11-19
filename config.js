@@ -10,7 +10,7 @@ const CONFIG = {
   SHEETS_API_URL: "https://script.google.com/macros/s/AKfycbzE0NUBtDRgMQDmtDeUcy4QpO82lutlR-66wvWYpMLUsA2e0-01vcu3LrTFMlIdk7nFXg/exec",
   
   // Nombre del negocio
-  APP_NAME: "Carnes Premium — Juanito & Lucas",
+  APP_NAME: "Carnes Premium",
   
   // Auto-sincronización en segundo plano cada 60 segundos
   AUTO_SYNC_INTERVAL: 60000
