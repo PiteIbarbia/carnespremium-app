@@ -158,6 +158,27 @@ async function loadInitialData() {
       AppState.pedidos = localPedidos ? JSON.parse(localPedidos) : [];
       AppState.proveedor = localProveedor ? JSON.parse(localProveedor) : [];
       AppState.ofertas = localOfertas ? JSON.parse(localOfertas) : [];
+
+      // Integrar ventas históricas/nuevas de ventas.json que no estén en localStorage (asegura que Noviembre siempre aparezca)
+      try {
+        const vtaRes = await fetch('./database/ventas.json').then(r => r.json()).catch(() => []);
+        if (Array.isArray(vtaRes) && vtaRes.length > 0) {
+          const existingIds = new Set(AppState.ventas.map(v => String(v.id)));
+          let added = false;
+          vtaRes.forEach(v => {
+            if (!existingIds.has(String(v.id))) {
+              AppState.ventas.push(v);
+              added = true;
+            }
+          });
+          if (added) {
+            AppState.ventas.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+            saveLocalData();
+          }
+        }
+      } catch (err) {
+        console.warn('Sync fallback ventas.json error:', err);
+      }
     } else {
       const [prodRes, cliRes, vtaRes, pedRes, provRes, ofRes] = await Promise.all([
         fetch('./database/productos.json').then(r => r.json()).catch(() => []),
@@ -181,6 +202,7 @@ async function loadInitialData() {
     calculateClientBalances();
     populateProductSelects();
     populateClientDatalists();
+    populatePeriodFilters(true);
   } catch (error) {
     console.error('Error cargando base de datos inicial:', error);
   }
@@ -256,6 +278,76 @@ function populateClientDatalists() {
     .filter(c => c.nombre)
     .map(c => `<option value="${c.nombre}"></option>`)
     .join('');
+}
+
+// Selector dinámico de Años y Meses para Métricas
+function populatePeriodFilters(resetSelection = false) {
+  const yearSelect = document.getElementById('dashYearFilter');
+  const monthSelect = document.getElementById('dashMonthFilter');
+  if (!yearSelect || !monthSelect) return;
+
+  const prevYear = yearSelect.value;
+  const prevMonth = monthSelect.value;
+
+  // 1. Años presentes en ventas
+  const yearsSet = new Set(['2026']);
+  AppState.ventas.forEach(v => {
+    if (v.fecha) {
+      const y = v.fecha.split('-')[0];
+      if (y && y.length === 4) yearsSet.add(y);
+    }
+  });
+
+  const sortedYears = Array.from(yearsSet).sort((a, b) => b.localeCompare(a));
+  yearSelect.innerHTML = '';
+  yearSelect.appendChild(new Option('Todos los Años', 'all'));
+  sortedYears.forEach(y => {
+    const opt = new Option(`Año ${y}`, y);
+    yearSelect.appendChild(opt);
+  });
+
+  if (!resetSelection && prevYear) {
+    yearSelect.value = prevYear;
+  } else {
+    yearSelect.value = sortedYears.includes('2026') ? '2026' : 'all';
+  }
+
+  // 2. Meses y conteo para el año seleccionado
+  const selectedYear = yearSelect.value;
+  const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const salesCountByMonth = {};
+  mesesNombres.forEach(m => salesCountByMonth[m] = 0);
+
+  AppState.ventas.forEach(v => {
+    const vDate = v.fecha || '';
+    const vYear = vDate ? vDate.split('-')[0] : '2026';
+    if (selectedYear === 'all' || vYear === selectedYear) {
+      let m = v.mes;
+      if (!m && vDate) {
+        const mIdx = parseInt(vDate.split('-')[1], 10);
+        m = mesesNombres[mIdx - 1];
+      }
+      if (m && salesCountByMonth[m] !== undefined) {
+        salesCountByMonth[m]++;
+      }
+    }
+  });
+
+  monthSelect.innerHTML = '';
+  monthSelect.appendChild(new Option(selectedYear === 'all' ? 'Todo el Histórico (Todos los Meses)' : `Todo el Año (${selectedYear})`, 'all'));
+
+  mesesNombres.forEach(m => {
+    const count = salesCountByMonth[m] || 0;
+    const label = count > 0 ? `${m} (${count} ventas)` : m;
+    const opt = new Option(label, m);
+    monthSelect.appendChild(opt);
+  });
+
+  if (!resetSelection && prevMonth) {
+    monthSelect.value = prevMonth;
+  } else {
+    monthSelect.value = (salesCountByMonth['Noviembre'] > 0) ? 'Noviembre' : 'all';
+  }
 }
 
 // ====================================================================
@@ -396,11 +488,57 @@ function setupEventListeners() {
   const provForm = document.getElementById('proveedorForm');
   if (provForm) provForm.addEventListener('submit', handleGuardarMovimientoProveedor);
 
-  // Filtro de Dashboard
-  document.getElementById('dashMonthFilter').addEventListener('change', () => {
-    renderDashboard();
-    renderCharts();
-  });
+  // Filtros de Dashboard (Año y Mes)
+  const monthFilterEl = document.getElementById('dashMonthFilter');
+  if (monthFilterEl) {
+    monthFilterEl.addEventListener('change', () => {
+      renderDashboard();
+      renderCharts();
+    });
+  }
+
+  const yearFilterEl = document.getElementById('dashYearFilter');
+  if (yearFilterEl) {
+    yearFilterEl.addEventListener('change', () => {
+      populatePeriodFilters(false);
+      renderDashboard();
+      renderCharts();
+    });
+  }
+
+  // Botones de Acceso Rápido de Período
+  const btnNov = document.getElementById('btnQuickNov2026');
+  if (btnNov) {
+    btnNov.addEventListener('click', () => {
+      if (yearFilterEl) yearFilterEl.value = '2026';
+      populatePeriodFilters(false);
+      if (monthFilterEl) monthFilterEl.value = 'Noviembre';
+      renderDashboard();
+      renderCharts();
+    });
+  }
+
+  const btnYear = document.getElementById('btnQuickYear2026');
+  if (btnYear) {
+    btnYear.addEventListener('click', () => {
+      if (yearFilterEl) yearFilterEl.value = '2026';
+      populatePeriodFilters(false);
+      if (monthFilterEl) monthFilterEl.value = 'all';
+      renderDashboard();
+      renderCharts();
+    });
+  }
+
+  const btnAll = document.getElementById('btnQuickAllTime');
+  if (btnAll) {
+    btnAll.addEventListener('click', () => {
+      if (yearFilterEl) yearFilterEl.value = 'all';
+      populatePeriodFilters(false);
+      if (monthFilterEl) monthFilterEl.value = 'all';
+      renderDashboard();
+      renderCharts();
+    });
+  }
 
   // Simulador de Metas
   const metaInput = document.getElementById('inputMetaGanancia');
@@ -1761,11 +1899,56 @@ function renderProveedor() {
 // 14. DASHBOARD, MÉTRICAS & CHART.JS
 // ====================================================================
 function renderDashboard() {
-  const filterMonth = document.getElementById('dashMonthFilter').value;
+  const yearSelect = document.getElementById('dashYearFilter');
+  const monthSelect = document.getElementById('dashMonthFilter');
+  const filterYear = yearSelect ? yearSelect.value : '2026';
+  const filterMonth = monthSelect ? monthSelect.value : 'Noviembre';
 
-  let filtered = AppState.ventas;
-  if (filterMonth !== 'all') {
-    filtered = AppState.ventas.filter(v => v.mes && v.mes.toLowerCase() === filterMonth.toLowerCase());
+  const mesesNombres = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+  let filtered = AppState.ventas.filter(v => {
+    const vDate = v.fecha || '';
+    const vYear = vDate ? vDate.split('-')[0] : (v.mes ? '2026' : '');
+
+    let vMes = v.mes;
+    if (!vMes && vDate) {
+      const mNum = parseInt(vDate.split('-')[1], 10);
+      vMes = mesesNombres[mNum] || '';
+    }
+
+    // Filtro por Año
+    if (filterYear !== 'all' && vYear !== filterYear) {
+      return false;
+    }
+
+    // Filtro por Mes
+    if (filterMonth !== 'all' && (!vMes || vMes.toLowerCase() !== filterMonth.toLowerCase())) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // Actualizar cartel indicador de período visible
+  const activePeriodText = document.getElementById('dashActivePeriodText');
+  const badgeSalesCount = document.getElementById('dashPeriodSalesCountBadge');
+
+  let periodStr = '';
+  if (filterYear === 'all' && filterMonth === 'all') {
+    periodStr = 'Histórico Completo (Todos los Años)';
+  } else if (filterYear !== 'all' && filterMonth === 'all') {
+    periodStr = `Año ${filterYear} Completo`;
+  } else if (filterYear === 'all' && filterMonth !== 'all') {
+    periodStr = `Mes de ${filterMonth} (Todos los Años)`;
+  } else {
+    periodStr = `${filterMonth} ${filterYear}`;
+  }
+
+  if (activePeriodText) {
+    activePeriodText.textContent = `Período: ${periodStr}`;
+  }
+  if (badgeSalesCount) {
+    badgeSalesCount.textContent = `${filtered.length} operaciones`;
   }
 
   let totalFacturado = 0;
@@ -2047,8 +2230,15 @@ function calculateProjectionSimulator() {
 function renderCharts() {
   if (typeof Chart === 'undefined') return;
 
-  // 1. Datos mensuales
-  const mesesOrdenados = ["Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre"];
+  const yearSelect = document.getElementById('dashYearFilter');
+  const monthSelect = document.getElementById('dashMonthFilter');
+  const filterYear = yearSelect ? yearSelect.value : '2026';
+  const filterMonth = monthSelect ? monthSelect.value : 'Noviembre';
+
+  const mesesNombres = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+  // 1. Datos mensuales para la evolución del año seleccionado (o todos)
+  const mesesOrdenados = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
   const salesByMonth = {};
   const profitByMonth = {};
 
@@ -2058,11 +2248,27 @@ function renderCharts() {
   });
 
   AppState.ventas.forEach(v => {
-    if (v.mes && salesByMonth[v.mes] !== undefined) {
-      salesByMonth[v.mes] += (v.total_venta || 0);
-      profitByMonth[v.mes] += (v.ganancia_neta || 0);
+    const vDate = v.fecha || '';
+    const vYear = vDate ? vDate.split('-')[0] : '2026';
+
+    if (filterYear === 'all' || vYear === filterYear) {
+      let m = v.mes;
+      if (!m && vDate) {
+        const mIdx = parseInt(vDate.split('-')[1], 10);
+        m = mesesNombres[mIdx];
+      }
+      if (m && salesByMonth[m] !== undefined) {
+        salesByMonth[m] += (parseFloat(v.total_venta) || (v.kg_vendidos * v.precio_x_kg) || 0);
+        profitByMonth[m] += (parseFloat(v.ganancia_neta) || 0);
+      }
     }
   });
+
+  // Mostrar meses con ventas o el rango habitual desde Abril hasta Diciembre
+  const activeMonths = mesesOrdenados.filter(m =>
+    ["Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"].includes(m) ||
+    salesByMonth[m] > 0
+  );
 
   // Gráfico 1: Evolución Mensual
   const ctxMonthly = document.getElementById('monthlyEvolutionChart');
@@ -2072,17 +2278,17 @@ function renderCharts() {
     AppState.charts.monthly = new Chart(ctxMonthly, {
       type: 'bar',
       data: {
-        labels: mesesOrdenados,
+        labels: activeMonths,
         datasets: [
           {
-            label: 'Facturación ($)',
-            data: mesesOrdenados.map(m => salesByMonth[m]),
-            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            label: `Facturación (${filterYear === 'all' ? 'Histórico' : filterYear}) $`,
+            data: activeMonths.map(m => salesByMonth[m]),
+            backgroundColor: 'rgba(59, 130, 246, 0.75)',
             borderRadius: 6
           },
           {
-            label: 'Ganancia Neta ($)',
-            data: mesesOrdenados.map(m => profitByMonth[m]),
+            label: `Ganancia Neta (${filterYear === 'all' ? 'Histórico' : filterYear}) $`,
+            data: activeMonths.map(m => profitByMonth[m]),
             backgroundColor: 'rgba(16, 185, 129, 0.85)',
             borderRadius: 6
           }
@@ -2092,21 +2298,47 @@ function renderCharts() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+          legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${formatMoney(context.raw)}`;
+              }
+            }
+          }
         },
         scales: {
           x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
-          y: { ticks: { color: '#94a3b8' }, grid: { color: '#2a3756' } }
+          y: {
+            ticks: {
+              color: '#94a3b8',
+              callback: function(value) {
+                return '$' + (value >= 1000000 ? (value/1000000).toFixed(1) + 'M' : (value/1000).toFixed(0) + 'k');
+              }
+            },
+            grid: { color: '#2a3756' }
+          }
         }
       }
     });
   }
 
-  // Gráfico 2: Demanda por Corte (Kilos)
+  // Gráfico 2: Demanda por Corte en el período filtrado
   const cutsTally = {};
   AppState.ventas.forEach(v => {
+    const vDate = v.fecha || '';
+    const vYear = vDate ? vDate.split('-')[0] : '2026';
+    let vMes = v.mes;
+    if (!vMes && vDate) {
+      const mNum = parseInt(vDate.split('-')[1], 10);
+      vMes = mesesNombres[mNum] || '';
+    }
+
+    if (filterYear !== 'all' && vYear !== filterYear) return;
+    if (filterMonth !== 'all' && (!vMes || vMes.toLowerCase() !== filterMonth.toLowerCase())) return;
+
     if (v.corte) {
-      cutsTally[v.corte] = (cutsTally[v.corte] || 0) + (v.kg_vendidos || 0);
+      cutsTally[v.corte] = (cutsTally[v.corte] || 0) + (parseFloat(v.kg_vendidos) || 0);
     }
   });
 
@@ -2115,21 +2347,23 @@ function renderCharts() {
   if (ctxCuts) {
     if (AppState.charts.cuts) AppState.charts.cuts.destroy();
 
+    const chartTitle = (filterMonth !== 'all' ? filterMonth : (filterYear !== 'all' ? `Año ${filterYear}` : 'Histórico'));
+
     AppState.charts.cuts = new Chart(ctxCuts, {
       type: 'bar',
       data: {
         labels: sortedCuts.map(c => c[0]),
         datasets: [{
-          label: 'Kilos Vendidos',
+          label: `Kilos Vendidos (${chartTitle})`,
           data: sortedCuts.map(c => c[1]),
           backgroundColor: [
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(139, 92, 246, 0.8)',
-            'rgba(245, 158, 11, 0.8)',
-            'rgba(244, 63, 94, 0.8)',
-            'rgba(20, 184, 166, 0.8)',
-            'rgba(99, 102, 241, 0.8)'
+            'rgba(16, 185, 129, 0.85)',
+            'rgba(59, 130, 246, 0.85)',
+            'rgba(139, 92, 246, 0.85)',
+            'rgba(245, 158, 11, 0.85)',
+            'rgba(244, 63, 94, 0.85)',
+            'rgba(20, 184, 166, 0.85)',
+            'rgba(99, 102, 241, 0.85)'
           ],
           borderRadius: 6
         }]
@@ -2139,7 +2373,14 @@ function renderCharts() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false }
+          legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.raw.toFixed(1)} Kg`;
+              }
+            }
+          }
         },
         scales: {
           x: { ticks: { color: '#94a3b8' }, grid: { color: '#2a3756' } },
@@ -2225,6 +2466,7 @@ async function syncFromSheetsSilently() {
       saveLocalData();
       populateProductSelects();
       populateClientDatalists();
+      populatePeriodFilters(false);
       renderDashboard();
       renderPedidos();
       renderCortesCatalog();

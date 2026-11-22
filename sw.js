@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnes-premium-v2';
+const CACHE_NAME = 'carnes-premium-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,13 @@ const ASSETS = [
   './app.js',
   './config.js',
   './manifest.json',
+  './favicon.ico',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/icon-maskable-192.png',
+  './icons/icon-maskable-512.png',
+  './icons/apple-touch-icon.png',
+  './icons/favicon.png',
   './database/productos.json',
   './database/clientes.json',
   './database/ventas.json',

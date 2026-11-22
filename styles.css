@@ -402,6 +402,33 @@ body {
   height: 260px;
 }
 
+/* PERIOD SELECTOR & BANNER */
+.period-selector-panel {
+  background: linear-gradient(145deg, #162032, #0f172a);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.period-quick-btn {
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+.period-quick-btn:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+.period-quick-btn:active {
+  transform: translateY(0);
+}
+
 /* PROJECTION SIMULATOR BOX */
 .projection-box {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));

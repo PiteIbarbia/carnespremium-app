@@ -6,6 +6,15 @@
   <title>Carnes Premium — Gestión, Pedidos & Ventas</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Carnes Premium">
+  <meta name="application-name" content="Carnes Premium">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#0b0f19">
   <!-- Chart.js para gráficos táctiles interactivos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -264,19 +273,64 @@
          TAB 3: MÉTRICAS, GRÁFICAS & PROYECCIONES
          ========================================== -->
     <section id="tab-dashboard" class="tab-content">
-      <div class="panel" style="padding: 12px 16px; margin-bottom: 14px;">
-        <div style="display: flex; gap: 8px; align-items: center; overflow-x: auto;">
-          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Período:</span>
-          <select id="dashMonthFilter" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
-            <option value="all">Todo el Año (2026)</option>
-            <option value="Abril">Abril</option>
-            <option value="Mayo">Mayo</option>
-            <option value="Junio">Junio</option>
-            <option value="Julio">Julio</option>
-            <option value="Agosto">Agosto</option>
-            <option value="Septiembre">Septiembre</option>
-            <option value="Octubre">Octubre</option>
-          </select>
+      <!-- SELECTOR DE PERÍODO (AÑO Y MES) CON ACCESOS RÁPIDOS -->
+      <div class="period-selector-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.2rem;">📅</span>
+            <div>
+              <div id="dashActivePeriodText" style="font-size: 1rem; font-weight: 800; color: #fff;">
+                Período: Noviembre 2026
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">
+                Visualizando métricas, volumen en kilos y registro histórico
+              </div>
+            </div>
+          </div>
+          <!-- Botones de Acceso Rápido -->
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" id="btnQuickNov2026" class="period-quick-btn" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.4);">
+              ⚡ Noviembre 2026
+            </button>
+            <button type="button" id="btnQuickYear2026" class="period-quick-btn" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.4);">
+              📆 Todo 2026
+            </button>
+            <button type="button" id="btnQuickAllTime" class="period-quick-btn" style="background: rgba(148, 163, 184, 0.15); color: var(--text-main); border-color: rgba(148, 163, 184, 0.3);">
+              🌐 Todo el Histórico
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px;">
+          <!-- Filtro de Año -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label for="dashYearFilter" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Filtrar Año:</label>
+            <select id="dashYearFilter" class="form-control" style="width: auto; min-width: 130px; padding: 6px 12px; font-size: 0.85rem; font-weight: 700;">
+              <option value="2026" selected>Año 2026</option>
+              <option value="all">Todos los Años</option>
+            </select>
+          </div>
+
+          <!-- Filtro de Mes -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label for="dashMonthFilter" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Filtrar Mes:</label>
+            <select id="dashMonthFilter" class="form-control" style="width: auto; min-width: 170px; padding: 6px 12px; font-size: 0.85rem; font-weight: 700;">
+              <option value="all">Todo el Año (2026)</option>
+              <option value="Noviembre" selected>Noviembre</option>
+              <option value="Octubre">Octubre</option>
+              <option value="Septiembre">Septiembre</option>
+              <option value="Agosto">Agosto</option>
+              <option value="Julio">Julio</option>
+              <option value="Junio">Junio</option>
+              <option value="Mayo">Mayo</option>
+              <option value="Abril">Abril</option>
+            </select>
+          </div>
+
+          <!-- Conteo en vivo del período -->
+          <div id="dashPeriodSalesCountBadge" class="badge badge-green" style="margin-left: auto; font-size: 0.8rem; padding: 6px 10px;">
+            0 ventas
+          </div>
         </div>
       </div>
 
