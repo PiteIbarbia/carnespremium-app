@@ -1,0 +1,340 @@
+{
+  "status": "success",
+  "data": {
+    "productos": [],
+    "clientes": [
+      {
+        "cliente": "Adela Igarzabal",
+        "teléfono_contacto": "54 911-3261-4129",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Ale Silveyra",
+        "teléfono_contacto": "54 911-5720-1983",
+        "domicilio": "Victoria Ocampo 738, Beccar",
+        "notas": "Coordinar con Silvina"
+      },
+      {
+        "cliente": "Ana del Pino",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Annette",
+        "teléfono_contacto": "54 911-6227-8629",
+        "domicilio": "Suipacha 2365, Beccar",
+        "notas": ""
+      },
+      {
+        "cliente": "Bettina Helvadjian",
+        "teléfono_contacto": "54 911-4889-5676",
+        "domicilio": "Diagonal Tucumán 671, Martinez",
+        "notas": ""
+      },
+      {
+        "cliente": "Carlos Rivero",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Carola Alfonzo",
+        "teléfono_contacto": "54 911-6369-0104",
+        "domicilio": "",
+        "notas": "Máma Fran Rodillo"
+      },
+      {
+        "cliente": "Cristina Igarzabal",
+        "teléfono_contacto": "54 911-3245-6070",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Delia",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Diego",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Diego Gonzalez Bonorino",
+        "teléfono_contacto": "54 911-4041-3480",
+        "domicilio": "Nicolás Avellaneda 2262, San Isidro",
+        "notas": ""
+      },
+      {
+        "cliente": "Ezequiel",
+        "teléfono_contacto": "54 911-6589-4002",
+        "domicilio": "Barrio Sunny, Tigre",
+        "notas": "Lote 24"
+      },
+      {
+        "cliente": "Fran Rodillo",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Gaston",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Gaston Uzin",
+        "teléfono_contacto": "54 911-3245-7669",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Inés Igarzabal",
+        "teléfono_contacto": "54 911-6494-8444",
+        "domicilio": "Jacinto Diaz 2080, San Isidro",
+        "notas": ""
+      },
+      {
+        "cliente": "Isabel Lopez Lacarrere",
+        "teléfono_contacto": "54 911-4444-7034",
+        "domicilio": "Barrio Sunny, Tigre",
+        "notas": "Lote 49"
+      },
+      {
+        "cliente": "Jaime Lorenzo",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Jime Gonzalez Mathys",
+        "teléfono_contacto": "54 911-3090-2166",
+        "domicilio": "Rosario de Santa Fe 649, Beccar",
+        "notas": ""
+      },
+      {
+        "cliente": "Joaquin Reichart",
+        "teléfono_contacto": "56 9 9851-6389",
+        "domicilio": "Bolivar 290, Beccar",
+        "notas": "Casa de los padres"
+      },
+      {
+        "cliente": "Juan Sw",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Juanito",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "JuanMa",
+        "teléfono_contacto": "54 911-3209-0844",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Laura Guidi",
+        "teléfono_contacto": "54 911-3930-7437",
+        "domicilio": "J. F. Kennedy, Victoria",
+        "notas": "Costurera/Limpieza"
+      },
+      {
+        "cliente": "Laura Igarzabal",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Lourdes",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Maria Eizayaga",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Mariano",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Matias de Blasi",
+        "teléfono_contacto": "54 911-6299-2667",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Matias Sonzini",
+        "teléfono_contacto": "54 911-3593-2039",
+        "domicilio": "Ohiggins 450, San Isidro",
+        "notas": "1A"
+      },
+      {
+        "cliente": "Matias Ureta",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Muncha",
+        "teléfono_contacto": "54 911-4416-8375",
+        "domicilio": "Murature 732, San Isidro",
+        "notas": "Mamá de Naco y Juan Ortega"
+      },
+      {
+        "cliente": "Pato O'Reilly",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Patricio Cabrini",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Peter",
+        "teléfono_contacto": "54 911-5452-4573",
+        "domicilio": "Vicente Fidel López 388, Martinez",
+        "notas": "2A"
+      },
+      {
+        "cliente": "Rochi Melazza",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Rodolfo Melazza",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Santi Breide",
+        "teléfono_contacto": "54 911-3904-5214",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Sonia Haddad",
+        "teléfono_contacto": "507 6354-0567",
+        "domicilio": "Monseñor Alberti 474, San Isidro",
+        "notas": "3A"
+      },
+      {
+        "cliente": "Tomas Koch",
+        "teléfono_contacto": "54 911-3004-1596",
+        "domicilio": "Comandante Luis Piedrabuena 3311, Victoria",
+        "notas": ""
+      },
+      {
+        "cliente": "Tomi Rivero",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Tomi Suarez",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Ezequiel Cardoni",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Nacho Gabancho",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Amapro Nogueira",
+        "teléfono_contacto": "54 911-6959-1241",
+        "domicilio": "Juan Jose Diaz 1068, San Isidro",
+        "notas": "Casa 1"
+      },
+      {
+        "cliente": "Fernadno Zambra",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Sole Ezcurra",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Santi Perrota",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Agustin Reichart",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "María Aramburu Igarzabal",
+        "teléfono_contacto": "54 911-6208-0177",
+        "domicilio": "Pacheco Golf",
+        "notas": "Lote 77"
+      },
+      {
+        "cliente": "Marcos Bruno",
+        "teléfono_contacto": "54 911-3676-9054",
+        "domicilio": "Santa Catalina 6105, en victoria",
+        "notas": "Barrio Cerrado Greenlands Lote 5"
+      },
+      {
+        "cliente": "Jorge Galache",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Santiago Reichart",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Francisco Vazquez (Pela)",
+        "teléfono_contacto": "",
+        "domicilio": "",
+        "notas": ""
+      },
+      {
+        "cliente": "Lucia Fernandez",
+        "teléfono_contacto": "",
+        "domicilio": "Santa Catalina 6105, en victoria",
+        "notas": "Lote 71"
+      }
+    ],
+    "ventas": [],
+    "lucas": []
+  }
+}
