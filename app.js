@@ -50,6 +50,21 @@ const formatMoney = (val) => {
   }).format(val || 0);
 };
 
+// Formateador de fechas a formato estándar argentino DD/MM/AAAA
+const formatDateAR = (dateStr) => {
+  if (!dateStr) return '';
+  if (typeof dateStr !== 'string') dateStr = String(dateStr);
+  if (dateStr.includes('/')) return dateStr;
+  const parts = dateStr.split('T')[0].split('-');
+  if (parts.length === 3) {
+    const [y, m, d] = parts;
+    if (y.length === 4) {
+      return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+    }
+  }
+  return dateStr;
+};
+
 // ====================================================================
 // INICIALIZACIÓN DE LA APLICACIÓN AL CARGAR EL DOM
 // ====================================================================
@@ -223,21 +238,98 @@ function normalizeClient(c) {
   };
 }
 
+function normalizeProduct(p) {
+  const costo = Number(p.costo_kg || p.costo_x_kg || p['costo_x_kg_(lucas)'] || p.costo || 0);
+  const precio = Number(p.precio_kg || p.precio_x_kg || p['precio_x_kg_(vta)'] || p.precio || 0);
+  const ganancia = Number(p.ganancia_kg || p.ganancia_x_kg || 0) || (precio - costo);
+
+  return {
+    id: p.id || p.corte || String(Date.now() + Math.random()),
+    corte: (p.corte || p.producto || p.nombre || '').trim(),
+    costo_kg: costo,
+    precio_kg: precio,
+    ganancia_kg: ganancia,
+    notas: p.notas || ''
+  };
+}
+
+function normalizeVenta(v) {
+  const total = Number(v.total_venta || v.total_ticket || (Number(v.kg_vendidos || 0) * Number(v.precio_x_kg || 0)) || 0);
+  const recibido = v.monto_recibido !== undefined && v.monto_recibido !== '' ? Number(v.monto_recibido) : total;
+  // Convención contable: saldo_cliente = total_venta - monto_recibido
+  // Positivo (+) = Debe el cliente; Negativo (-) = A favor del cliente; Cero = Pagó exacto
+  let saldo = v.saldo_cliente !== undefined && v.saldo_cliente !== '' ? Number(v.saldo_cliente) : (total - recibido);
+
+  return {
+    id: v.id || v.id_ticket || String(Date.now() + Math.random()),
+    id_ticket: v.id_ticket || v.id || '',
+    fecha: v.fecha ? String(v.fecha).split('T')[0] : '',
+    mes: v.mes || '',
+    cliente: (v.cliente || '').trim(),
+    corte: (v.corte || '').trim(),
+    kg_vendidos: Number(v.kg_vendidos || v.kilos || 0),
+    costo_x_kg: Number(v.costo_x_kg || v.costo_kg || 0),
+    costo_total: Number(v.costo_total || 0),
+    precio_x_kg: Number(v.precio_x_kg || v.precio_kg || 0),
+    subtotal_venta: Number(v.subtotal_venta || (Number(v.kg_vendidos || 0) * Number(v.precio_x_kg || 0))),
+    descuento_ticket: Number(v.descuento_ticket || v.descuento || 0),
+    total_ticket: Number(v.total_ticket || total),
+    total_venta: total,
+    margen_bruto: Number(v.margen_bruto || (total - Number(v.costo_total || 0))),
+    ganancia_neta: Number(v.ganancia_neta || 0),
+    etapa_margen: v.etapa_margen || '',
+    medio_pago: v.medio_pago || 'MercadoPago',
+    cobro_efectivo: Number(v.cobro_efectivo || 0),
+    cobro_digital: Number(v.cobro_digital || 0),
+    monto_recibido: recibido,
+    saldo_cliente: saldo,
+    estado_pago: saldo === 0 ? 'Pagó' : (saldo < 0 ? 'A favor' : 'Saldo Pendiente'),
+    observaciones: v.observaciones || ''
+  };
+}
+
+function normalizeMovimientoLucas(m) {
+  const pago = Number(m.pague || m.pago_a_proveedor || m.pago || 0);
+  const costo = Number(m.costo_carne || m['le_debo_esto_tiene_q_ser_igual_a_tu_costo_'] || m.costo || 0);
+  const saldo = Number(m.saldo || 0);
+
+  return {
+    id: m.id || String(Date.now() + Math.random()),
+    fecha: m.fecha ? String(m.fecha).split('T')[0] : '',
+    concepto: m.concepto || 'Movimiento',
+    medio_pago: m.medio_d_pago || m.medio_pago || 'MercadoPago',
+    pago_a_proveedor: pago,
+    costo_carne: costo,
+    saldo: saldo,
+    notas: m.notas || ''
+  };
+}
+
 function calculateClientBalances() {
   const balanceMap = {};
+  const processedTickets = new Set();
+
   AppState.ventas.forEach(v => {
     if (!v.cliente) return;
     const key = v.cliente.trim().toLowerCase();
-    const saldo = Number(v.saldo_cliente) || 0;
-    balanceMap[key] = (balanceMap[key] || 0) + saldo;
+
+    // Si la venta tiene id_ticket, solo sumamos el saldo una sola vez por ticket completo
+    if (v.id_ticket) {
+      if (!processedTickets.has(v.id_ticket)) {
+        processedTickets.add(v.id_ticket);
+        const saldo = Number(v.saldo_cliente) || 0;
+        balanceMap[key] = (balanceMap[key] || 0) + saldo;
+      }
+    } else {
+      const saldo = Number(v.saldo_cliente) || 0;
+      balanceMap[key] = (balanceMap[key] || 0) + saldo;
+    }
   });
 
   AppState.clientes.forEach(c => {
     if (!c.nombre) return;
     const key = c.nombre.trim().toLowerCase();
-    if (balanceMap[key] !== undefined) {
-      c.saldo = balanceMap[key];
-    }
+    c.saldo = balanceMap[key] !== undefined ? balanceMap[key] : 0;
   });
 }
 
@@ -407,17 +499,19 @@ function setupEventListeners() {
       badge.innerHTML = `📞 ${match.telefono || 'Sin teléfono'} | 📍 ${match.domicilio || 'Sin dirección'}`;
 
       if (match.saldo > 0) {
-        walletBox.style.display = 'flex';
-        walletBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-        walletBox.style.background = 'rgba(16, 185, 129, 0.15)';
-        btnApply.style.display = 'inline-block';
-        walletText.innerHTML = `🟢 <strong>${match.nombre}</strong> tiene <strong>${formatMoney(match.saldo)}</strong> a favor en su billetera.`;
-      } else if (match.saldo < 0) {
+        // Saldo positivo = Cliente debe dinero
         walletBox.style.display = 'flex';
         walletBox.style.borderColor = 'rgba(244, 63, 94, 0.4)';
         walletBox.style.background = 'rgba(244, 63, 94, 0.15)';
         btnApply.style.display = 'none';
-        walletText.innerHTML = `🔴 <strong>${match.nombre}</strong> adeuda <strong>${formatMoney(Math.abs(match.saldo))}</strong> de compras anteriores.`;
+        walletText.innerHTML = `🔴 <strong>${match.nombre}</strong> adeuda <strong>${formatMoney(match.saldo)}</strong> de compras anteriores.`;
+      } else if (match.saldo < 0) {
+        // Saldo negativo = Saldo a favor del cliente (crédito)
+        walletBox.style.display = 'flex';
+        walletBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        walletBox.style.background = 'rgba(16, 185, 129, 0.15)';
+        btnApply.style.display = 'inline-block';
+        walletText.innerHTML = `🟢 <strong>${match.nombre}</strong> tiene <strong>${formatMoney(Math.abs(match.saldo))}</strong> a favor en su billetera.`;
       } else {
         walletBox.style.display = 'none';
       }
@@ -430,12 +524,13 @@ function setupEventListeners() {
 
   // Botón para aplicar crédito a favor del cliente
   document.getElementById('btnApplyWalletCredit').addEventListener('click', () => {
-    if (AppState.selectedClient && AppState.selectedClient.saldo > 0) {
+    if (AppState.selectedClient && AppState.selectedClient.saldo < 0) {
+      const creditoDisponible = Math.abs(AppState.selectedClient.saldo);
       const c = calculatePosTotals();
-      const montoNeto = Math.max(0, c.totalVenta - AppState.selectedClient.saldo);
+      const montoNeto = Math.max(0, c.totalVenta - creditoDisponible);
       montoRecibidoInput.value = montoNeto;
       calculatePosTotals();
-      alert(`Se aplicó el crédito de ${formatMoney(AppState.selectedClient.saldo)}. Saldo a abonar: ${formatMoney(montoNeto)}`);
+      alert(`Se aplicó el crédito de ${formatMoney(creditoDisponible)}. Saldo a abonar: ${formatMoney(montoNeto)}`);
     }
   });
 
@@ -621,6 +716,10 @@ function setupEventListeners() {
   });
 
   document.getElementById('btnSyncFromSheets').addEventListener('click', syncFromSheets);
+  const btnExportAll = document.getElementById('btnExportAllToSheets');
+  if (btnExportAll) {
+    btnExportAll.addEventListener('click', exportarTodasLasVentasASheets);
+  }
   document.getElementById('btnExportJson').addEventListener('click', exportarBackupJSON);
 }
 
@@ -795,13 +894,13 @@ function calculatePosTotals() {
 
   const saldoBox = document.getElementById('saldoDiferenciaBox');
   if (totalVenta > 0 && !isNaN(montoRecibido)) {
-    const dif = montoRecibido - totalVenta;
+    const dif = totalVenta - montoRecibido;
     if (dif === 0) {
       saldoBox.innerHTML = '<span style="color: var(--accent-green);">✅ Pagó monto exacto.</span>';
     } else if (dif > 0) {
-      saldoBox.innerHTML = `<span style="color: var(--accent-green);">🟢 Saldo a favor del cliente: +${formatMoney(dif)}</span>`;
+      saldoBox.innerHTML = `<span style="color: var(--accent-rose);">🔴 Saldo adeudado por cliente: Debe ${formatMoney(dif)}</span>`;
     } else {
-      saldoBox.innerHTML = `<span style="color: var(--accent-rose);">🔴 Saldo adeudado por cliente: ${formatMoney(dif)}</span>`;
+      saldoBox.innerHTML = `<span style="color: var(--accent-green);">🟢 Saldo a favor del cliente: +${formatMoney(Math.abs(dif))}</span>`;
     }
   } else {
     saldoBox.innerHTML = '';
@@ -854,7 +953,7 @@ async function handleGuardarVenta(e) {
   }
 
   const motivoDescuento = document.getElementById('posMotivoDescuento').value.trim();
-  const saldoCliente = c.montoRecibido - c.totalVenta;
+  const saldoCliente = c.totalVenta - c.montoRecibido;
   const meses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
   const mIdx = parseInt(c.fecha.split('-')[1], 10);
   const mes = meses[mIdx] || 'Noviembre';
@@ -879,7 +978,7 @@ async function handleGuardarVenta(e) {
     cobro_digital: c.cobroDigital,
     monto_recibido: c.montoRecibido,
     saldo_cliente: saldoCliente,
-    estado_pago: saldoCliente >= 0 ? 'Pagó' : 'Saldo Pendiente',
+    estado_pago: saldoCliente === 0 ? 'Pagó' : (saldoCliente < 0 ? 'A favor' : 'Saldo Pendiente'),
     observaciones: motivoDescuento
   };
 
@@ -913,7 +1012,7 @@ async function handleGuardarVenta(e) {
       cobro_digital: c.cobroDigital,
       monto_recibido: c.montoRecibido,
       saldo_cliente: saldoCliente,
-      estado_pago: saldoCliente >= 0 ? 'Pagó' : 'Saldo Pendiente',
+      estado_pago: saldoCliente === 0 ? 'Pagó' : (saldoCliente < 0 ? 'A favor' : 'Saldo Pendiente'),
       observaciones: motivoDescuento
     });
   });
@@ -983,7 +1082,7 @@ function handleEnviarWhatsApp() {
       cobro_efectivo: c.cobroEfectivo,
       cobro_digital: c.cobroDigital,
       monto_recibido: c.montoRecibido,
-      saldo_cliente: c.montoRecibido - c.totalVenta
+      saldo_cliente: c.totalVenta - c.montoRecibido
     };
   }
 
@@ -995,8 +1094,8 @@ function handleEnviarWhatsApp() {
   const tel = cliente ? (cliente.telefono_whatsapp || cliente.telefono.replace(/\D/g, '')) : '';
 
   let saldoTxt = '✅ *Saldo:* Al día ($0)';
-  if (t.saldo_cliente > 0) saldoTxt = `🟢 *Saldo a tu favor:* +${formatMoney(t.saldo_cliente)}`;
-  if (t.saldo_cliente < 0) saldoTxt = `⚠️ *Saldo pendiente:* ${formatMoney(Math.abs(t.saldo_cliente))}`;
+  if (t.saldo_cliente > 0) saldoTxt = `⚠️ *Saldo pendiente:* Debe ${formatMoney(t.saldo_cliente)}`;
+  if (t.saldo_cliente < 0) saldoTxt = `🟢 *Saldo a tu favor:* +${formatMoney(Math.abs(t.saldo_cliente))}`;
 
   let detalleItems = t.items.map(it => `  • ${it.kg_vendidos} Kg de ${it.corte} (${formatMoney(it.precio_x_kg)}/Kg) → *${formatMoney(it.subtotal)}*`).join('\n');
 
@@ -1014,7 +1113,7 @@ function handleEnviarWhatsApp() {
 `🥩 *CARNES PREMIUM*
 ----------------------------------------
 👤 *Cliente:* ${t.cliente}
-📅 *Fecha:* ${t.fecha}
+📅 *Fecha:* ${formatDateAR(t.fecha)}
 🧾 *Ticket:* #${t.id_ticket}
 🛒 *Detalle del Pedido:*
 ${detalleItems}
@@ -1045,10 +1144,10 @@ function renderTicketModal(ticketData = null) {
     total_venta: calculatePosTotals().totalVenta,
     medio_pago: document.getElementById('posMedioPago').value,
     monto_recibido: calculatePosTotals().montoRecibido,
-    saldo_cliente: calculatePosTotals().montoRecibido - calculatePosTotals().totalVenta
+    saldo_cliente: calculatePosTotals().totalVenta - calculatePosTotals().montoRecibido
   };
 
-  document.getElementById('ticketFecha').textContent = `${t.fecha} — #${t.id_ticket}`;
+  document.getElementById('ticketFecha').textContent = `${formatDateAR(t.fecha)} — #${t.id_ticket}`;
 
   let itemsHtml = '';
   if (t.items && t.items.length > 0) {
@@ -1079,7 +1178,7 @@ function renderTicketModal(ticketData = null) {
     <div class="ticket-row"><span>ABONADO:</span> <span>${formatMoney(t.monto_recibido)}</span></div>
     <div class="ticket-row">
       <span>SALDO:</span>
-      <span>${t.saldo_cliente === 0 ? '$ 0 (Al día)' : (t.saldo_cliente > 0 ? `+${formatMoney(t.saldo_cliente)} a favor` : `${formatMoney(t.saldo_cliente)} pendiente`)}</span>
+      <span>${t.saldo_cliente === 0 ? '$ 0 (Al día)' : (t.saldo_cliente > 0 ? `Debe ${formatMoney(t.saldo_cliente)}` : `+${formatMoney(Math.abs(t.saldo_cliente))} a favor`)}</span>
     </div>
   `;
 }
@@ -1208,7 +1307,7 @@ function renderPedidos() {
         <div class="item-title">
           ${p.cliente} <span class="badge ${badgeClass}" style="margin-left: 6px;">${p.estado}</span>
         </div>
-        <div class="item-desc">📅 Entrega: <strong>${p.fecha_entrega}</strong> | 🥩 ${p.corte} (~${p.kg_estimados} Kg)</div>
+        <div class="item-desc">📅 Entrega: <strong>${formatDateAR(p.fecha_entrega)}</strong> | 🥩 ${p.corte} (~${p.kg_estimados} Kg)</div>
         ${p.notas ? `<div style="font-size: 0.75rem; color: var(--accent-amber);">📝 ${p.notas}</div>` : ''}
       </div>
       <div class="item-actions">
@@ -1218,7 +1317,7 @@ function renderPedidos() {
           </button>
         ` : ''}
         ${p.telefono ? `
-          <a href="https://wa.me/${p.telefono.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${p.cliente}! Tu pedido de ${p.corte} para el ${p.fecha_entrega} está agendado en Carnes Premium.`)}" target="_blank" class="badge badge-green" style="text-decoration: none; padding: 6px 10px;">
+          <a href="https://wa.me/${p.telefono.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${p.cliente}! Tu pedido de ${p.corte} para el ${formatDateAR(p.fecha_entrega)} está agendado en Carnes Premium.`)}" target="_blank" class="badge badge-green" style="text-decoration: none; padding: 6px 10px;">
             📲 WA
           </a>
         ` : ''}
@@ -1625,8 +1724,9 @@ function renderClientes(query = '') {
     item.className = 'list-item';
 
     let saldoBadge = '';
-    if (c.saldo > 0) saldoBadge = `<span class="badge badge-green">+${formatMoney(c.saldo)} a favor</span>`;
-    if (c.saldo < 0) saldoBadge = `<span class="badge badge-red">Debe ${formatMoney(Math.abs(c.saldo))}</span>`;
+    if (c.saldo > 0) saldoBadge = `<span class="badge badge-red">Debe ${formatMoney(c.saldo)}</span>`;
+    else if (c.saldo < 0) saldoBadge = `<span class="badge badge-green">+${formatMoney(Math.abs(c.saldo))} a favor</span>`;
+    else saldoBadge = `<span class="badge badge-green">Al día ($0)</span>`;
 
     item.innerHTML = `
       <div class="item-main" onclick="abrirFichaCliente('${c.nombre.replace(/'/g, "\\'")}')">
@@ -1762,14 +1862,14 @@ window.abrirFichaCliente = function(nombreCliente) {
 
   const saldoEl = document.getElementById('clientModalSaldo');
   if (cliente.saldo > 0) {
-    saldoEl.textContent = `+${formatMoney(cliente.saldo)}`;
-    saldoEl.style.color = 'var(--accent-green)';
-  } else if (cliente.saldo < 0) {
-    saldoEl.textContent = `-${formatMoney(Math.abs(cliente.saldo))}`;
+    saldoEl.textContent = `Debe ${formatMoney(cliente.saldo)}`;
     saldoEl.style.color = 'var(--accent-rose)';
+  } else if (cliente.saldo < 0) {
+    saldoEl.textContent = `+${formatMoney(Math.abs(cliente.saldo))} a favor`;
+    saldoEl.style.color = 'var(--accent-green)';
   } else {
     saldoEl.textContent = '$ 0 (Al día)';
-    saldoEl.style.color = '#fff';
+    saldoEl.style.color = 'var(--accent-green)';
   }
 
   // Enlace WhatsApp
@@ -1800,7 +1900,7 @@ window.abrirFichaCliente = function(nombreCliente) {
       row.style.padding = '8px 10px';
       row.innerHTML = `
         <div class="item-main">
-          <div style="font-weight: 700; font-size: 0.85rem;">${v.fecha} — ${v.corte || 'Carne'}</div>
+          <div style="font-weight: 700; font-size: 0.85rem;">${formatDateAR(v.fecha)} — ${v.corte || 'Carne'}</div>
           <div style="font-size: 0.75rem; color: var(--text-muted);">${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}</div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -1846,6 +1946,16 @@ function handleGuardarMovimientoProveedor(e) {
   saveLocalData();
   renderProveedor();
 
+  // Sincronizar movimiento con Google Sheets vía POST
+  if (AppState.sheetsApiUrl) {
+    updateStatusBadge('syncing');
+    fetch(AppState.sheetsApiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'guardar_proveedor', movimiento: nuevoMov })
+    }).then(r => r.json()).then(() => updateStatusBadge('connected')).catch(() => updateStatusBadge('offline'));
+  }
+
   alert('Movimiento de proveedor registrado.');
   document.getElementById('proveedorForm').reset();
   initDateDisplays();
@@ -1879,7 +1989,7 @@ function renderProveedor() {
     item.innerHTML = `
       <div class="item-main">
         <div class="item-title">${l.concepto || 'Movimiento'}</div>
-        <div class="item-desc">${l.fecha} | ${l.medio_pago || 'MercadoPago'}</div>
+        <div class="item-desc">${formatDateAR(l.fecha)} | ${l.medio_pago || 'MercadoPago'}</div>
         ${l.notas ? `<div style="font-size: 0.75rem; color: var(--text-muted);">${l.notas}</div>` : ''}
       </div>
       <div class="item-actions" style="text-align: right; flex-direction: column; align-items: flex-end;">
@@ -1978,9 +2088,9 @@ function renderDashboard() {
   if (filterPago === 'pagados') {
     listFiltered = listFiltered.filter(v => (v.saldo_cliente || 0) === 0);
   } else if (filterPago === 'pendientes') {
-    listFiltered = listFiltered.filter(v => (v.saldo_cliente || 0) < 0);
-  } else if (filterPago === 'favor') {
     listFiltered = listFiltered.filter(v => (v.saldo_cliente || 0) > 0);
+  } else if (filterPago === 'favor') {
+    listFiltered = listFiltered.filter(v => (v.saldo_cliente || 0) < 0);
   }
 
   if (searchVentaQuery) {
@@ -2011,10 +2121,10 @@ function renderDashboard() {
 
     let saldoBadge = '';
     const saldo = Number(v.saldo_cliente) || 0;
-    if (saldo < 0) {
-      saldoBadge = `<span class="badge badge-red">Debe ${formatMoney(Math.abs(saldo))}</span>`;
-    } else if (saldo > 0) {
-      saldoBadge = `<span class="badge badge-green">+${formatMoney(saldo)} a favor</span>`;
+    if (saldo > 0) {
+      saldoBadge = `<span class="badge badge-red">Debe ${formatMoney(saldo)}</span>`;
+    } else if (saldo < 0) {
+      saldoBadge = `<span class="badge badge-green">+${formatMoney(Math.abs(saldo))} a favor</span>`;
     } else {
       saldoBadge = `<span class="badge badge-green">Pagó exacto</span>`;
     }
@@ -2027,7 +2137,7 @@ function renderDashboard() {
           ${v.cliente} <span style="font-size: 0.75rem; color: var(--accent-blue); font-weight: normal;">#${ticketId}</span>
         </div>
         <div class="item-desc">
-          ${v.fecha} | ${v.corte ? v.corte + ' • ' : ''}${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}
+          ${formatDateAR(v.fecha)} | ${v.corte ? v.corte + ' • ' : ''}${v.kg_vendidos ? v.kg_vendidos + ' Kg • ' : ''}${v.medio_pago || 'MP'}
         </div>
         ${v.observaciones ? `<div style="font-size: 0.75rem; color: var(--accent-amber); margin-top: 2px;">📌 ${v.observaciones}</div>` : ''}
       </div>
@@ -2110,7 +2220,7 @@ function handleSaveSaleEdit(e) {
     gananciaNeta = margenTotal * 0.5;
   }
 
-  const saldoCliente = montoRecibido - totalVenta;
+  const saldoCliente = totalVenta - montoRecibido;
 
   v.fecha = fecha;
   v.mes = mes;
@@ -2128,7 +2238,7 @@ function handleSaveSaleEdit(e) {
   v.medio_pago = medioPago;
   v.monto_recibido = montoRecibido;
   v.saldo_cliente = saldoCliente;
-  v.estado_pago = saldoCliente >= 0 ? 'Pagó' : 'Saldo Pendiente';
+  v.estado_pago = saldoCliente === 0 ? 'Pagó' : (saldoCliente < 0 ? 'A favor' : 'Saldo Pendiente');
   v.observaciones = obs;
 
   calculateClientBalances();
@@ -2195,7 +2305,7 @@ window.verTicketHistorico = function(idTicket) {
     total_venta: total,
     medio_pago: first.medio_pago,
     monto_recibido: recibido,
-    saldo_cliente: first.saldo_cliente || (recibido - total)
+    saldo_cliente: first.saldo_cliente !== undefined ? first.saldo_cliente : (total - recibido)
   };
 
   AppState.lastSavedTicket = ticketData;
@@ -2445,18 +2555,20 @@ async function syncFromSheetsSilently() {
     const json = await res.json();
 
     if (json.status === 'success' && json.data) {
-      if (json.data.productos && json.data.productos.length > 0) AppState.productos = json.data.productos;
+      if (json.data.productos && json.data.productos.length > 0) {
+        AppState.productos = json.data.productos.map(normalizeProduct);
+      }
       if (json.data.clientes && json.data.clientes.length > 0) {
         AppState.clientes = json.data.clientes.map(normalizeClient);
       }
       if (json.data.ventas && json.data.ventas.length > 0) {
-        AppState.ventas = json.data.ventas;
+        AppState.ventas = json.data.ventas.map(normalizeVenta);
       }
       if (json.data.pedidos && json.data.pedidos.length > 0) {
         AppState.pedidos = json.data.pedidos;
       }
       if (json.data.lucas && json.data.lucas.length > 0) {
-        AppState.proveedor = json.data.lucas;
+        AppState.proveedor = json.data.lucas.map(normalizeMovimientoLucas);
       }
       if (json.data.ofertas && json.data.ofertas.length > 0) {
         AppState.ofertas = json.data.ofertas;
@@ -2510,4 +2622,33 @@ function exportarBackupJSON() {
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
+}
+
+async function exportarTodasLasVentasASheets() {
+  if (!AppState.sheetsApiUrl) {
+    alert('Ingresa y guarda la URL de la Web App en el campo superior.');
+    return;
+  }
+  if (!confirm(`¿Deseas sincronizar todo el histórico de ventas (${AppState.ventas.length} registros) con la hoja VENTAS de Google Sheets?\n\nEsto cargará todos los registros en tu planilla oficial.`)) {
+    return;
+  }
+  updateStatusBadge('syncing');
+  try {
+    const res = await fetch(AppState.sheetsApiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'sincronizar_todo_historico', ventas: AppState.ventas })
+    });
+    const json = await res.json();
+    if (json.status === 'success') {
+      alert(`¡Éxito! Se sincronizaron ${AppState.ventas.length} ventas en la hoja VENTAS de Google Sheets.`);
+      updateStatusBadge('connected');
+    } else {
+      alert(`Aviso de Google Sheets: ${json.message}`);
+      updateStatusBadge('connected');
+    }
+  } catch (err) {
+    alert(`Error al conectar con Google Sheets: ${err.message}`);
+    updateStatusBadge('offline');
+  }
 }
